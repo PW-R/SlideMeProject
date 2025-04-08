@@ -8,7 +8,7 @@ function DriverNavBar() {
 
             <div className="driverNavbar_box">
                 <Link to ='#'>
-                <button></button>
+                <button>Home</button>
                 </Link>
             </div>
         </div>

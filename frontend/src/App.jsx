@@ -27,6 +27,7 @@ function App() {
       <div className="app-router">
         <HashRouter>
           <Routes>
+<<<<<<< HEAD
             <Route path="/" element={<DriverorUser />}>
               <Route path="UserHome" element={<UserHome/>} />
               <Route path="LoginUser" element={<LoginUser />} />
@@ -37,6 +38,18 @@ function App() {
               <Route path="ListDriver" element={<ListDriver />} />
             </Route>
           </Routes>
+=======
+  <Route path="/" element={<DriverorUser />} />
+  <Route path="/LoginDriver" element={<LoginDriver />} />
+  <Route path="/LoginUser" element={<LoginUser />} />
+  <Route path="/UserHome" element={<UserHome />} />
+  <Route path="/ShopReccommend" element={<ShopReccommend />} />
+  <Route path="/OrderInfoInputPage" element={<InputInfo />} />
+  <Route path="/HomeCustomize" element={<HomeCustomize />} />
+  <Route path="/ListDriver" element={<ListDriver />} />
+</Routes>
+
+>>>>>>> a9c1e55944e6823fea38ff9ce0a035cb970f42d6
         </HashRouter>
 
         {/* <h1 className="text-red-500">TailwindCSS! RED</h1> */}

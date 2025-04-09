@@ -4,7 +4,7 @@ function LoginUser() {
     return ( <div>
         <h1>ควยยยยยยยยยยยย</h1>
         <Link to="/UserHome">
-          <button>LOGINDRIVER</button>
+          <button>ไปฝั่งคนใช้โว้ยยยยยยยยย</button>
         </Link>
     </div> );
 }

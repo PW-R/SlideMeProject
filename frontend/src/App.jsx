@@ -10,7 +10,7 @@ import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 
 //Driver
-import DriverNavBar from "./components/Driver/DriverNavBar";
+import DriverLayout from "./components/Driver/DriverLayout";
 import HomeCustomize from "./components/Driver/HomeDriver/HomeCustomize";
 import ListDriver from "./components/Driver/ListDriver/ListDriver";
 import "./index.css";

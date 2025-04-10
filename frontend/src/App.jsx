@@ -24,9 +24,15 @@ import DriverNotificationList from "./components/Driver/NotificationDriver/Notif
 import OrderHistoryList from "./components/Driver/ListDriver/OrderHistory/OrderHistoryList";
 import OrderStatusList from "./components/Driver/ListDriver/OrderStatus/OrderStatusList";
 import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_OrderList";
+import CreateAndjoin from "./components/Driver/CreatestoreAndJoin/CreateAndjoin";
+import CreateStore from "./components/Driver/CreatestoreAndJoin/Createstore";
+import JoinStore from "./components/Driver/CreatestoreAndJoin/joinStore";
 
 import "./index.css";
 import "./App.css";
+
+
+
 
 
 function App() {
@@ -58,6 +64,9 @@ function App() {
             <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
             <Route path="/OrderStatusList" element={<OrderStatusList />} />
             <Route path="/IncomingOrder" element={<IncomingOrder />} />
+            <Route path="/CreateAndjoin" element={<CreateAndjoin />} />
+            <Route path="/Createstore" element={<CreateStore />} />
+            <Route path="/Joinstore" element={<JoinStore />} />
             </Route>
            
 

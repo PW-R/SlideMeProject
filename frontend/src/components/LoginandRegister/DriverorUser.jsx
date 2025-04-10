@@ -1,25 +1,39 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 function DriverorUser() {
-    return ( 
-      <AppWrapper>
-        <div className='flex flex-col justify-center items-center gap-5 mt-20'>
-          
-          <h3 className='text-[#18C338]'>Are You User or Driver ?</h3>
-
-            <Link to="/LoginUser">
-              <button className='rounded-full bg-[#2CD64B] w-[300px] h-[50px] text-white font-semibold'>
-                <p className='text-white text-xl mb-1'>User</p>
-              </button>
-            </Link>
-            <Link to="/LoginDriver">
-              <button className='rounded-full bg-[#2CD64B] w-[300px] h-[50px] text-white font-semibold'>
-                <p className='text-white text-xl mb-1'>Driver</p>
-              </button>
-            </Link>
+  return (
+    <AppWrapper>
+      <div className="flex flex-col justify-center items-center gap-6 mt-20">
+        {/* โลโก้ */}
+        <div className="flex justify-center mb-4">
+          <img
+            src="/Logo.png"
+            alt="Logo"
+            className="w-60 h-60 object-contain"
+          />
         </div>
-      </AppWrapper>
-    );
+
+        {/* หัวข้อ */}
+        <h3 className="!text-[#18C338] text-xl font-semibold">
+          Are You User or Driver?
+        </h3>
+
+        {/* ปุ่ม: User */}
+        <Link to="/LoginUser" className="w-[300px]">
+          <div className="w-full h-[52px] rounded-[15px] bg-[#2CD64B] text-white font-semibold text-xl shadow-md hover:bg-[#24b23e] transition duration-200 flex items-center justify-center">
+            User
+          </div>
+        </Link>
+
+        {/* ปุ่ม: Driver */}
+        <Link to="/LoginDriver" className="w-[300px]">
+          <div className="w-full h-[52px] rounded-[15px] bg-[#2CD64B] text-white font-semibold text-xl shadow-md hover:bg-[#24b23e] transition duration-200 flex items-center justify-center">
+            Driver
+          </div>
+        </Link>
+      </div>
+    </AppWrapper>
+  );
 }
 
 function AppWrapper({ children }) {

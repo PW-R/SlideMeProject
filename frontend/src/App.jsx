@@ -15,6 +15,7 @@ import UserLayout from "./components/User/UserLayout";
 import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 import UserHome from "./components/User/HomeUser/UserHome";
+import RegisterUser from "./components/LoginandRegister/RegisterUser";
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -24,12 +25,13 @@ import DriverNotificationList from "./components/Driver/NotificationDriver/Notif
 import OrderHistoryList from "./components/Driver/ListDriver/OrderHistory/OrderHistoryList";
 import OrderStatusList from "./components/Driver/ListDriver/OrderStatus/OrderStatusList";
 import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_OrderList";
-import CreateAndjoin from "./components/Driver/CreatestoreAndJoin/CreateAndjoin";
-import CreateStore from "./components/Driver/CreatestoreAndJoin/Createstore";
-import JoinStore from "./components/Driver/CreatestoreAndJoin/joinStore";
+import CreateAndjoin from "./components/CreatestoreAndJoin/CreateAndjoin";
+import CreateStore from "./components/CreatestoreAndJoin/Createstore";
+import JoinStore from "./components/CreatestoreAndJoin/joinStore";
 
 import "./index.css";
 import "./App.css";
+
 
 
 
@@ -46,7 +48,11 @@ function App() {
             <Route path="/LoginDriver" element={<LoginDriver />} />
             <Route path="/LoginUser" element={<LoginUser />} />
             <Route path="/RegisterDriver" element={<RegisterDirver />} />
+            <Route path="/RegisterUser" element={<RegisterUser />} />
             <Route path="/Forgotpass" element={<Forgotpass />} />
+            <Route path="/CreateAndjoin" element={<CreateAndjoin />} />
+            <Route path="/CreateStore" element={<CreateStore />} />
+            <Route path="/JoinStore" element={<JoinStore />} />
             
 
             {/* User */}
@@ -64,9 +70,8 @@ function App() {
             <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
             <Route path="/OrderStatusList" element={<OrderStatusList />} />
             <Route path="/IncomingOrder" element={<IncomingOrder />} />
-            <Route path="/CreateAndjoin" element={<CreateAndjoin />} />
-            <Route path="/Createstore" element={<CreateStore />} />
-            <Route path="/Joinstore" element={<JoinStore />} />
+            
+            
             </Route>
            
 

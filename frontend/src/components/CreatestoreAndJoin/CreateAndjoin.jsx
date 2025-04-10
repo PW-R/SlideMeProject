@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 function CreateAndjoin() {
     return (
+      <AppWrapper>
         <div className=" flex flex-col items-center justify-center px-4 ">
           {/* โลโก้ */}
           <div className="flex justify-center mb-4">
@@ -31,7 +32,16 @@ function CreateAndjoin() {
             </Link>
           </div>
         </div>
+        </AppWrapper>
       );
+}
+
+function AppWrapper({ children }) {
+  return (
+    <div className="w-[390px] h-[844px] mx-auto border border-red-300 shadow-xl overflow-auto relative">
+      {children}
+    </div>
+  );
 }
 
 export default CreateAndjoin;

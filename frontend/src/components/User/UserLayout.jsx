@@ -5,7 +5,7 @@ function UserLayout() {
   return (
     <AppWrapper>
       <div className="flex flex-col h-full">
-        <div className="flex-grow overflow-auto">
+        <div className="flex-grow overflow-auto scrollbar-hide" style={{ maxHeight: 'calc(100% - 80px)' }}>
           <Outlet />
         </div>
         <UserNavBar />

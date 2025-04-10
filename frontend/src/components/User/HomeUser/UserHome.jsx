@@ -88,6 +88,9 @@ function UserHome() {
                   <Carousel.Item interval={1000}>
                       <img className="d-block w-100 rounded-xl" src="./advert_car3.svg" alt="Third slide"/>
                   </Carousel.Item>
+                  <Carousel.Item interval={1000}>
+                      <img className="d-block w-100 rounded-xl" src="./advert_car4.svg" alt="four slide"/>
+                  </Carousel.Item>
               </Carousel>
             </Link>
           </div>

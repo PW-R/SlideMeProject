@@ -9,7 +9,6 @@ import RegisterDirver from "./components/LoginandRegister/RegisterDirver";
 import Forgotpass from "./components/LoginandRegister/Forgotpass";
 
 
-
 // User
 import UserLayout from "./components/User/UserLayout";
 import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
@@ -31,10 +30,6 @@ import JoinStore from "./components/CreatestoreAndJoin/joinStore";
 
 import "./index.css";
 import "./App.css";
-
-
-
-
 
 
 function App() {

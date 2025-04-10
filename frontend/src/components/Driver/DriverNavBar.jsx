@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { Dropdown } from "react-bootstrap";
-
 function DriverNavBar({ tab, setTab }) {
   return (
     <div className="driverNavbar">

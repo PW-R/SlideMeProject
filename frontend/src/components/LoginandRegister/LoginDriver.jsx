@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react"; // ไอคอนจาก lucide-react
 
+
 function LoginDriver() {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -11,7 +12,7 @@ function LoginDriver() {
         {/* โลโก้ */}
         <div className="flex justify-center mb-4">
           <img
-            src="/Logo.png"
+           src="/slideme.svg"
             alt="Logo"
             className="w-60 h-60 object-contain"
           />

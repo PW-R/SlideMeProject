@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 function DriverorUser() {
   return (
     <AppWrapper>
-      <div className="flex flex-col justify-center items-center gap-6 mt-20">
+      <div className="flex flex-col justify-center items-center gap-6 mt-20" >
         {/* โลโก้ */}
         <div className="flex justify-center mb-4">
           <img
-            src="/Logo.png"
+            src="/slideme.svg"
             alt="Logo"
             className="w-60 h-60 object-contain"
           />

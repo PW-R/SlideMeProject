@@ -11,7 +11,7 @@ function LoginUser() {
          {/* โลโก้ */}
          <div className="flex justify-center mb-4">
            <img
-             src="/Logo.png"
+            src="/slideme.svg"
              alt="Logo"
              className="w-60 h-60 object-contain"
            />

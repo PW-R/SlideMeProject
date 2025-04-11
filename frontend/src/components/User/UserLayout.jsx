@@ -1,14 +1,21 @@
 import { Outlet } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import UserNavBar from "./UserNavBar";
 
 function UserLayout() {
+
+  const location = useLocation();
+
+  const hideNavBarRoutes = ["/StartPosition", "/Destination"];
+  const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
+
   return (
     <AppWrapper>
       <div className="flex flex-col h-full">
-        <div className="flex-grow overflow-auto scrollbar-hide" style={{ maxHeight: 'calc(100% - 80px)' }}>
+        <div className="flex-grow overflow-auto scrollbar-hide">
           <Outlet />
         </div>
-        <UserNavBar />
+        { !shouldHideNavBar && <UserNavBar />}
       </div>
     </AppWrapper>
   );

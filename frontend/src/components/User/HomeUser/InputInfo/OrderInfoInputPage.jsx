@@ -1,16 +1,12 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { useState } from "react";
-// import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
-// import { TextField } from "@mui/material";
-// import dayjs from "dayjs"; // ใช้ dayjs ในการจัดการวันที่
 
 function OrderInfoInputPage() {
   const [selectedVehicle_condition, setSelectedVehicle_condition] =
     useState("");
   const [selectedDriverCar_type, setSelectedDriverCar_type] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  // const [selectedDate, setSelectedDate] = useState("");
 
   // เลือกสภาพยานพาหนะ
   const handleVehicleConditionChange = (event) => {
@@ -27,12 +23,6 @@ function OrderInfoInputPage() {
     setSelectedTime(event.target.value);
   };
 
-  // เลือกวันที่
-  // const handleDateChange = (newDate) => {
-  //   setSelectedDate(newDate);
-  // };
-  // const currentYear = dayjs().year(); // ดึงปีปัจจุบัน
-
   return (
     <div style={{ minHeight: "100vh", overflow: "hidden" }}>
       {/* header */}
@@ -48,19 +38,19 @@ function OrderInfoInputPage() {
         <div className="m-6">
           <div className="grid grid-cols-[1fr_8fr] gap-4">
             {/* icon */}
-            <div className="flex flex-col items-start justify-center relative gap-10">
+            <div className="flex flex-col items-start justify-center relative gap-15">
               <div className="flex justify-center items-center w-5 h-5 bg-[#F84C4C] rounded-full relative z-20"></div>
+              <div className="absolute top-[1.5rem] left-[0.6rem] h-[70px] w-[2px] bg-[#D9D9D9] z-0"></div>
               <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
-              <div className="absolute top-[1.5rem] left-[0.6rem] h-[50px] w-[2px] bg-[#D9D9D9] z-0"></div>
             </div>
             <div className="flex flex-col gap-4 ">
-              <Link to="#" className="w-full">
-                <div className="rounded-lg bg-gray-300 text-black px-2 py-2 text-left">
+              <Link to="/StartPosition" className="w-full">
+                <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
                   ตำแหน่งต้นทาง
                 </div>
               </Link>
-              <Link to="#" className="w-full">
-                <div className="rounded-lg bg-gray-300 text-black px-2 py-2 text-left">
+              <Link to="/Destination" className="w-full">
+                <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
                   ตำแหน่งปลายทาง
                 </div>
               </Link>
@@ -78,7 +68,7 @@ function OrderInfoInputPage() {
                   type="text"
                   id="Car_Brand"
                   placeholder="ยี่ห้อรถ"
-                  className="block w-full rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                 />
               </div>
               <div>
@@ -86,7 +76,7 @@ function OrderInfoInputPage() {
                   type="text"
                   id="UserCar_type"
                   placeholder="รุ่นรถ"
-                  className="block w-full rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                  className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
                 />
               </div>
             </div>
@@ -101,7 +91,7 @@ function OrderInfoInputPage() {
               <select
                 value={selectedVehicle_condition}
                 onChange={handleVehicleConditionChange}
-                className="block rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none w-1/2"
+                className="block h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none w-1/2"
               >
                 <option value="">สภาพยานพาหนะ</option>
                 <option value="Option 1">รถชน</option>
@@ -109,36 +99,25 @@ function OrderInfoInputPage() {
                 <option value="Option 3">รถดับ</option>
               </select>
               <input
-                type="text"
+                type="number"
                 id="UserCar_type"
                 placeholder="ปีที่รถผลิต"
-                className="block w-1/2 rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                className="block w-1/2 rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               />
-              {/* ปีที่รถผลิต */}
-              {/* <div className="mt-2.5 mb-2">
-                    <DatePicker
-                        label="Years in descending order"
-                        maxDate={currentYear}
-                        openTo="year"
-                        views={['year', 'month']}
-                        yearsOrder="desc"
-                        sx={{ minWidth: 250 }}
-                    />
-                </div> */}
             </div>
             <div className="mb-2">
               <input
                 type="text"
                 id="License_Plate"
                 placeholder="เลขทะเบียน"
-                className="block w-full rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               />
             </div>
             <div className="relative">
               <textarea
                 id="Note"
                 placeholder="รายละเอียดเพิ่มเติม"
-                className="block w-full h-20 resize-none rounded-lg bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                className="block w-full h-20 resize-none rounded-xl bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               ></textarea>
             </div>
           </div>
@@ -152,7 +131,7 @@ function OrderInfoInputPage() {
               <select
                 value={selectedDriverCar_type}
                 onChange={handleDriverCarTypeChange}
-                className="block w-full rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               >
                 <option value="">เลือกรถ</option>
                 <option value="DriverCar_type 1">รถสไลด์ขนาดเล็ก</option>
@@ -172,7 +151,7 @@ function OrderInfoInputPage() {
               <select
                 value={selectedTime}
                 onChange={handleTimeChange}
-                className="block w-full rounded-lg px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+                className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               >
                 <option value="">เลือกเวลา</option>
                 <option value="Time 1">เรียกรถทันที</option>
@@ -184,17 +163,24 @@ function OrderInfoInputPage() {
           {/* เลือก "กำหนดเรียก" */}
           {selectedTime === "Time 2" && (
             <div className="mb-2 mt-2">
-              {/* <DesktopDatePicker
-                inputFormat="DD/MM/YYYY"
-                value={selectedDate}
-                onChange={handleDateChange}
-                renderInput={(params) => <TextField {...params} />}
-              /> */}
+              <input
+                type="date"
+                className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f]"
+              />
+              <input
+                type="time"
+                className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f] mt-2"
+              />
+              <input
+                type="number"
+                placeholder="จำนวนเงิน"
+                className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f] mt-2"
+              />
             </div>
           )}
 
           {/* ปุ่มค้นหา */}
-          <Link to="#" className="block w-[150px] h-[40px] mx-auto mt-4">
+          <Link to="#" className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">
             <div className="rounded-[20px] bg-[#0DC964] text-white w-full h-full font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition">
               ค้นหารถสไลด์
             </div>

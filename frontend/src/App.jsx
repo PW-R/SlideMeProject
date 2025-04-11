@@ -10,11 +10,13 @@ import Forgotpass from "./components/LoginandRegister/Forgotpass";
 
 
 // User
+import RegisterUser from "./components/LoginandRegister/RegisterUser";
 import UserLayout from "./components/User/UserLayout";
+import UserHome from "./components/User/HomeUser/UserHome";
+import StartPosition from "./components/User/HomeUser/PresetPosition/StartPosition";
+import Destination from "./components/User/HomeUser/PresetPosition/Destination";
 import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
-import UserHome from "./components/User/HomeUser/UserHome";
-import RegisterUser from "./components/LoginandRegister/RegisterUser";
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -53,6 +55,8 @@ function App() {
             {/* User */}
             <Route  element={<UserLayout />}>
               <Route path="UserHome" element={<UserHome />} />
+              <Route path="StartPosition" element={<StartPosition />} />
+              <Route path="Destination" element={<Destination/>}/>
               <Route path="ShopReccommend" element={<ShopReccommend />} />
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
             </Route>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 function OrderInfoInputPage() {
@@ -7,6 +7,8 @@ function OrderInfoInputPage() {
     useState("");
   const [selectedDriverCar_type, setSelectedDriverCar_type] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
+
+  const navigate = useNavigate();
 
   // เลือกสภาพยานพาหนะ
   const handleVehicleConditionChange = (event) => {
@@ -21,6 +23,11 @@ function OrderInfoInputPage() {
   // เลือกเวลา
   const handleTimeChange = (event) => {
     setSelectedTime(event.target.value);
+  };
+
+  // ฟังก์ชั่นสำหรับยืนยันตำแหน่ง
+  const handleSearchSlideCar = () => {
+    navigate("/DCSS");
   };
 
   return (
@@ -43,7 +50,7 @@ function OrderInfoInputPage() {
               <div className="absolute top-[1.5rem] left-[0.6rem] h-[70px] w-[2px] bg-[#D9D9D9] z-0"></div>
               <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
             </div>
-            <div className="flex flex-col gap-4 ">
+            <div className="flex flex-col gap-4">
               <Link to="/StartPosition" className="w-full">
                 <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
                   ตำแหน่งต้นทาง
@@ -162,7 +169,7 @@ function OrderInfoInputPage() {
 
           {/* เลือก "กำหนดเรียก" */}
           {selectedTime === "Time 2" && (
-            <div className="mb-2 mt-2">
+            <div className="mb-2 mt-3">
               <input
                 type="date"
                 className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f]"
@@ -180,11 +187,15 @@ function OrderInfoInputPage() {
           )}
 
           {/* ปุ่มค้นหา */}
-          <Link to="#" className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">
-            <div className="rounded-[20px] bg-[#0DC964] text-white w-full h-full font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition">
+          <div className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">
+            <button
+              onClick={handleSearchSlideCar}
+              style={{ borderRadius: "50px" }}
+              className="bg-[#0DC964] text-white w-[150px] h-[40px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
+            >
               ค้นหารถสไลด์
-            </div>
-          </Link>
+            </button>
+          </div>
         </div>
       </div>
     </div>

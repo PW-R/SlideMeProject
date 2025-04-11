@@ -1,5 +1,4 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
-import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 //Login and Register
 import DriverorUser from "./components/LoginandRegister/DriverorUser";
@@ -17,6 +16,7 @@ import StartPosition from "./components/User/HomeUser/PresetPosition/StartPositi
 import Destination from "./components/User/HomeUser/PresetPosition/Destination";
 import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
+import DCSS from "./components/User/HomeUser/DCSS/DCSS";
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -59,6 +59,7 @@ function App() {
               <Route path="Destination" element={<Destination/>}/>
               <Route path="ShopReccommend" element={<ShopReccommend />} />
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
+              <Route path="DCSS" element={<DCSS />} />
             </Route>
 
             {/* Driver */}

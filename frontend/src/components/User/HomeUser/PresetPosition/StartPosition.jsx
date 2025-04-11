@@ -6,13 +6,12 @@ function StartPosition() {
 
   // ฟังก์ชั่นสำหรับย้อนกลับ
   const handleBack = () => {
-    navigate(-1); // ย้อนกลับไปยังหน้าก่อนหน้า
+    navigate(-1); 
   };
 
   // ฟังก์ชั่นสำหรับยืนยันตำแหน่ง
-  const handleConfirm = () => {
-    // คุณสามารถใช้ navigate ไปยังหน้าที่ต้องการหลังจากยืนยันตำแหน่ง
-    navigate(-1); // ย้อนกลับไปยังหน้าก่อนหน้า
+  const handleConfirmStartPosition = () => {
+    navigate(-1);
   };
 
   return (
@@ -45,7 +44,7 @@ function StartPosition() {
           </div>
           <br />
           <button
-            onClick={handleConfirm}
+            onClick={handleConfirmStartPosition}
             style={{ borderRadius: "50px" }}
             className="rounded-2xl bg-[#0DC964] text-white w-[200px] h-[40px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
           >

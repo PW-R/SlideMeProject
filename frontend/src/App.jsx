@@ -7,7 +7,6 @@ import LoginDriver from "./components/LoginandRegister/LoginDriver";
 import RegisterDirver from "./components/LoginandRegister/RegisterDirver";
 import Forgotpass from "./components/LoginandRegister/Forgotpass";
 
-
 // User
 import RegisterUser from "./components/LoginandRegister/RegisterUser";
 import UserLayout from "./components/User/UserLayout";
@@ -17,6 +16,9 @@ import Destination from "./components/User/HomeUser/PresetPosition/Destination";
 import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 import DCSS from "./components/User/HomeUser/DCSS/DCSS";
+import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
+
+import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -32,7 +34,6 @@ import JoinStore from "./components/CreatestoreAndJoin/joinStore";
 
 import "./index.css";
 import "./App.css";
-
 
 function App() {
   return (
@@ -50,32 +51,33 @@ function App() {
             <Route path="/CreateAndjoin" element={<CreateAndjoin />} />
             <Route path="/CreateStore" element={<CreateStore />} />
             <Route path="/JoinStore" element={<JoinStore />} />
-            
 
             {/* User */}
-            <Route  element={<UserLayout />}>
+            <Route element={<UserLayout />}>
               <Route path="UserHome" element={<UserHome />} />
               <Route path="StartPosition" element={<StartPosition />} />
-              <Route path="Destination" element={<Destination/>}/>
+              <Route path="Destination" element={<Destination />} />
               <Route path="ShopReccommend" element={<ShopReccommend />} />
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
               <Route path="DCSS" element={<DCSS />} />
+              <Route path="PaymentConfirm" element={<PaymentConfirm />} />
+
+              <Route path="ShopDetail" element={<ShopDetail />} />
             </Route>
 
             {/* Driver */}
-            <Route  element={<DriverLayout />}>
-            <Route path="/HomeCustomize" element={<HomeCustomize />} />
-            <Route path="/ListDriver" element={<ListDriver />} />
-            <Route path="/DriverNotificationList" element={<DriverNotificationList />} />\
-            <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
-            <Route path="/OrderStatusList" element={<OrderStatusList />} />
-            <Route path="/IncomingOrder" element={<IncomingOrder />} />
-            
-            
+            <Route element={<DriverLayout />}>
+              <Route path="/HomeCustomize" element={<HomeCustomize />} />
+              <Route path="/ListDriver" element={<ListDriver />} />
+              <Route
+                path="/DriverNotificationList"
+                element={<DriverNotificationList />}
+              />
+              \
+              <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
+              <Route path="/OrderStatusList" element={<OrderStatusList />} />
+              <Route path="/IncomingOrder" element={<IncomingOrder />} />
             </Route>
-           
-
-            
           </Routes>
         </HashRouter>
       </div>

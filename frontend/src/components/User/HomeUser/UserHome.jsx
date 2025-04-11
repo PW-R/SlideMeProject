@@ -76,7 +76,7 @@ function UserHome() {
         {/* โฆษณา */}
         <div className="mt-6">
           <Link to="/ShopReccommend">
-            <Carousel className="rounded-xl ">
+            <Carousel className="rounded-xl h-[160px] overflow-hidden">
               <Carousel.Item interval={1000}>
                 <img
                   className="d-block w-100 rounded-xl"
@@ -108,6 +108,7 @@ function UserHome() {
             </Carousel>
           </Link>
         </div>
+        
       </div>
     </div>
   );

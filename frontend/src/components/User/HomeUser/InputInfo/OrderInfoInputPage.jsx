@@ -167,7 +167,7 @@ function OrderInfoInputPage() {
             </div>
           </div>
 
-          {/* เลือก "กำหนดเรียก" */}
+          {/* ถ้าเลือก "กำหนดเรียก" */}
           {selectedTime === "Time 2" && (
             <div className="mb-2 mt-3">
               <input
@@ -196,6 +196,7 @@ function OrderInfoInputPage() {
               ค้นหารถสไลด์
             </button>
           </div>
+
         </div>
       </div>
     </div>

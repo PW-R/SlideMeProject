@@ -1,15 +1,43 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function DCSS() {
+  const navigate = useNavigate();
   const [tab, setTab] = useState("details");
+  const [isLoadingStoreTab, setIsLoadingStoreTab] = useState(false);
 
-  const handleTabChange = (newTab) => {
-    setTab(newTab);
-  };
+  //   ใช้กับ backend
+  //   useEffect(() => {
+  //     if (tab === "chooseStore") {
+  //       setIsLoadingStoreTab(true);
+  //       fetchDataFromBackend().then(() => {
+  //         setIsLoadingStoreTab(false);
+  //       });
+  //     }
+  //   }, [tab]);
 
+  //  ปุ่มถัดไป
   const handleNextChooseStore = () => {
     handleTabChange("chooseStore");
+  };
+
+  // "รอสักครู่..."
+  const handleTabChange = (newTab) => {
+    if (newTab === "chooseStore") {
+      setIsLoadingStoreTab(true);
+      setTab("chooseStore");
+      // ตั้ง timeout 3 วินาที
+      setTimeout(() => {
+        setIsLoadingStoreTab(false);
+      }, 3000);
+    } else {
+      setTab(newTab);
+    }
+  };
+
+  // ลิ้งไปหน้าไหนวะ
+  const handleChooseStore = () => {
+    navigate("/PaymentConfirm");
   };
 
   return (
@@ -30,7 +58,7 @@ function DCSS() {
 
         {/* แถบ รายละเอียด, เลือกร้าน */}
         <div className="h-1/2 flex flex-col items-center text-black ">
-          <div className="flex justify-between items-center bg-white sticky top-0 h-[70px] z-10 px-4 pb-2 w-full">
+          <div className="flex justify-between items-center bg-white sticky top-[20px] h-[70px] z-10 px-4 pb-2 w-full rounded-t-3xl">
             <button
               onClick={() => handleTabChange("details")}
               className={`text-black text-base px-4 py-2 rounded-md text-center flex-1 relative transition-all duration-200 ${
@@ -53,18 +81,18 @@ function DCSS() {
             </button>
           </div>
 
-          {/* ข้อมูล-รายละเอียด */}
+          {/* ข้อมูล "รายละเอียด" */}
           <div className="w-full">
             {tab === "details" && (
-              <div className="m-6 mt-2">
+              <div className="m-6 mt-0 mb-0">
                 <div className="grid grid-cols-[1fr_8fr] gap-4">
                   {/* icon */}
                   <div className="flex flex-col items-start justify-center relative gap-10">
                     <div className="flex justify-center items-center w-5 h-5 bg-[#F84C4C] rounded-full relative z-20"></div>
-                    <div className="absolute top-[1rem] left-[0.6rem] h-[50px] w-[2px] bg-[#D9D9D9] z-0"></div>
+                    <div className="absolute top-[1rem] left-[0.6rem] h-[55px] w-[2px] bg-[#D9D9D9] z-0"></div>
                     <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
                   </div>
-                  <div className="flex flex-col gap-2 mb-2">
+                  <div className="flex flex-col gap-2">
                     <Link to="/StartPosition" className="w-full">
                       <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left">
                         ตำแหน่งต้นทาง
@@ -103,7 +131,7 @@ function DCSS() {
                     <p>จังหวัด</p>
                   </div>
                 </div>
-                {/* ปุ่ม */}
+                {/* ปุ่มถัดไป  */}
                 <div className="flex justify-center items-center mb-0">
                   <button
                     onClick={handleNextChooseStore}
@@ -116,10 +144,43 @@ function DCSS() {
               </div>
             )}
 
-            {/* ข้อมูล-เลือกร้าน */}
+            {/* ข้อมูล "เลือกร้าน" */}
             {tab === "chooseStore" && (
-              <div className="choose-store-content">
-                <p>เลือกร้านรถสไลด์</p>
+              <div className="choose-store-content m-6">
+                {isLoadingStoreTab ? (
+                  <p className="text-gray-500 flex justify-center items-center h-full">
+                    รอสักครู่...
+                  </p>
+                ) : (
+                  <div>
+                    <div className="grid grid-cols-[1fr_3fr_1fr] items-center">
+                      <div>
+                        <img
+                          className="w-[50px] y-[50px] rounded-full"
+                          src="advert_car4.svg"
+                        />
+                      </div>
+                      <div>
+                        <p className="text-[#0DC964] text-xl font-bold mb-0">
+                          ร้านบัวบางแคร์
+                        </p>
+                        <p className="mb-0">01/01/2025</p>
+                      </div>
+                      <div>
+                        <p className="text-center mb-0">1500</p>
+                        <button
+                          onClick={handleChooseStore}
+                          style={{ borderRadius: "50px" }}
+                          className="bg-[#0DC964] text-white w-[80px] h-[20px] font-medium text-[15px] flex items-center justify-center hover:bg-[#43af56] transition"
+                        >
+                          เลือก
+                        </button>
+                      </div>
+                    </div>
+                    {/* เส้นสีเทา */}
+                    <div className="w-full border-t-2 border-gray-300 mt-3 mb-2"></div>
+                  </div>
+                )}
               </div>
             )}
           </div>

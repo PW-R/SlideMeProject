@@ -157,7 +157,7 @@ function DCSS() {
                       <div>
                         <img
                           className="w-[50px] y-[50px] rounded-full"
-                          src="advert_car4.svg"
+                          src="driver_logo.svg"
                         />
                       </div>
                       <div>

@@ -1,11 +1,15 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+
 //Login and Register
 import DriverorUser from "./components/LoginandRegister/DriverorUser";
 import LoginUser from "./components/LoginandRegister/LoginUser";
 import LoginDriver from "./components/LoginandRegister/LoginDriver";
 import RegisterDirver from "./components/LoginandRegister/RegisterDirver";
 import Forgotpass from "./components/LoginandRegister/Forgotpass";
+
+// Account
+import UserAccount from "./components/Account/UserAccount"
 
 // User
 import RegisterUser from "./components/LoginandRegister/RegisterUser";
@@ -20,6 +24,9 @@ import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
 import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
 import Coupon from "./components/User/HomeUser/Payment/Coupon";
 
+import ListPendingOrder from "./components/User/ListUser/ListPendingOrder";
+import ListOrderHistory from "./components/User/ListUser/ListOrderHistory";
+import NotiUser from "./components/User/NotificationUser/NotiUser";
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -52,7 +59,7 @@ function App() {
             <Route path="/CreateAndjoin" element={<CreateAndjoin />} />
             <Route path="/CreateStore" element={<CreateStore />} />
             <Route path="/JoinStore" element={<JoinStore />} />
-
+            
             {/* User */}
             <Route element={<UserLayout />}>
               <Route path="UserHome" element={<UserHome />} />
@@ -64,6 +71,11 @@ function App() {
               <Route path="PaymentConfirm" element={<PaymentConfirm />} />
               <Route path="ShopDetail" element={<ShopDetail />} />
               <Route path="Coupon" element={<Coupon />} />
+              
+              <Route path="ListPendingOrder" element={<ListPendingOrder />} />
+              <Route path="ListOrderHistory" element={<ListOrderHistory />} />
+              <Route path="NotiUser" element={<NotiUser />} />
+              <Route path="UserAccount" element={<UserAccount />} />
             </Route>
 
             {/* Driver */}

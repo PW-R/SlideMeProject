@@ -12,21 +12,21 @@ function UserNavBar() {
         </button>
       </Link>
 
-      <Link to="#">
+      <Link to="ListPendingOrder">
         <button className="flex flex-col items-center border-none bg-transparent">
           <i className="bi bi-list mt-3 text-white text-2xl"></i>
           <p className="text-white text-xs no-underline">รายการ</p>
         </button>
       </Link>
 
-      <Link to="#">
+      <Link to="NotiUser">
         <button className="flex flex-col items-center border-none bg-transparent">
           <i className="bi bi-bell mt-3 text-white text-2xl"></i>
           <p className="text-white text-xs no-underline">แจ้งเตือน</p>
         </button>
       </Link>
 
-      <Link to="#">
+      <Link to="UserAccount">
         <button className="flex flex-col items-center border-none bg-transparent">
           <i className="bi bi-person-circle mt-3 text-white text-2xl"></i>
           <p className="text-white text-xs no-underline">บัญชี</p>

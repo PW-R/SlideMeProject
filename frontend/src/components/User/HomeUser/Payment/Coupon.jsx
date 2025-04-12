@@ -35,7 +35,7 @@ function Coupon() {
               style={{ fontSize: "15px", borderRadius: "15px" }}
               className="bg-[#FF0A0A] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#EF1D33] transition"
             >
-              use
+              Redeem
             </button>
           </div>
         </div>

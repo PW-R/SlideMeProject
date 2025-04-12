@@ -17,8 +17,9 @@ import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 import DCSS from "./components/User/HomeUser/DCSS/DCSS";
 import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
-
 import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
+import Coupon from "./components/User/HomeUser/Payment/Coupon";
+
 
 //Driver
 import DriverLayout from "./components/Driver/DriverLayout";
@@ -61,8 +62,8 @@ function App() {
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
               <Route path="DCSS" element={<DCSS />} />
               <Route path="PaymentConfirm" element={<PaymentConfirm />} />
-
               <Route path="ShopDetail" element={<ShopDetail />} />
+              <Route path="Coupon" element={<Coupon />} />
             </Route>
 
             {/* Driver */}

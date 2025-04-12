@@ -81,8 +81,8 @@ function DCSS() {
             </button>
           </div>
 
-          {/* ข้อมูล "รายละเอียด" */}
           <div className="w-full">
+          {/* ข้อมูล "รายละเอียด" */}
             {tab === "details" && (
               <div className="m-6 mt-0 mb-0">
                 <div className="grid grid-cols-[1fr_8fr] gap-4">

@@ -40,6 +40,7 @@ import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_Order
 import CreateAndjoin from "./components/CreatestoreAndJoin/CreateAndjoin";
 import CreateStore from "./components/CreatestoreAndJoin/Createstore";
 import JoinStore from "./components/CreatestoreAndJoin/joinStore";
+import LocationStore from "./components/Driver/ListDriver/OrderLocation/LocationStore";
 
 import "./index.css";
 import "./App.css";
@@ -73,7 +74,6 @@ function App() {
               <Route path="ShopDetail" element={<ShopDetail />} />
               <Route path="Coupon" element={<Coupon />} />
               <Route path="OrderStatusListUser" element={<OrderStatusListUser />} />
-              
               <Route path="ListPendingOrder" element={<ListPendingOrder />} />
               <Route path="ListOrderHistory" element={<ListOrderHistory />} />
               <Route path="NotiUser" element={<NotiUser />} />
@@ -84,14 +84,12 @@ function App() {
             <Route element={<DriverLayout />}>
               <Route path="/HomeCustomize" element={<HomeCustomize />} />
               <Route path="/ListDriver" element={<ListDriver />} />
-              <Route
-                path="/DriverNotificationList"
-                element={<DriverNotificationList />}
-              />
+              <Route path="/DriverNotificationList" element={<DriverNotificationList />}/>
               \
               <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
               <Route path="/OrderStatusList" element={<OrderStatusList />} />
               <Route path="/IncomingOrder" element={<IncomingOrder />} />
+              <Route path="/LocationStore" element={<LocationStore />} />
             </Route>
           </Routes>
         </HashRouter>

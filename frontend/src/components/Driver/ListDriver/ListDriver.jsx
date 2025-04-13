@@ -13,10 +13,12 @@ function ListDriver() {
             ประวัติการทำงาน
           </div>
         </Link>
-
+          
+          <Link to="/LocationStore">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
             Location
           </div>
+          </Link>
     
         <Link to="/OrderStatusList">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">

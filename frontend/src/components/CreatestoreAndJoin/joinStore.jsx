@@ -14,7 +14,7 @@ function JoinStore() {
       name: "ร้าน",
       code: "123",
       logo: "advert_car1.svg",
-    }
+    },
   ];
 
   const handleSearch = () => {
@@ -45,17 +45,17 @@ function JoinStore() {
   return (
     <AppWrapper>
       <div>
-      <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-  {/* ปุ่มย้อนกลับ */}
-  <Link to="/CreateAndjoin">
-    <i className="bi bi-chevron-left text-white text-2xl absolute left-4 bottom-4"></i>
-  </Link>
+        <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
+          {/* ปุ่มย้อนกลับ */}
+          <Link to="/CreateAndjoin">
+            <i className="bi bi-chevron-left text-white text-2xl absolute left-4 bottom-4"></i>
+          </Link>
 
-  {/* หัวข้อหน้า */}
-  <div className="text-center">
-    <h1 className="text-white font-bold text-xl">Join Store</h1>
-  </div>
-</div>
+          {/* หัวข้อหน้า */}
+          <div className="text-center">
+            <h1 className="text-white font-bold text-xl">Join Store</h1>
+          </div>
+        </div>
 
         <div className="flex justify-center items-center bg-white">
           <div className="flex flex-col gap-4 p-4 items-center">
@@ -83,7 +83,9 @@ function JoinStore() {
             </button>
 
             {result && (
-              <p className="text-center text-[15px] mt-2 text-red-500">{result}</p>
+              <p className="text-center text-[15px] mt-2 text-red-500">
+                {result}
+              </p>
             )}
 
             {foundStore && (
@@ -93,7 +95,9 @@ function JoinStore() {
                   alt="store-logo"
                   className="w-[60px] h-[60px] rounded-full shadow-md"
                 />
-                <p className="text-lg font-semibold text-gray-800">{foundStore.name}</p>
+                <p className="text-lg font-semibold text-gray-800">
+                  {foundStore.name}
+                </p>
 
                 {requestStatus === "idle" && (
                   <button
@@ -105,7 +109,9 @@ function JoinStore() {
                 )}
 
                 {requestStatus === "pending" && (
-                  <p className="text-black-600 animate-pulse">⏳ รอเจ้าของร้านอนุมัติ...</p>
+                  <p className="text-black-600 animate-pulse">
+                    ⏳ รอเจ้าของร้านอนุมัติ...
+                  </p>
                 )}
               </div>
             )}

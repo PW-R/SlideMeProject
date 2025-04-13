@@ -5,11 +5,6 @@ import { Carousel } from "react-bootstrap";
 function PaymentConfirm() {
   const navigate = useNavigate();
 
-  // ฟังก์ชั่นสำหรับย้อนกลับ
-  const handleBack = () => {
-    navigate(-1);
-  };
-
   // ไปหน้าข้อมูลผู้ให้บริการ
   const handleShopDetail = () => {
     navigate("/ShopDetail");
@@ -24,10 +19,9 @@ function PaymentConfirm() {
     <div style={{ overflow: "hidden" }}>
       {/* header */}
       <div className="fixed w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <i
-          onClick={handleBack}
-          className="bi bi-chevron-left mt-3 text-white text-2xl absolute left-3 bottom-4"
-        ></i>
+        <Link to="/DCSS">
+          <i className="bi bi-chevron-left mt-3 text-white text-2xl absolute left-3 bottom-4"></i>
+        </Link>
         <h1 className="text-white">เรียกรถสไลด์</h1>
       </div>
 
@@ -157,11 +151,14 @@ function PaymentConfirm() {
           >
             ชำระเงิน
           </button>
+          {/* ลองลิ้งไปหน้า สถานะรถสไลด์ ก่อนนะ */}
           <button
+            onClick={() => navigate("/OrderStatusListUser")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FF0A0A] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#EF1D33] transition"
           >
-            ยกเลิก
+            สถานะรถสไลด์
+            {/* ยกเลิก */}
           </button>
         </div>
       </div>

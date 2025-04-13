@@ -56,7 +56,7 @@ function DCSS() {
           MAP
         </div>
 
-        {/* แถบ รายละเอียด, เลือกร้าน */}
+        {/* แถบ รายละเอียด / เลือกร้าน */}
         <div className="h-1/2 flex flex-col items-center text-black ">
           <div className="flex justify-between items-center bg-white sticky top-[20px] h-[70px] z-10 px-4 pb-2 w-full rounded-t-3xl">
             <button

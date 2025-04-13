@@ -23,6 +23,7 @@ import DCSS from "./components/User/HomeUser/DCSS/DCSS";
 import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
 import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
 import Coupon from "./components/User/HomeUser/Payment/Coupon";
+import OrderStatusListUser from "./components/User/ListUser/PendingOrder/OrderStatusList";
 
 import ListPendingOrder from "./components/User/ListUser/ListPendingOrder";
 import ListOrderHistory from "./components/User/ListUser/ListOrderHistory";
@@ -71,6 +72,7 @@ function App() {
               <Route path="PaymentConfirm" element={<PaymentConfirm />} />
               <Route path="ShopDetail" element={<ShopDetail />} />
               <Route path="Coupon" element={<Coupon />} />
+              <Route path="OrderStatusListUser" element={<OrderStatusListUser />} />
               
               <Route path="ListPendingOrder" element={<ListPendingOrder />} />
               <Route path="ListOrderHistory" element={<ListOrderHistory />} />

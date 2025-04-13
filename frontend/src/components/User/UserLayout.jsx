@@ -6,7 +6,7 @@ function UserLayout() {
 
   const location = useLocation();
 
-  const hideNavBarRoutes = ["/StartPosition", "/Destination"];
+  const hideNavBarRoutes = ["/StartPosition", "/Destination", "/OrderStatusListUser"];
   const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
 
   return (

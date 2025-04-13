@@ -34,17 +34,14 @@ function PaymentConfirm() {
             <div className="absolute top-[1.5rem] left-[0.6rem] h-[70px] w-[2px] bg-[#D9D9D9] z-0"></div>
             <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
           </div>
+          {/* ตำแหน่ง */}
           <div className="flex flex-col gap-4 ">
-            <Link to="/StartPosition" className="w-full">
-              <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
-                ตำแหน่งต้นทาง
-              </div>
-            </Link>
-            <Link to="/Destination" className="w-full">
-              <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
-                ตำแหน่งปลายทาง
-              </div>
-            </Link>
+            <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
+              ตำแหน่งต้นทาง
+            </div>
+            <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
+              ตำแหน่งปลายทาง
+            </div>
           </div>
         </div>
 
@@ -153,12 +150,11 @@ function PaymentConfirm() {
           </button>
           {/* ลองลิ้งไปหน้า สถานะรถสไลด์ ก่อนนะ */}
           <button
-            onClick={() => navigate("/OrderStatusListUser")}
+            // onClick={() => navigate("/OrderStatusListUser")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FF0A0A] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#EF1D33] transition"
           >
-            สถานะรถสไลด์
-            {/* ยกเลิก */}
+            ยกเลิก
           </button>
         </div>
       </div>

@@ -29,13 +29,13 @@ function DCSS() {
       // ตั้ง timeout 3 วินาที
       setTimeout(() => {
         setIsLoadingStoreTab(false);
-      }, 3000);
+      }, 2000);
     } else {
       setTab(newTab);
     }
   };
 
-  // ลิ้งไปหน้าไหนวะ
+  // ไปหน้า PaymentConfirm
   const handleChooseStore = () => {
     navigate("/PaymentConfirm");
   };
@@ -50,66 +50,65 @@ function DCSS() {
         <h1 className="text-white">เรียกรถสไลด์</h1>
       </div>
 
-      <div className="pt-[115px] h-[750px] flex flex-col">
+      <div className="pt-[115px] flex flex-col h-full">
         {/* พื้นที่แสดง MAP */}
-        <div className="bg-blue-300 h-1/2 flex items-center justify-center">
-          MAP
-        </div>
+        <div className="relative z-[1] h-[500px] flex-grow">MAP</div>
 
         {/* แถบ รายละเอียด / เลือกร้าน */}
-        <div className="h-1/2 flex flex-col items-center text-black ">
-          <div className="flex justify-between items-center bg-white sticky top-[20px] h-[70px] z-10 px-4 pb-2 w-full rounded-t-3xl">
-            <button
-              onClick={() => handleTabChange("details")}
-              className={`text-black text-base px-4 py-2 rounded-md text-center flex-1 relative transition-all duration-200 ${
-                tab === "details"
-                  ? "font-bold after:absolute after:bottom-[-3px] after:left-0 after:w-full after:h-[2px] after:bg-blue-500"
-                  : ""
-              }`}
-            >
-              รายละเอียด
-            </button>
-            <button
-              onClick={() => handleTabChange("chooseStore")}
-              className={`text-black text-base px-4 py-2 rounded-md text-center flex-1 relative transition-all duration-200 ${
-                tab === "chooseStore"
-                  ? "font-bold after:absolute after:bottom-[-3px] after:left-0 after:w-full after:h-[2px] after:bg-blue-500"
-                  : ""
-              }`}
-            >
-              เลือกร้าน
-            </button>
+        <div className="absolute bottom-0 w-full h-[370px] bg-white rounded-t-3xl z-[5000] overflow-y-auto shadow-[0_-4px_10px_rgba(0,0,0,0.2)] flex flex-col">
+          <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2">
+            <div className="flex justify-between items-center w-full">
+              <button
+                onClick={() => handleTabChange("details")}
+                className={`text-black text-base px-4 py-2 rounded-md text-center flex-1 relative transition-all duration-200 ${
+                  tab === "details"
+                    ? "font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-blue-500"
+                    : ""
+                }`}
+              >
+                รายละเอียด
+              </button>
+              <button
+                onClick={() => handleTabChange("chooseStore")}
+                className={`text-black text-base px-4 py-2 rounded-md text-center flex-1 relative transition-all duration-200 ${
+                  tab === "chooseStore"
+                    ? "font-bold after:absolute after:bottom-0 after:left-0 after:w-full after:h-[2px] after:bg-blue-500"
+                    : ""
+                }`}
+              >
+                เลือกร้าน
+              </button>
+            </div>
           </div>
 
-          <div className="w-full">
-          {/* ข้อมูล "รายละเอียด" */}
+          {/* Content Area */}
+          <div className="px-6">
+            {/* "รายละเอียด" */}
             {tab === "details" && (
-              <div className="m-6 mt-0 mb-0">
+              <div className="mt-2">
                 <div className="grid grid-cols-[1fr_8fr] gap-4">
-                  {/* icon */}
+                  {/* Icons */}
                   <div className="flex flex-col items-start justify-center relative gap-10">
-                    <div className="flex justify-center items-center w-5 h-5 bg-[#F84C4C] rounded-full relative z-20"></div>
+                    <div className="flex justify-center items-center w-5 h-5 bg-[#F84C4C] rounded-full z-20"></div>
                     <div className="absolute top-[1rem] left-[0.6rem] h-[55px] w-[2px] bg-[#D9D9D9] z-0"></div>
-                    <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
+                    <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] z-10"></i>
                   </div>
+                  {/* ตำแหน่ง */}
                   <div className="flex flex-col gap-2">
-                    <Link to="/StartPosition" className="w-full">
-                      <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left">
-                        ตำแหน่งต้นทาง
-                      </div>
-                    </Link>
-                    <Link to="/Destination" className="w-full">
-                      <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left">
-                        ตำแหน่งปลายทาง
-                      </div>
-                    </Link>
+                    <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left">
+                      ตำแหน่งต้นทาง
+                    </div>
+                    <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left">
+                      ตำแหน่งปลายทาง
+                    </div>
                   </div>
                 </div>
-                {/* เส้นสีเทา */}
-                <div className="w-full border-t-2 border-gray-300 mt-2 mb-2"></div>
+
+                {/* เส้นแบ่ง */}
+                <div className="w-full border-t-2 border-gray-300 mt-3 mb-2"></div>
+
                 {/* รายละเอียดเพิ่มเติม */}
-                <div className="grid grid-cols-2 gap-x-2 mb-0">
-                  {/* ฝั่งซ้าย */}
+                <div className="grid grid-cols-2 gap-x-4">
                   <div className="flex flex-col space-y-1">
                     <div className="grid grid-cols-[1fr_3fr] items-center">
                       <i className="bi bi-sign-turn-right"></i>
@@ -124,19 +123,17 @@ function DCSS() {
                       <p className="mb-1">เรียกรถทันที</p>
                     </div>
                   </div>
-                  {/* ฝั่งขวา */}
-                  <div className="flex flex-col items-end space-y-1">
-                    <img className="w-[65px] mb-1" src="logo-black.svg" />
-                    <p className="mb-0">เลขทะเบียน</p>
-                    <p>จังหวัด</p>
+                  <div className="flex justify-end items-center">
+                    <img className="w-[90px]" src="logo-black.svg" alt="Logo" />
                   </div>
                 </div>
-                {/* ปุ่มถัดไป  */}
-                <div className="flex justify-center items-center mb-0">
+
+                {/* ปุ่มถัดไป */}
+                <div className="flex justify-center mt-2">
                   <button
-                    onClick={handleNextChooseStore}
                     style={{ borderRadius: "50px" }}
-                    className="bg-[#0DC964] text-white w-[120px] h-[30px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
+                    onClick={handleNextChooseStore}
+                    className="bg-[#0DC964] text-white w-[120px] h-[35px] font-bold text-base rounded-full hover:bg-[#43af56] transition"
                   >
                     ถัดไป
                   </button>
@@ -144,43 +141,45 @@ function DCSS() {
               </div>
             )}
 
-            {/* ข้อมูล "เลือกร้าน" */}
+            {/* "เลือกร้าน" */}
             {tab === "chooseStore" && (
-              <div className="choose-store-content m-6">
+              <div className="mt-2">
                 {isLoadingStoreTab ? (
-                  <p className="text-gray-500 flex justify-center items-center h-full">
-                    รอสักครู่...
-                  </p>
+                  <p className="text-gray-500 text-center">รอสักครู่...</p>
                 ) : (
-                  <div>
-                    <div className="grid grid-cols-[1fr_3fr_1fr] items-center">
+                  <>
+                    <div className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3">
                       <div>
                         <img
-                          className="w-[50px] y-[50px] rounded-full"
+                          className="w-[50px] h-[50px] rounded-full object-cover"
                           src="driver_logo.svg"
+                          alt="Driver"
                         />
                       </div>
                       <div>
-                        <p className="text-[#0DC964] text-xl font-bold mb-0">
-                          ร้านบัวบางแคร์
-                        </p>
-                        <p className="mb-0">01/01/2025</p>
-                      </div>
-                      <div>
-                        <p className="text-center mb-0">1500</p>
                         <button
-                          onClick={handleChooseStore}
+                          style={{ fontSize: "20px" }}
+                          // onClick={handleChooseStore}
+                          className="text-[#0DC964] font-bold mb-0"
+                        >
+                          ร้านบัวบางแคร์
+                        </button>
+                        <p className="mb-0 text-sm text-gray-600">01/01/2025</p>
+                      </div>
+                      <div className="flex flex-col items-center space-y-1">
+                        <p className="mb-0 font-semibold">1500</p>
+                        <button
                           style={{ borderRadius: "50px" }}
-                          className="bg-[#0DC964] text-white w-[80px] h-[20px] font-medium text-[15px] flex items-center justify-center hover:bg-[#43af56] transition"
+                          onClick={handleChooseStore}
+                          className="bg-[#0DC964] text-white w-[80px] h-[28px] text-sm rounded-full hover:bg-[#43af56] transition"
                         >
                           เลือก
                         </button>
                       </div>
                     </div>
-                    
-                    {/* เส้นสีเทา */}
-                    <div className="w-full border-t-2 border-gray-300 mt-3 mb-2"></div>
-                  </div>
+
+                    <div className="w-full border-t-2 border-gray-300"></div>
+                  </>
                 )}
               </div>
             )}

@@ -6,28 +6,28 @@ function ListDriver() {
         <h1 className="text-white text-center">รายการ</h1>
       </div>
 
-      <div className="flex flex-col gap-4 items-center text-center mt-5 ">
+      <div className="flex flex-col gap-4 items-center text-center font-bold text-lg mt-5  ">
 
         <Link to="/OrderHistoryList">
-          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
+          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4 ">
             ประวัติการทำงาน
           </div>
         </Link>
 
-          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
+          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
             Location
           </div>
     
         <Link to="/OrderStatusList">
-          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
+          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
             สถานะงาน
           </div>
         </Link>
 
-        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
+        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
           งานที่สามารถรับได้
         </div>
-        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
+        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
           ตารางงาน
         </div>
       </div>

@@ -40,6 +40,7 @@ import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_Order
 import CreateAndjoin from "./components/CreatestoreAndJoin/CreateAndjoin";
 import CreateStore from "./components/CreatestoreAndJoin/Createstore";
 import JoinStore from "./components/CreatestoreAndJoin/joinStore";
+import OrderhistoryDetail from "./components/Driver/ListDriver/OrderHistory/OrderhistoryDetail";
 
 import "./index.css";
 import "./App.css";
@@ -92,6 +93,7 @@ function App() {
               <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
               <Route path="/OrderStatusList" element={<OrderStatusList />} />
               <Route path="/IncomingOrder" element={<IncomingOrder />} />
+              <Route path="/OrderhistoryDetail" element={<OrderhistoryDetail />} />
             </Route>
           </Routes>
         </HashRouter>

@@ -6,28 +6,28 @@ function HomeCustomize() {
             <h1 className="text-white text-center">HOME</h1>
             </div>
           
-          <div className="flex flex-col mt-4">
+          <div className="flex flex-col items-center mt-4">
 
             <div className="form-check form-switch ">
               <label className="form-check-label" for="switchCheckDefault">Store status: </label>
-              <input className="form-check-input-ml-4" for="switchCheckDefault" type="checkbox" role="switch" id="switchCheckDefault" />
+              <input className="form-check-input" for="switchCheckDefault" type="checkbox" role="switch" id="switchCheckDefault" />
             </div>
 
-            <div className="w-auto h-[220px] border-none bg-gray-500 mt-4">
+            <div className="w-full h-[220px] border-none bg-gray-500 mt-4">
             <p>store img</p>
             </div>
 
-            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] mt-4 ml-4">
+            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4">
             <i class="bi bi-shop"></i>
             <p>เกี่ยวกับเรา</p>
             </div>
 
-            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] mt-4 ml-4">
+            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4">
             <i class="bi bi-shop"></i>
             <p>บริการของเรา</p>
             </div>
 
-            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] mt-4 ml-4">
+            <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4">
             <i class="bi bi-geo-alt-fill"></i>
             <p>ที่อยู่ร้าน</p>
             </div>

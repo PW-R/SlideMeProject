@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function ShopDetail() {
+function DriverDetail() {
   return (
     <div style={{ overflow: "hidden" }}>
       {/* header */}
@@ -89,4 +89,4 @@ function ShopDetail() {
   );
 }
 
-export default ShopDetail;
+export default DriverDetail;

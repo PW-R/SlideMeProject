@@ -5,16 +5,6 @@ import { Carousel } from "react-bootstrap";
 function PaymentConfirm() {
   const navigate = useNavigate();
 
-  // ไปหน้าข้อมูลผู้ให้บริการ
-  const handleShopDetail = () => {
-    navigate("/ShopDetail");
-  };
-
-  // ไปหน้าคูปองส่วนลด
-  const handleCoupon = () => {
-    navigate("/Coupon");
-  };
-
   return (
     <div style={{ overflow: "hidden" }}>
       {/* header */}
@@ -45,10 +35,10 @@ function PaymentConfirm() {
           </div>
         </div>
 
-        {/* 3ปุ่ม ข้อมูลผู้ให้บริการ-โทรหาผู้ให้บริการ-ส่งข้อความ */}
+        {/* 3ปุ่ม ข้อมูลผู้ให้บริการ / โทรหาผู้ให้บริการ / ส่งข้อความ */}
         <div className="grid grid-cols-3 mt-6 gap-2">
           <button
-            onClick={handleShopDetail}
+            onClick={() => navigate("/DriverDetail")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-[100px] h-[30px] text-[10px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
@@ -132,17 +122,18 @@ function PaymentConfirm() {
         {/* ปุ่มคูปองส่วนลด */}
         <div className="mb-6">
           <button
-            onClick={handleCoupon}
+            onClick={() => navigate("/UseCoupon")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FFC4FF] text-black w-full h-[30px] flex items-center justify-center hover:bg-[#FFA3BA] transition"
           >
-            คูปองส่วนลด
+            คูปอง
           </button>
         </div>
 
-        {/* ปุ่มชำระเงิน-ยกเลิก */}
+        {/* ปุ่มชำระเงิน / ยกเลิก */}
         <div className="flex justify-center gap-4">
           <button
+            // onClick={() => navigate("/UseCoupon")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
@@ -150,7 +141,7 @@ function PaymentConfirm() {
           </button>
           {/* ลองลิ้งไปหน้า สถานะรถสไลด์ ก่อนนะ */}
           <button
-            // onClick={() => navigate("/OrderStatusListUser")}
+            onClick={() => navigate("/DCSS")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FF0A0A] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#EF1D33] transition"
           >

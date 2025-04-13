@@ -35,11 +35,6 @@ function DCSS() {
     }
   };
 
-  // ไปหน้า PaymentConfirm
-  const handleChooseStore = () => {
-    navigate("/PaymentConfirm");
-  };
-
   return (
     <div style={{ overflow: "hidden" }}>
       {/* header */}
@@ -51,10 +46,10 @@ function DCSS() {
       </div>
 
       <div className="pt-[115px] flex flex-col h-full">
-        {/* พื้นที่แสดง MAP */}
+        {/* MAP */}
         <div className="relative z-[1] h-[500px] flex-grow">MAP</div>
 
-        {/* แถบ รายละเอียด / เลือกร้าน */}
+        {/* รายละเอียด / เลือกร้าน */}
         <div className="absolute bottom-0 w-full h-[370px] bg-white rounded-t-3xl z-[5000] overflow-y-auto shadow-[0_-4px_10px_rgba(0,0,0,0.2)] flex flex-col">
           <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2">
             <div className="flex justify-between items-center w-full">
@@ -170,7 +165,7 @@ function DCSS() {
                         <p className="mb-0 font-semibold">1500</p>
                         <button
                           style={{ borderRadius: "50px" }}
-                          onClick={handleChooseStore}
+                          onClick={() => navigate("/PaymentConfirm")}
                           className="bg-[#0DC964] text-white w-[80px] h-[28px] text-sm rounded-full hover:bg-[#43af56] transition"
                         >
                           เลือก

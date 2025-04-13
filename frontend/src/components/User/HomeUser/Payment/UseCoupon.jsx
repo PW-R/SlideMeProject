@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-function Coupon() {
+function UseCoupon() {
   return (
     <div style={{ overflow: "hidden" }}>
       {/* header */}
@@ -44,4 +44,4 @@ function Coupon() {
   );
 }
 
-export default Coupon;
+export default UseCoupon;

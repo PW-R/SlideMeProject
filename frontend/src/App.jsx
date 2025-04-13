@@ -21,8 +21,8 @@ import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 import DCSS from "./components/User/HomeUser/DCSS/DCSS";
 import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
-import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
-import Coupon from "./components/User/HomeUser/Payment/Coupon";
+import DriverDetail from "./components/User/HomeUser/DCSS/DriverDetail";
+import UseCoupon from "./components/User/HomeUser/Payment/UseCoupon";
 import OrderStatusListUser from "./components/User/ListUser/PendingOrder/OrderStatusList";
 
 import ListPendingOrder from "./components/User/ListUser/ListPendingOrder";
@@ -75,8 +75,8 @@ function App() {
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
               <Route path="DCSS" element={<DCSS />} />
               <Route path="PaymentConfirm" element={<PaymentConfirm />} />
-              <Route path="ShopDetail" element={<ShopDetail />} />
-              <Route path="Coupon" element={<Coupon />} />
+              <Route path="DriverDetail" element={<DriverDetail />} />
+              <Route path="UseCoupon" element={<UseCoupon />} />
               <Route path="OrderStatusListUser" element={<OrderStatusListUser />} />
               <Route path="ListPendingOrder" element={<ListPendingOrder />} />
               <Route path="ListOrderHistory" element={<ListOrderHistory />} />

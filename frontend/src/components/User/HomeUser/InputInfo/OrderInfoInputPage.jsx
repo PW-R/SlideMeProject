@@ -25,11 +25,6 @@ function OrderInfoInputPage() {
     setSelectedTime(event.target.value);
   };
 
-  // ฟังก์ชั่นสำหรับยืนยันตำแหน่ง
-  const handleSearchSlideCar = () => {
-    navigate("/DCSS");
-  };
-
   return (
     <div style={{ minHeight: "100vh", overflow: "hidden" }}>
       {/* header */}
@@ -193,7 +188,7 @@ function OrderInfoInputPage() {
         {/* ปุ่มค้นหา */}
         <div className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">
           <button
-            onClick={handleSearchSlideCar}
+            onClick={() => navigate("/DCSS")}
             style={{ borderRadius: "50px" }}
             className="bg-[#0DC964] text-white w-[150px] h-[40px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
           >

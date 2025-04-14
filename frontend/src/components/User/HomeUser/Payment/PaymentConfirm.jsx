@@ -45,12 +45,14 @@ function PaymentConfirm() {
             ข้อมูลผู้ให้บริการ
           </button>
           <button
+            onClick={() => navigate("/UserMassage")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-[100px] h-[30px] text-[10px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
             โทรหาผู้ให้บริการ
           </button>
           <button
+            onClick={() => navigate("/UserMassage")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-[100px] h-[30px] text-[10px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
@@ -133,7 +135,7 @@ function PaymentConfirm() {
         {/* ปุ่มชำระเงิน / ยกเลิก */}
         <div className="flex justify-center gap-4">
           <button
-            // onClick={() => navigate("/UseCoupon")}
+            onClick={() => navigate("/Receipt")}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#43af56] transition"
           >

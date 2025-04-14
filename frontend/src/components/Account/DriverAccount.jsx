@@ -18,22 +18,47 @@ function DriverAccount() {
             className="w-16 h-16 rounded-full bg-gray-200"
           />
           <div>
-            <p className="text-[#0dc964] text-sm font-medium">สวัสดี ขอให้วันนี้เป็นวันที่ดี</p>
+            <p className="text-[#0dc964] text-[16px] font-medium">
+              สวัสดี ขอให้วันนี้เป็นวันที่ดี
+            </p>
             <h2 className="text-black font-bold text-lg">สมใจ สมดีนคร</h2>
           </div>
         </div>
 
         {/* เมนู */}
         <div className="mt-6 space-y-3">
-          <Link to="/EditDriverAccount" className="block border-b py-2">ข้อมูลส่วนตัว</Link>
-          <Link to="/StoreAccount" className="block border-b py-2">ข้อมูลร้าน</Link>
-          <Link to="/RoleEmployee" className="block border-b py-2">ระบบพนักงาน</Link>
-          <Link to="/RequestJoin" className="block border-b py-2">คำขอสมัครพนักงาน</Link>
-          <Link to="/" className="block border-b py-2">ออกจากระบบ</Link>
+          <Link
+            to="/EditDriverAccount"
+            className="block border-b py-2 text-black "
+          >
+            ข้อมูลส่วนตัว
+          </Link>
+          <Link
+            to="/StoreAccount"
+            className="block border-b py-2 text-black "
+          >
+            ข้อมูลร้าน
+          </Link>
+          <Link
+            to="/RoleEmployee"
+            className="block border-b py-2 text-black "
+          >
+            ระบบพนักงาน
+          </Link>
+          <Link
+            to="/RequestJoin"
+            className="block border-b py-2 text-black"
+          >
+            คำขอสมัครพนักงาน
+          </Link>
+          <Link
+            to="/"
+            className="block border-b py-2 text-black "
+          >
+            ออกจากระบบ
+          </Link>
         </div>
       </div>
-
-      
     </div>
   );
 }

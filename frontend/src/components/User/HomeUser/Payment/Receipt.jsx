@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; // Add this import
 
 function Receipt() {
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
   const [timerActive, setTimerActive] = useState(true);
+  const navigate = useNavigate(); // Initialize navigate function
 
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
@@ -42,10 +44,14 @@ function Receipt() {
           <p>กรุณาสแกน QR Code ด้วยแอปพลิเคชัน Mobile Banking ของคุณ</p>
         </div>
         <div className="mt-6 flex gap-4 justify-center">
-          <button className="bg-[#0dc964] text-white px-6 py-2 rounded-xl">
+          <button 
+          onClick={() => navigate("/PaymentCompleted")}
+          className="bg-[#0dc964] text-white px-6 py-2 rounded-xl">
             บันทึกรูป
           </button>
-          <button className="bg-[#0dc964] text-white px-6 py-2 rounded-xl">
+          <button 
+          onClick={() => navigate("/UserHome")}
+          className="bg-[#ff0000] text-white px-6 py-2 rounded-xl">
             กลับไปหน้าแรก
           </button>
         </div>

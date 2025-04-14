@@ -24,6 +24,7 @@ import ShopReccommend from "./components/User/HomeUser/ShopReccommend";
 import InputInfo from "./components/User/HomeUser/InputInfo/OrderInfoInputPage";
 import DCSS from "./components/User/HomeUser/DCSS/DCSS";
 import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
+import PaymentCompleted from "./components/User/HomeUser/Payment/PaymentCompleted";
 import Receipt from "./components/User/HomeUser/Payment/Receipt";
 import DriverDetail from "./components/User/HomeUser/DCSS/DriverDetail";
 import UseCoupon from "./components/User/HomeUser/Payment/UseCoupon";
@@ -83,6 +84,7 @@ function App() {
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
               <Route path="DCSS" element={<DCSS />} />
               <Route path="PaymentConfirm" element={<PaymentConfirm />} />
+              <Route path="PaymentCompleted" element={<PaymentCompleted />} />
               <Route path="Receipt" element={<Receipt />}/>
               <Route path="DriverDetail" element={<DriverDetail />} />
               <Route path="UseCoupon" element={<UseCoupon />} />

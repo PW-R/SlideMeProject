@@ -43,6 +43,13 @@ function EditUserProfile() {
             placeholder="ยืนยันรหัสผ่านใหม่"
           />
         </div>
+
+        {/* บันทึก Button */}
+        <div className="mt-6 flex justify-center">
+          <button className="bg-[#0DC964] text-white font-semibold py-2 px-6 rounded-lg hover:bg-[#0bb257] transition">
+            บันทึก
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -11,6 +11,7 @@ import Forgotpass from "./components/LoginandRegister/Forgotpass";
 // Account
 import UserAccount from "./components/Account/UserAccount"
 import PresetPosition from "./components/Account/UserAccount/PresetPosition";
+import EditUserProfile from "./components/Account/UserAccount/EditUserProfile";
 
 // User
 import RegisterUser from "./components/LoginandRegister/RegisterUser";
@@ -84,6 +85,7 @@ function App() {
               <Route path="NotiUser" element={<NotiUser />} />
               <Route path="UserAccount" element={<UserAccount />} />
               <Route path="PresetPosition" element={<PresetPosition />} />
+              <Route path="EditUserProfile" element={<EditUserProfile />} />
             </Route>
 
             {/* Driver */}

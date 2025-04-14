@@ -39,7 +39,10 @@ const UserAccount = () => {
           className="w-full text-left px-4 py-3 bg-gray-100 rounded-lg border hover:bg-gray-200 transition">
             ร้านตำแหน่งสร้างไว้
           </button>
-          <button className="w-full text-left px-4 py-3 bg-gray-100 rounded-lg border hover:bg-gray-200 transition">
+          <button 
+          
+          onClick={() => navigate("/EditUserProfile")}
+          className="w-full text-left px-4 py-3 bg-gray-100 rounded-lg border hover:bg-gray-200 transition">
           แก้ไขข้อมูลส่วนตัว
           </button>
          

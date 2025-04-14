@@ -24,7 +24,7 @@ function DriverNavBar({ tab, setTab }) {
           </button>
         </Link>
 
-        <Link to="#">
+        <Link to="/DriverAccount">
           <button className="flex flex-col items-center border-none bg-transparent hover:bg-[#0ea78f]">
             <i className="bi bi-person-circle mt-3 text-white text-2xl"></i>
             <p className="text-white text-xs no-underline">บัญชี</p>

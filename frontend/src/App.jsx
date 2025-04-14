@@ -42,11 +42,13 @@ import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_Order
 import CreateAndjoin from "./components/CreatestoreAndJoin/CreateAndjoin";
 import CreateStore from "./components/CreatestoreAndJoin/Createstore";
 import JoinStore from "./components/CreatestoreAndJoin/joinStore";
- 
 import LocationStore from "./components/Driver/ListDriver/OrderLocation/LocationStore";
-
 import OrderhistoryDetail from "./components/Driver/ListDriver/OrderHistory/OrderhistoryDetail";
-
+import StoreAccount from "./components/Account/StoreAccount";
+import DriverAccount from "./components/Account/DriverAccount";
+import EditDriverAccount from "./components/Account/DriverAccount/EditDriverAccount";
+import RoleEmployee from "./components/Driver/EmployeeSystem/RoleEmployee";
+import RequestJoin from "./components/Driver/EmployeeSystem/RequestJoin";
 
 import "./index.css";
 import "./App.css";
@@ -93,15 +95,17 @@ function App() {
               <Route path="/HomeCustomize" element={<HomeCustomize />} />
               <Route path="/ListDriver" element={<ListDriver />} />
               <Route path="/DriverNotificationList" element={<DriverNotificationList />}/>
-              \
               <Route path="/OrderHistoryList" element={<OrderHistoryList />} />
               <Route path="/OrderStatusList" element={<OrderStatusList />} />
               <Route path="/IncomingOrder" element={<IncomingOrder />} />
-
               <Route path="/LocationStore" element={<LocationStore />} />
-
               <Route path="/OrderhistoryDetail" element={<OrderhistoryDetail />} />
-
+              <Route path="/StoreAccount" element={<StoreAccount />} />
+              <Route path="/DriverAccount" element={<DriverAccount />} />
+              <Route path="/EditDriverAccount" element={<EditDriverAccount />} />
+              <Route path="/RoleEmployee" element={<RoleEmployee />} />
+              <Route path="/RequestJoin" element={<RequestJoin />} />
+              
             </Route>
           </Routes>
         </HashRouter>

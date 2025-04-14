@@ -1,4 +1,4 @@
-mysqldump: [Warning] Using a password on the command line interface can be insecure.
+-- mysqldump: [Warning] Using a password on the command line interface can be insecure.
 -- MySQL dump 10.13  Distrib 9.2.0, for Linux (x86_64)
 --
 -- Host: localhost    Database: SlideMeDB

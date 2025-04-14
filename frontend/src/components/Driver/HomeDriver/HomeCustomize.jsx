@@ -1,12 +1,12 @@
 function HomeCustomize() {
     return (
         <div >
-        
-            <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-            <h1 className="text-white text-center">HOME</h1>
-            </div>
+        <div style={{ overflow: "hidden" }} className="pb-32">
+        <div className="fixed w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
+        <h1 className="text-white">HOME</h1>
+         </div>
           
-          <div className="flex flex-col items-center mt-4">
+          <div className="pt-[150px] flex flex-col items-center gap-4">
 
             <div className="form-check form-switch ">
               <label className="form-check-label" for="switchCheckDefault">Store status: </label>
@@ -34,7 +34,7 @@ function HomeCustomize() {
 
             </div>
         </div>
-       
+        </div>
     )
 }
 

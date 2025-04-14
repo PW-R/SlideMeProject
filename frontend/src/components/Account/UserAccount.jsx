@@ -45,6 +45,13 @@ const UserAccount = () => {
           className="w-full text-left px-4 py-3 bg-gray-100 rounded-lg border hover:bg-gray-200 transition">
           แก้ไขข้อมูลส่วนตัว
           </button>
+
+          <button 
+          
+          onClick={() => navigate("/")}
+          className="w-full text-left px-4 py-3 bg-gray-100 rounded-lg border hover:bg-gray-200 transition">
+          ออกจากระบบ
+          </button>
          
         </div>
       </div>

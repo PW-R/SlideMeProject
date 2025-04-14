@@ -1,14 +1,15 @@
-function OrderInfo() {
+function IncomingOrderInfo() {
   return (
     <div>
       <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <h1 className="text-white text-center">สถานะงาน</h1>
+        <h1 className="text-white text-center">รายละเอียดงาน</h1>
       </div>
 
       <div className="flex flex-col items-center mt-4 ">
         <div className=" mt-4 font-bold bg-[#62EF8A] w-[300px] h-auto !rounded-[10px] p-3 leading-none ">
           <p>#56665789-897</p>
           <p>คุณพร บ่าวแม็ค</p>
+          <p>ประเภทการเรียก: เรียกทันที</p>
         </div>
 
         <div className="bg-[#62EF8A] w-[300px] h-auto !rounded-[10px] p-3 leading-none mt-4">
@@ -28,9 +29,13 @@ function OrderInfo() {
           <p>เวลา 12.50</p>
           <p>งบประมาณ : 3,000 บาท</p>
         </div>
+        <div className="flex m-4 ">
+        <button type="button" className="btn btn-success">รับงาน</button>
+        <button type="button" className="btn btn-danger">ปฏิเสธงาน</button>
+        </div>
       </div>
     </div>
   );
 }
 
-export default OrderInfo;
+export default IncomingOrderInfo;

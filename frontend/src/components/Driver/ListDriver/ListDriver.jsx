@@ -7,37 +7,35 @@ function ListDriver() {
       </div>
 
       <div className="flex flex-col gap-4 items-center text-center font-bold text-lg mt-5  ">
-
         <Link to="/OrderHistoryList">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4 ">
             ประวัติการทำงาน
           </div>
         </Link>
 
-          
-          <Link to="/LocationStore">
+        <Link to="/LocationStore">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
-
-
-          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
-
-            Location
+            <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
+              Location
+            </div>
           </div>
-         </div>
-          </Link>
-    
+        </Link>
+
         <Link to="/OrderStatusList">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
             สถานะงาน
           </div>
         </Link>
 
-        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
-          งานที่สามารถรับได้
-        </div>
-        <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
-          ตารางงาน
-        </div>
+        <Link to="/ICOrderList">
+          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
+            งานที่สามารถรับได้
+          </div>
+        </Link>
+        
+          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
+            ตารางงาน
+          </div>
       </div>
     </div>
   );

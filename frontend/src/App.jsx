@@ -38,7 +38,7 @@ import ListDriver from "./components/Driver/ListDriver/ListDriver";
 import DriverNotificationList from "./components/Driver/NotificationDriver/NotificationList";
 import OrderHistoryList from "./components/Driver/ListDriver/OrderHistory/OrderHistoryList";
 import OrderStatusList from "./components/Driver/ListDriver/OrderStatus/OrderStatusList";
-import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/IC_OrderList";
+import IncomingOrder from "./components/Driver/ListDriver/IncomingOrder/ICOrderList";
 import CreateAndjoin from "./components/CreatestoreAndJoin/CreateAndjoin";
 import CreateStore from "./components/CreatestoreAndJoin/Createstore";
 import JoinStore from "./components/CreatestoreAndJoin/joinStore";
@@ -49,6 +49,10 @@ import DriverAccount from "./components/Account/DriverAccount";
 import EditDriverAccount from "./components/Account/DriverAccount/EditDriverAccount";
 import RoleEmployee from "./components/Driver/EmployeeSystem/RoleEmployee";
 import RequestJoin from "./components/Driver/EmployeeSystem/RequestJoin";
+import OrderInfo from "./components/Driver/ListDriver/OrderStatus/OrderInfo";
+import ICOrderList from "./components/Driver/ListDriver/IncomingOrder/ICOrderList";
+import IncomingOrderInfo from "./components/Driver/ListDriver/IncomingOrder/IncomingOrderInfo";
+import OrderPayment from "./components/Driver/ListDriver/IncomingOrder/OrderPayment";
 
 import "./index.css";
 import "./App.css";
@@ -105,6 +109,10 @@ function App() {
               <Route path="/EditDriverAccount" element={<EditDriverAccount />} />
               <Route path="/RoleEmployee" element={<RoleEmployee />} />
               <Route path="/RequestJoin" element={<RequestJoin />} />
+              <Route path="/OrderInfo" element={<OrderInfo />} />
+              <Route path="/ICOrderList" element={<ICOrderList />} />
+              <Route path="/IncomingOrderInfo" element={<IncomingOrderInfo />} />
+              <Route path="/OrderPayment" element={<OrderPayment />} />
               
             </Route>
           </Routes>

@@ -3,10 +3,15 @@ import { useLocation } from "react-router-dom";
 import UserNavBar from "./UserNavBar";
 
 function UserLayout() {
-
   const location = useLocation();
 
-  const hideNavBarRoutes = ["/StartPosition", "/Destination", "/OrderStatusListUser","/Reciept"];
+  const hideNavBarRoutes = [
+    "/StartPosition",
+    "/Destination",
+    "/OrderStatusListUser",
+    "/Receipt",
+    "/PaymentCompleted"
+  ];
   const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
 
   return (
@@ -15,7 +20,7 @@ function UserLayout() {
         <div className="flex-grow overflow-auto scrollbar-hide">
           <Outlet />
         </div>
-        { !shouldHideNavBar && <UserNavBar />}
+        {!shouldHideNavBar && <UserNavBar />}
       </div>
     </AppWrapper>
   );

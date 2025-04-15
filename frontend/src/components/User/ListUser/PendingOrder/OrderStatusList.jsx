@@ -61,18 +61,15 @@ function OrderStatusListUser() {
             </div>
 
             <button
+              onClick={() => navigate("/UserMassage")}
               style={{ borderRadius: "10px" }}
               className="w-8 h-8 rounded-[10px] bg-[#60B876] flex items-center justify-center"
-              //   onClick={() =>
-              //     (window.location.href = `tel:${
-              //       selectedOffer?.phoneNumber || "+0682538888"
-              //     }`)
-              //   }
             >
               <i className="bi bi-telephone text-white"></i>
             </button>
 
             <button
+              onClick={() => navigate("/UserMassage")}
               style={{ borderRadius: "10px" }}
               className="w-8 h-8 rounded-[10px] bg-[#60B876] flex items-center justify-center"
             >
@@ -83,7 +80,7 @@ function OrderStatusListUser() {
           {/* ปุ่มกลับ  */}
           <div className="flex justify-center items-center">
             <button
-              // onClick={handleNextChooseStore}
+              onClick={() => navigate("/ListPendingOrder")}
               style={{ borderRadius: "50px" }}
               className="bg-[#0DC964] text-white w-[120px] h-[30px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
             >

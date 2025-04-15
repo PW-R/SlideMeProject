@@ -6,7 +6,7 @@ function HomeCustomize() {
         <h1 className="text-white">HOME</h1>
          </div>
           
-          <div className="pt-[150px] flex flex-col items-center gap-4">
+          <div className="pt-[150px] flex flex-col items-center ">
 
             <div className="form-check form-switch ">
               <label className="form-check-label" for="switchCheckDefault">Store status: </label>

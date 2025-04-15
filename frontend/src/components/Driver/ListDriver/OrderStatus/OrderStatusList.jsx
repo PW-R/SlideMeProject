@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 function OrderStatusList() {
   const [show, setShow] = useState(false);
@@ -79,6 +80,7 @@ function OrderStatusList() {
             </div>
 
             <div className="flex items-center mt-2 ml-4">
+              <Link to="/OrderConfirmation">
               <button
                 type="button"
                 className="btn btn-success"
@@ -86,6 +88,7 @@ function OrderStatusList() {
               >
                 สำเร็จงาน
               </button>
+              </Link>
               <button
                 type="button"
                 className="btn btn-danger"

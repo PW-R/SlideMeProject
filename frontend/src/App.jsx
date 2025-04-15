@@ -58,6 +58,7 @@ import OrderInfo from "./components/Driver/ListDriver/OrderStatus/OrderInfo";
 import ICOrderList from "./components/Driver/ListDriver/IncomingOrder/ICOrderList";
 import IncomingOrderInfo from "./components/Driver/ListDriver/IncomingOrder/IncomingOrderInfo";
 import OrderPayment from "./components/Driver/ListDriver/IncomingOrder/OrderPayment";
+import OrderConfirmation from "./components/Driver/ListDriver/IncomingOrder/OrderConfirmation";
 
 import "./index.css";
 import "./App.css";
@@ -122,6 +123,8 @@ function App() {
               <Route path="/ICOrderList" element={<ICOrderList />} />
               <Route path="/IncomingOrderInfo" element={<IncomingOrderInfo />} />
               <Route path="/OrderPayment" element={<OrderPayment />} />
+              <Route path="/OrderConfirmation" element={<OrderConfirmation />} />
+              
               
             </Route>
           </Routes>

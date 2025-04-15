@@ -32,7 +32,7 @@ function Review() {
   const [comment, setComment] = useState("");
 
   return (
-    <div className="p-4">
+    <div style={{ overflow: "hidden" }}>
       {/* Header */}
       <div className="relative bg-[#0DC964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
         <h1 className="text-white text-xl font-bold">รีวิว</h1>
@@ -40,13 +40,14 @@ function Review() {
 
       {/* Icons */}
       <div className="flex items-center justify-center mt-4">
-        <div className="w-10 h-10 bg-gray-200 rounded-full flex justify-center items-center mr-4">
-          <i className="fas fa-car text-xl text-gray-700"></i>
-        </div>
-        <div className="w-10 h-10 bg-gray-200 rounded-full flex justify-center items-center">
-          <i className="fas fa-user text-xl text-gray-700"></i>
-        </div>
-      </div>
+  <div className="w-20 h-20 bg-gray-200 rounded-full flex justify-center items-center z-10">
+    <i className="fas fa-car text-xl text-gray-700"></i>
+  </div>
+  <div className="w-20 h-20 bg-red-200 rounded-full flex justify-center items-center -ml-8 z-0">
+    <i className="fas fa-user text-xl text-gray-700"></i>
+  </div>
+</div>
+
 
       {/* Shop Name */}
       <div className="text-center mt-2 mb-4">
@@ -54,8 +55,8 @@ function Review() {
       </div>
 
       {/* Ratings */}
-      <div>
-        <h3 className="font-semibold text-lg mb-4">ให้คะแนน</h3>
+      <div className="m-6">
+        <h3 className="font-semibold text-lg mb-2">ให้คะแนน</h3>
         <StarRating label="ตรงต่อเวลา" rating={onTime} setRating={setOnTime} />
         <StarRating label="ปลอดภัย" rating={safety} setRating={setSafety} />
         <StarRating
@@ -71,7 +72,7 @@ function Review() {
       </div>
 
       {/* Comment Section */}
-      <div className="mt-6">
+      <div className="m-4 mb-2">
         <textarea
           className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
           rows="4"
@@ -80,8 +81,10 @@ function Review() {
           onChange={(e) => setComment(e.target.value)}
         ></textarea>
       </div>
+
       <button
-        className="mt-4 w-full bg-[#0DC964] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#0bb558] transition duration-200"
+        style={{ borderRadius: "50px" }}
+        className=" w-[340px] mx-auto bg-[#0DC964] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#0bb558] transition duration-200 m-6 block"
         onClick={() => {
           // You can replace this alert with your actual submit logic
           alert("ความคิดเห็นถูกบันทึกแล้ว!");

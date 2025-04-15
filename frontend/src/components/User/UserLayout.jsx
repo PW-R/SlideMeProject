@@ -10,7 +10,8 @@ function UserLayout() {
     "/Destination",
     "/OrderStatusListUser",
     "/Receipt",
-    "/PaymentCompleted"
+    "/PaymentCompleted",
+    "/UserMassage",
   ];
   const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
 

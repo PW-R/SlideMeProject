@@ -89,14 +89,15 @@ function ListPendingOrder() {
   };
 
   return (
-    <div className="p-4 overflow-hidden">
+    <div style={{ minHeight: "100vh", overflow: "hidden" }}
+    className="relative w-full">
       {/* Header */}
-      <div className="relative bg-[#0DC964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
+      <div className="fixed w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
         <h1 className="text-white text-xl font-bold">รายการ</h1>
       </div>
 
       {/* Tabs */}
-      <div className="flex justify-between mt-6 mb-4 items-center">
+      <div className="fixed top-[100px] w-[387px] bg-white z-[40] pt-8 pb-2">
         <div className="flex w-full">
           <button
             className={`w-1/2 py-2 text-center ${
@@ -118,7 +119,7 @@ function ListPendingOrder() {
       </div>
 
       {/* Order List */}
-      <ul className="space-y-3">
+      <div className="absolute top-[170px] bottom-0 left-0 right-0 overflow-y-auto p-6 space-y-3">
         {filteredOrders.map((order) => (
           <li
             key={order.id}
@@ -151,7 +152,7 @@ function ListPendingOrder() {
         {filteredOrders.length === 0 && (
           <li className="text-gray-500 text-center">ไม่มีข้อมูล</li>
         )}
-      </ul>
+      </div>
     </div>
   );
 }

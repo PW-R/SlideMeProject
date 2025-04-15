@@ -143,7 +143,8 @@ function DCSS() {
                   <p className="text-gray-500 text-center">รอสักครู่...</p>
                 ) : (
                   <>
-                    <div className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3">
+                    {/* รายละเอียดร้าน */}
+                    <div className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3 mt-3">
                       <div>
                         <img
                           className="w-[50px] h-[50px] rounded-full object-cover"
@@ -172,7 +173,6 @@ function DCSS() {
                         </button>
                       </div>
                     </div>
-
                     <div className="w-full border-t-2 border-gray-300"></div>
                   </>
                 )}

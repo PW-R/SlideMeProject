@@ -38,15 +38,18 @@ function NotiUser() {
 
   return (
     <div className="driver-noti-container min-h-screen bg-white flex flex-col">
-      <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <h1 className="text-white text-center text-xl font-semibold">Notifications</h1>
+      <div className="fixed w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
+        <h1 className="text-white text-center text-xl font-semibold">
+          Notifications
+        </h1>
       </div>
 
       {/* Scrollable container */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="flex-1 overflow-y-auto px-4 py-6 pt-[115px] mt-6">
         <div className="flex flex-col gap-4 items-center pb-10">
           {notifications.map((noti) => (
             <button
+              style={{ borderRadius: "10px" }}
               key={noti.id}
               onClick={() => handleNotificationClick(noti.id)}
               className="w-full max-w-md flex items-start gap-3 rounded-xl p-4 shadow bg-gray-100 transition hover:scale-[1.01] active:scale-[0.98]"

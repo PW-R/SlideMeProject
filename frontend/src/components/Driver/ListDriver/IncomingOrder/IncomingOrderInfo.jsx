@@ -1,5 +1,10 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate  } from "react-router-dom";
 function IncomingOrderInfo() {
+  const navigate = useNavigate();
+  const handleAccept = () => {
+    navigate("/OrderPayment");
+  };
+
   return (
     <div style={{ overflow: "hidden" }} className="pb-32">
       <div className="w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000] relative">
@@ -38,7 +43,7 @@ function IncomingOrderInfo() {
           <p>งบประมาณ : 3,000 บาท</p>
         </div>
         <div className="flex m-4 gap-x-6">
-          <button type="button" className="btn btn-success">
+          <button type="button" className="btn btn-success" onClick={handleAccept}>
             รับงาน
           </button>
           <button type="button" className="btn btn-danger">

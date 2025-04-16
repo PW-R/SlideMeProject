@@ -177,13 +177,20 @@ function OrderInfoInputPage() {
               type="time"
               className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f] mt-2"
             />
-            <input
-              type="number"
-              placeholder="จำนวนเงิน"
-              className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f] mt-2"
-            />
           </div>
         )}
+
+        {/* กรอกจำนวนเงิน */}
+        <div className="mb-2 mt-2">
+          <label className="block text-xl/6 font-semibold text-black-900">
+            จำนวนเงิน
+          </label>
+          <input
+            type="number"
+            placeholder="กรอกจำนวนเงิน"
+            className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
+          />
+        </div>
 
         {/* ปุ่มค้นหา */}
         <div className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">

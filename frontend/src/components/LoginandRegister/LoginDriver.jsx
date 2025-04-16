@@ -59,7 +59,7 @@ function LoginDriver() {
         </div>
 
         {/* Login Button */}
-        <Link to="/HomeCustomize" className="mb-4 w-[291px] h-[50px]">
+        <Link to="/CreateAndJoin" className="mb-4 w-[291px] h-[50px]">
           <div className="bg-[#48d065] text-white w-full h-full rounded-[20px] font-bold text-lg flex items-center justify-center hover:bg-[#43af56] transition">
             Login
           </div>
@@ -71,15 +71,6 @@ function LoginDriver() {
             Sign In
           </div>
         </Link>
-        
-         {/* สร้างร้านจำเป็น */}
-         <Link to="/CreateAndJoin" className="mb-4 w-[291px] h-[50px]">
-          <div className="bg-[#48d065] text-white w-full h-full rounded-[20px] font-bold text-lg flex items-center justify-center hover:bg-[#43af56] transition">
-            สร้างร้านจำเป็น
-          </div>
-        </Link>
-
-
       </div>
     </AppWrapper>
   );

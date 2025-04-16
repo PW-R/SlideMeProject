@@ -20,7 +20,7 @@ function PendingOrderLocation() {
     <div style={{ overflow: "hidden" }}>
       {/* Header */}
       <div className="fixed w-full max-w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <Link to="/OrderInfoInputPage">
+        <Link to="/HomeCustomize">
           <i className="bi bi-chevron-left text-white text-2xl absolute left-3 bottom-4"></i>
         </Link>
         <h1 className="text-white text-lg font-bold">ดำเนินงาน</h1>

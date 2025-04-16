@@ -1,11 +1,23 @@
 import { Link, useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
 function OrderPayment() {
   const navigate = useNavigate();
   const [price, setPrice] = useState("");
-  const [items, setItems] = useState([
-    { name: "", quantity: "", unit: "", price: "" },
-  ]);
+  const [items, setItems] = useState([{ name: "", quantity: "", price: "" }]);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    calculateTotal();
+  }, [price, items]);
+
+  const calculateTotal = () => {
+    const basePrice = parseFloat(price) || 0;
+    const accessoryTotal = items.reduce((acc, item) => {
+      const itemPrice = parseFloat(item.price) || 0;
+      return acc + itemPrice;
+    }, 0);
+    setTotal(basePrice + accessoryTotal);
+  };
 
   const handleOfferJob = () => {
     navigate("/PendingOrderLocation");
@@ -91,7 +103,8 @@ function OrderPayment() {
           placeholder="ระบุราคาที่ต้องการเสนอ"
           className="border-2 border-[#6FBB84] rounded-lg px-4 py-2 w-full focus:outline-none focus:border-green-500"
         />
-        <hr />
+
+        <hr className="my-4" />
         <p className="text-lg font-bold mb-4">ค่าอุปกรณ์เสริม</p>
 
         {items.map((item, index) => (
@@ -116,7 +129,6 @@ function OrderPayment() {
                 placeholder="จำนวน"
                 className="border-2 border-[#6FBB84] rounded-lg px-3 py-2 w-full"
               />
-
               <input
                 type="number"
                 value={item.price}
@@ -127,7 +139,6 @@ function OrderPayment() {
                 className="border-2 border-[#6FBB84] rounded-lg px-3 py-2 w-full"
               />
             </div>
-
             <button
               onClick={() => handleRemoveRow(index)}
               className="mt-2 border border-[#6FBB84] text-green-700 px-4 py-1 rounded-lg font-semibold hover:bg-green-50 w-fit"
@@ -143,9 +154,18 @@ function OrderPayment() {
         >
           เพิ่มแถว
         </button>
+
+        <hr className="my-4" />
+        <p className="text-xl font-bold text-green-700">
+          ยอดรวมทั้งหมด: {total.toLocaleString()} บาท
+        </p>
       </div>
 
-      <button type="button" className="btn btn-success" onClick={handleOfferJob}>
+      <button
+        type="button"
+        className="btn btn-success"
+        onClick={handleOfferJob}
+      >
         เสนองาน
       </button>
     </div>

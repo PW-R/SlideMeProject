@@ -60,6 +60,8 @@ import IncomingOrderInfo from "./components/Driver/ListDriver/IncomingOrder/Inco
 import OrderPayment from "./components/Driver/ListDriver/IncomingOrder/OrderPayment";
 import OrderConfirmation from "./components/Driver/ListDriver/IncomingOrder/OrderConfirmation";
 import OrderSchedue from "./components/Driver/ListDriver/OrderSchedue";
+import PendingOrderLocation from "./components/Driver/ListDriver/OrderLocation/PendingOrderLocation";
+
 
 import "./index.css";
 import "./App.css";
@@ -126,7 +128,7 @@ function App() {
               <Route path="/OrderPayment" element={<OrderPayment />} />
               <Route path="/OrderConfirmation" element={<OrderConfirmation />} />
               <Route path="/OrderSchedue" element={<OrderSchedue />} />
-              
+              <Route path="/PendingOrderLocation" element={<PendingOrderLocation />} />
               
             </Route>
           </Routes>

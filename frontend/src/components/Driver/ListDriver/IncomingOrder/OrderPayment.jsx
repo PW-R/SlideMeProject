@@ -8,7 +8,7 @@ function OrderPayment() {
   ]);
 
   const handleOfferJob = () => {
-    navigate("/OrderSchedue");
+    navigate("/PendingOrderLocation");
   };
   const handleChangePrice = (e) => {
     const value = e.target.value;

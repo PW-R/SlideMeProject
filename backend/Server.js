@@ -15,8 +15,7 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello from the Express server!" });
 });
 
-// Location Routes
-app.use('/api', locationRoutes);
+
 
 // Start the server
 app.listen(PORT, () => {

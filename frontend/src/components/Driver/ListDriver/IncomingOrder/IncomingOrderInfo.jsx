@@ -1,10 +1,23 @@
+import { Link, useNavigate  } from "react-router-dom";
 function IncomingOrderInfo() {
-  return (
-    <div>
-      <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <h1 className="text-white text-center">รายละเอียดงาน</h1>
-      </div>
+  const navigate = useNavigate();
+  const handleAccept = () => {
+    navigate("/OrderPayment");
+  };
 
+  return (
+    <div style={{ overflow: "hidden" }} className="pb-32">
+      <div className="w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000] relative">
+        {/* ปุ่มย้อนกลับ */}
+        <Link to="/ICOrderList">
+          <i className="bi bi-chevron-left text-white text-2xl absolute left-3 bottom-4"></i>
+        </Link>
+
+        {/* หัวข้อ Order History */}
+        <div className="text-white text-center">
+          <h1 className="text-lg font-bold">สถานะงาน</h1>
+        </div>
+      </div>
       <div className="flex flex-col items-center mt-4 ">
         <div className=" mt-4 font-bold bg-[#62EF8A] w-[300px] h-auto !rounded-[10px] p-3 leading-none ">
           <p>#56665789-897</p>
@@ -29,9 +42,13 @@ function IncomingOrderInfo() {
           <p>เวลา 12.50</p>
           <p>งบประมาณ : 3,000 บาท</p>
         </div>
-        <div className="flex m-4 ">
-        <button type="button" className="btn btn-success">รับงาน</button>
-        <button type="button" className="btn btn-danger">ปฏิเสธงาน</button>
+        <div className="flex m-4 gap-x-6">
+          <button type="button" className="btn btn-success" onClick={handleAccept}>
+            รับงาน
+          </button>
+          <button type="button" className="btn btn-danger">
+            ปฏิเสธงาน
+          </button>
         </div>
       </div>
     </div>

@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
 function OrderHistoryList() {
   return (
-    <div className="order-history-container">
-      <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <h1 className="text-white text-center">ประวัติการทำงาน</h1>
+    <div style={{ overflow: "hidden" }} className="pb-32">
+      <div className="w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000] relative">
+        {/* ปุ่มย้อนกลับ */}
+        <Link to="/ListDriver">
+          <i className="bi bi-chevron-left text-white text-2xl absolute left-3 bottom-4"></i>
+        </Link>
+
+        {/* หัวข้อ Order History */}
+        <div className="text-white text-center">
+          <h1 className="text-lg font-bold">Order History</h1>
+        </div>
       </div>
 
       <Link to={"/OrderhistoryDetail"}>

@@ -73,8 +73,8 @@ exports.NearbyShops = async (req, res) => {
         name: shop.Shop_Name,
         lat: shop.Shop_Lat,
         lng: shop.Shop_Lng,
-        price: shop.Total_Price
-        
+        price: shop.Total_Price,
+        Driver_ID: shop.Driver_ID
       }))
     });
     console.log("Nearby shops with price:", nearbyShop);

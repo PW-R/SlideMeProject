@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const InputOrderRoutes = require("./InputOrder/InputOrder.routes");
 const NearbyShopsRoutes = require("./NearbyShops/NearbyShops.routes")
+const SelectDriverRoutes = require("./SelectDriver/SelectDriver.routes")
 
 const app = express();
 const PORT = 3000;
@@ -19,14 +20,11 @@ app.get("/", (req, res) => {
 });
 
 
-<<<<<<< HEAD
 app.use("/api/InputOrder", InputOrderRoutes); // ใช้เส้นทางใน auth.routes
 app.use("/api", InputOrderRoutes); 
-
 app.use("/api/nearby-shops", NearbyShopsRoutes)
+app.use("/:orderId", SelectDriverRoutes)
 
-=======
->>>>>>> a7bd45e85098ec40f7da47483ee0872286001cde
 
 // Start the server
 app.listen(PORT, () => {

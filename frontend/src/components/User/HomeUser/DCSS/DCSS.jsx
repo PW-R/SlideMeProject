@@ -94,6 +94,7 @@ function DCSS() {
       axios
         .get(`http://localhost:3000/api/nearby-shops/${orderId}`)
         .then((response) => {
+          console.log("ข้อมูลร้านที่ใกล้เคียง:", response.data);
           setNearbyStores(response.data.stores); // เก็บร้านที่อยู่ใกล้
           setIsLoadingStores(false); // หยุดการโหลด
         })
@@ -103,6 +104,34 @@ function DCSS() {
         });
     }
   }, [orderId]);
+
+  // เลือกคนขับ
+  const handleSelectShops = async (store) => {
+    const driverId = Number(store.Driver_ID);
+    console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
+
+    if (isNaN(driverId) || driverId <= 0) {
+      console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
+      alert("ไม่พบข้อมูลคนขับ");
+      return;
+    }
+    
+    try {
+      // const orderId = /* ดึงมาจาก useParams หรือ state */;
+
+      await axios.post(`http://localhost:3000/api/SelectDriver/${orderId}`, {
+        Driver_ID: driverId,
+      });
+
+      console.log("✅ บันทึกคนขับเรียบร้อย");
+
+      // ไปหน้า PaymentConfirm
+      navigate(`/PaymentConfirm/${orderId}`);
+    } catch (err) {
+      console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
+      alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
+    }
+  };
 
   //  ปุ่มถัดไป
   const handleNextChooseStore = () => {
@@ -264,7 +293,7 @@ function DCSS() {
                     {nearbyStores.length > 0 ? (
                       nearbyStores.map((store) => (
                         <div
-                          key={store.Driver_ID}
+                          // key={store.driverId}
                           className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3 mt-3"
                         >
                           <div>
@@ -291,9 +320,22 @@ function DCSS() {
                             </p>
                             <button
                               style={{ borderRadius: "50px" }}
-                              onClick={() =>
-                                navigate(`/PaymentConfirm/${orderId}`)
-                              }
+                              onClick={() => {
+                                console.log("store:", store); // เพิ่ม log นี้
+                                console.log(
+                                  "เลือก Driver_ID:",
+                                  store.Driver_ID
+                                ); // เพิ่ม log นี้
+                                if (store.Driver_ID) {
+                                  handleSelectShops(store);
+                                  console.log(
+                                    "store.driverId",
+                                    store.Driver_ID
+                                  ); // ตรวจสอบค่า driverId
+                                } else {
+                                  console.error("ไม่มี Driver_ID");
+                                }
+                              }}
                               className="bg-[#0DC964] text-white w-[80px] h-[28px] text-sm rounded-full hover:bg-[#43af56] transition"
                             >
                               เลือก

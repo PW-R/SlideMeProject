@@ -1,5 +1,8 @@
+// server.js
 const express = require("express");
 const cors = require("cors");
+const InputOrderRoutes = require("./InputOrder/InputOrder.routes");
+const NearbyShopsRoutes = require("./NearbyShops/NearbyShops.routes")
 
 const app = express();
 const PORT = 3000;
@@ -14,6 +17,13 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "Hello from the Express server!" });
 });
+
+
+app.use("/api/InputOrder", InputOrderRoutes); // ใช้เส้นทางใน auth.routes
+app.use("/api", InputOrderRoutes); 
+
+app.use("/api/nearby-shops", NearbyShopsRoutes)
+
 
 // Start the server
 app.listen(PORT, () => {

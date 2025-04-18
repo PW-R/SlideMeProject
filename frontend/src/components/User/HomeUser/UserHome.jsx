@@ -1,8 +1,19 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Carousel } from "react-bootstrap";
+import { useEffect, useState } from "react";
 
 function UserHome() {
   const navigate = useNavigate();
+
+  const [start, setStart] = useState(null);
+  const [destination, setDestination] = useState(null);
+
+  useEffect(() => {
+    const storedStart = JSON.parse(sessionStorage.getItem("start"));
+    const storedDestination = JSON.parse(sessionStorage.getItem("destination"));
+    if (storedStart) setStart(storedStart);
+    if (storedDestination) setDestination(storedDestination);
+  }, []);
 
   return (
     <div>
@@ -40,16 +51,16 @@ function UserHome() {
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/StartPosition")}
-              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-full"
+              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              ตำแหน่งต้นทาง
+              {start?.name ? start.name : "ตำแหน่งต้นทาง"}
             </button>
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/Destination")}
-              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-full"
+              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              ตำแหน่งปลายทาง
+              {destination?.name ? destination.name : "ตำแหน่งปลายทาง"}
             </button>
           </div>
         </div>

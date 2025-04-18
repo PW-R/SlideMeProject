@@ -1,28 +1,117 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+import axios from "axios";
 
 function OrderInfoInputPage() {
-  const [selectedVehicle_condition, setSelectedVehicle_condition] =
-    useState("");
-  const [selectedDriverCar_type, setSelectedDriverCar_type] = useState("");
-  const [selectedTime, setSelectedTime] = useState("");
-
   const navigate = useNavigate();
 
-  // เลือกสภาพยานพาหนะ
-  const handleVehicleConditionChange = (event) => {
-    setSelectedVehicle_condition(event.target.value);
-  };
+  const [start, setStart] = useState(null);
+  const [destination, setDestination] = useState(null);
+  const [carBrand, setCarBrand] = useState("");
+  const [userCarType, setUserCarType] = useState("");
+  const [vehicleCondition, setVehicleCondition] = useState("");
+  const [carYear, setCarYear] = useState("");
+  const [licensePlate, setLicensePlate] = useState("");
+  const [note, setNote] = useState("");
+  const [driverCarType, setDriverCarType] = useState("");
+  const [serviceType, setServiceType] = useState("");
+  const [orderDateTime, setOrderDateTime] = useState({
+    date: "",
+    time: "",
+  });
+  const [orderBudget, setOrderBudget] = useState("");
 
-  // เลือกประเภทรถบริการ
-  const handleDriverCarTypeChange = (event) => {
-    setSelectedDriverCar_type(event.target.value);
-  };
+  useEffect(() => {
+    const storedData = JSON.parse(sessionStorage.getItem("formData"));
+    const storedStart = JSON.parse(sessionStorage.getItem("start"));
+    const storedDestination = JSON.parse(sessionStorage.getItem("destination"));
+    if (storedStart) setStart(storedStart);
+    if (storedDestination) setDestination(storedDestination);
 
-  // เลือกเวลา
-  const handleTimeChange = (event) => {
-    setSelectedTime(event.target.value);
+    if (storedData) {
+      setCarBrand(storedData.carBrand || "");
+      setUserCarType(storedData.userCarType || "");
+      setVehicleCondition(storedData.vehicleCondition || "");
+      setCarYear(storedData.carYear || "");
+      setLicensePlate(storedData.licensePlate || "");
+      setNote(storedData.note || "");
+      setDriverCarType(storedData.driverCarType || "");
+      setServiceType(storedData.serviceType || "");
+      setOrderDateTime(storedData.orderDateTime || { date: "", time: "" });
+      setOrderBudget(storedData.orderBudget || "");
+    }
+  }, []);
+
+  useEffect(() => {
+    const formData = {
+      carBrand,
+      userCarType,
+      vehicleCondition,
+      carYear,
+      licensePlate,
+      note,
+      driverCarType,
+      serviceType,
+      orderDateTime,
+      orderBudget,
+    };
+    sessionStorage.setItem("formData", JSON.stringify(formData));
+  }, [
+    carBrand,
+    userCarType,
+    vehicleCondition,
+    carYear,
+    licensePlate,
+    note,
+    driverCarType,
+    serviceType,
+    orderDateTime,
+    orderBudget,
+  ]);
+
+  const handleSearchSlideCar = async () => {
+    let dateTime = null;
+    if (serviceType === "กำหนดเรียก") {
+      if (!orderDateTime.date || !orderDateTime.time) {
+        alert("กรุณาเลือกวันและเวลาที่ต้องการเรียกรถ");
+        return;
+      }
+      dateTime = `${orderDateTime.date}T${orderDateTime.time}:00`;
+    }
+
+    const InputOrderData = {
+      startLat: start?.lat,
+      startLng: start?.lng,
+      endLat: destination?.lat,
+      endLng: destination?.lng,
+      carBrand,
+      userCarType,
+      vehicleCondition,
+      carYear,
+      licensePlate,
+      note,
+      serviceType,
+      driverCarType,
+      orderDateTime: serviceType === "กำหนดเรียก" ? dateTime : null,
+      orderBudget,
+    };
+
+    sessionStorage.setItem("slideCarInfo", JSON.stringify(InputOrderData));
+
+    try {
+      const res = await axios.post(
+        "http://localhost:3000/api/InputOrder",
+        InputOrderData
+      );
+      const orderId = res.data.orderId;
+      console.log("✅ Data saved");
+      navigate(`/DCSS/${orderId}`);
+    } catch (err) {
+      console.error("❌ Error saving data:", err);
+      alert("ไม่สามารถส่งข้อมูลไปยังเซิร์ฟเวอร์ได้");
+    }
   };
 
   return (
@@ -49,16 +138,16 @@ function OrderInfoInputPage() {
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/StartPosition")}
-              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-full"
+              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              ตำแหน่งต้นทาง
+              {start?.name ? start.name : "ตำแหน่งต้นทาง"}
             </button>
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/Destination")}
-              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-full"
+              className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              ตำแหน่งปลายทาง
+              {destination?.name ? destination.name : "ตำแหน่งปลายทาง"}
             </button>
           </div>
         </div>
@@ -72,7 +161,9 @@ function OrderInfoInputPage() {
             <div className="mt-1 mb-2">
               <input
                 type="text"
-                id="Car_Brand"
+                id="carBrand"
+                value={carBrand}
+                onChange={(e) => setCarBrand(e.target.value)}
                 placeholder="ยี่ห้อรถ"
                 className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               />
@@ -80,7 +171,9 @@ function OrderInfoInputPage() {
             <div>
               <input
                 type="text"
-                id="UserCar_type"
+                id="userCarType"
+                value={userCarType}
+                onChange={(e) => setUserCarType(e.target.value)}
                 placeholder="รุ่นรถ"
                 className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
               />
@@ -95,18 +188,19 @@ function OrderInfoInputPage() {
           </label>
           <div className="flex mt-1 mb-2 gap-x-2">
             <select
-              value={selectedVehicle_condition}
-              onChange={handleVehicleConditionChange}
+              value={vehicleCondition}
+              onChange={(e) => setVehicleCondition(e.target.value)}
               className="block h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none w-1/2"
             >
               <option value="">สภาพยานพาหนะ</option>
-              <option value="Option 1">รถชน</option>
-              <option value="Option 2">ยางรั่ว</option>
-              <option value="Option 3">รถดับ</option>
+              <option value="รถชน">รถชน</option>
+              <option value="ยางรั่ว">ยางรั่ว</option>
+              <option value="รถดับ">รถดับ</option>
             </select>
             <input
               type="number"
-              id="UserCar_type"
+              value={carYear}
+              onChange={(e) => setCarYear(e.target.value)}
               placeholder="ปีที่รถผลิต"
               className="block w-1/2 rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             />
@@ -114,14 +208,16 @@ function OrderInfoInputPage() {
           <div className="mb-2">
             <input
               type="text"
-              id="License_Plate"
+              value={licensePlate}
+              onChange={(e) => setLicensePlate(e.target.value)}
               placeholder="เลขทะเบียน"
               className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             />
           </div>
           <div className="relative">
             <textarea
-              id="Note"
+              value={note}
+              onChange={(e) => setNote(e.target.value)}
               placeholder="รายละเอียดเพิ่มเติม"
               className="block w-full h-20 resize-none rounded-xl bg-white px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             ></textarea>
@@ -135,46 +231,54 @@ function OrderInfoInputPage() {
           </label>
           <div className="mt-1 mb-2">
             <select
-              value={selectedDriverCar_type}
-              onChange={handleDriverCarTypeChange}
+              value={driverCarType}
+              onChange={(e) => setDriverCarType(e.target.value)}
               className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             >
               <option value="">เลือกรถ</option>
-              <option value="DriverCar_type 1">รถสไลด์ขนาดเล็ก</option>
-              <option value="DriverCar_type 2">รถสไลด์ขนาดกลาง</option>
-              <option value="DriverCar_type 3">รถสไลด์ขนาดใหญ่</option>
-              <option value="DriverCar_type 4">รถสไลด์บรรทุก</option>
+              <option value="รถสไลด์ขนาดเล็ก">รถสไลด์ขนาดเล็ก</option>
+              <option value="รถสไลด์ขนาดกลา">รถสไลด์ขนาดกลาง</option>
+              <option value="รถสไลด์ขนาดใหญ่">รถสไลด์ขนาดใหญ่</option>
+              <option value="รถสไลด์บรรทุ">รถสไลด์บรรทุก</option>
             </select>
           </div>
         </div>
 
-        {/* เวลา */}
+        {/* เลือกการรับบริการ */}
         <div className="mb-2 mt-2">
           <label className="block text-xl/6 font-semibold text-black-900">
             เวลา
           </label>
           <div className="mt-1 mb-2">
             <select
-              value={selectedTime}
-              onChange={handleTimeChange}
+              value={serviceType}
+              onChange={(e) => setServiceType(e.target.value)}
               className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-500 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
             >
               <option value="">เลือกเวลา</option>
-              <option value="Time 1">เรียกรถทันที</option>
-              <option value="Time 2">กำหนดเรียก</option>
+              <option value="เรียกทันที">เรียกรถทันที</option>
+              <option value="กำหนดเรียก">กำหนดเรียก</option>
             </select>
           </div>
         </div>
 
         {/* ถ้าเลือก "กำหนดเรียก" */}
-        {selectedTime === "Time 2" && (
+        {serviceType === "กำหนดเรียก" && (
           <div className="mb-2 mt-3">
             <input
               type="date"
+              value={orderDateTime.date}
+              onChange={(e) =>
+                setOrderDateTime((prev) => ({ ...prev, date: e.target.value }))
+              }
               className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f]"
             />
             <input
               type="time"
+              value={orderDateTime.time}
+              onChange={(e) =>
+                setOrderDateTime((prev) => ({ ...prev, time: e.target.value }))
+              }
               className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 px-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f] mt-2"
             />
           </div>
@@ -187,6 +291,8 @@ function OrderInfoInputPage() {
           </label>
           <input
             type="number"
+            value={orderBudget}
+            onChange={(e) => setOrderBudget(e.target.value)}
             placeholder="กรอกจำนวนเงิน"
             className="block w-full h-[52px] rounded-xl px-3.5 py-2 text-base text-gray-900 border border-gray-300 focus:border-green-500 focus:ring-2 focus:ring-green-500 focus:outline-none"
           />
@@ -195,7 +301,7 @@ function OrderInfoInputPage() {
         {/* ปุ่มค้นหา */}
         <div className="block w-[150px] h-[40px] mx-auto mt-4 mb-25">
           <button
-            onClick={() => navigate("/DCSS")}
+            onClick={handleSearchSlideCar}
             style={{ borderRadius: "50px" }}
             className="bg-[#0DC964] text-white w-[150px] h-[40px] font-bold text-l flex items-center justify-center hover:bg-[#43af56] transition"
           >

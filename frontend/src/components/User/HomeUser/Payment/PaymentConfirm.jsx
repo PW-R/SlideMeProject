@@ -1,15 +1,81 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
 import { Carousel } from "react-bootstrap";
 
 function PaymentConfirm() {
   const navigate = useNavigate();
 
+  const [orderData, setOrderData] = useState(null);
+  const { orderId } = useParams();
+  const [isLoadingStoreTab, setIsLoadingStoreTab] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingStores, setIsLoadingStores] = useState(false);
+
+  const [startAddress, setStartAddress] = useState("");
+  const [endAddress, setEndAddress] = useState("");
+  const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
+
+  const reverseGeocode = async (lat, lng) => {
+    try {
+      const res = await axios.get(
+        `https://nominatim.openstreetmap.org/reverse`,
+        {
+          params: {
+            lat,
+            lon: lng,
+            format: "json",
+          },
+        }
+      );
+      console.log("ที่อยู่ที่ได้จาก reverse geocode:", res.data.display_name); // พิมพ์ที่อยู่ที่ได้
+      return res.data.display_name; // ที่อยู่แบบเต็ม
+    } catch (error) {
+      console.error("Reverse geocoding failed:", error);
+      return "ไม่พบที่อยู่";
+    }
+  };
+
+  useEffect(() => {
+    if (orderData) {
+      console.log("ข้อมูลที่ได้จาก API:", orderData);
+      const { startLat, startLng, endLat, endLng, serviceType, driverCarType } =
+        orderData;
+      console.log("StartLat:", startLat, "StartLng:", startLng); // Check values
+      console.log("EndLat:", endLat, "EndLng:", endLng);
+
+      if (startLat && startLng) {
+        reverseGeocode(startLat, startLng).then(setStartAddress);
+      }
+
+      if (endLat && endLng) {
+        reverseGeocode(endLat, endLng).then(setEndAddress);
+      }
+    }
+  }, [orderData]);
+
+  useEffect(() => {
+    console.log("orderId:", orderId);
+    if (orderId) {
+      axios
+        .get(`http://localhost:3000/api/InputOrder/order/${orderId}`)
+        .then((response) => {
+          console.log("ข้อมูลคำสั่งซื้อ:", response.data);
+          setOrderData(response.data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching order data:", error);
+          setIsLoading(false);
+        });
+    }
+  }, [orderId]);
+
   return (
     <div style={{ overflow: "hidden" }}>
       {/* header */}
       <div className="fixed w-[387px] shadow-[0_0_10px_#969696] bg-[#0dc964] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-        <Link to="/DCSS">
+        <Link to={`/DCSS/${orderId}`}>
           <i className="bi bi-chevron-left mt-3 text-white text-2xl absolute left-3 bottom-4"></i>
         </Link>
         <h1 className="text-white">เรียกรถสไลด์</h1>
@@ -25,12 +91,14 @@ function PaymentConfirm() {
             <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10"></i>
           </div>
           {/* ตำแหน่ง */}
-          <div className="flex flex-col gap-4 ">
-            <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
-              ตำแหน่งต้นทาง
-            </div>
-            <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-3 text-left">
-              ตำแหน่งปลายทาง
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left w-[280px] overflow-hidden whitespace-nowrap text-ellipsis">
+                {startAddress || "ตำแหน่งต้นทาง"}
+              </div>
+              <div className="h-[52px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left w-[280px] overflow-hidden whitespace-nowrap text-ellipsis">
+                {endAddress || "ตำแหน่งปลายทาง"}
+              </div>
             </div>
           </div>
         </div>

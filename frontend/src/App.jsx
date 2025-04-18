@@ -1,6 +1,11 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 
+import { useLoadScript } from "@react-google-maps/api";
+import MapViewSearch from "./components/User/MapViewSearch";
+import MapDistance from "./components/User/MapDistance";
+const libraries = ["places"];
+
 //Login and Register
 import DriverorUser from "./components/LoginandRegister/DriverorUser";
 import LoginUser from "./components/LoginandRegister/LoginUser";
@@ -64,9 +69,20 @@ import "./index.css";
 import "./App.css";
 
 function App() {
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: "AIzaSyCA8YK8fH-zeQ7WM8237ERUOFDbQlIx89E", // อย่าลืมเก็บ API Key ไว้อย่างปลอดภัย
+    libraries: libraries,
+  });
+
+  if (!isLoaded) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="app">
       <div className="app-router">
+        
         <HashRouter>
           <Routes>
             {/* Login */}
@@ -87,8 +103,8 @@ function App() {
               <Route path="Destination" element={<Destination />} />
               <Route path="ShopReccommend" element={<ShopReccommend />} />
               <Route path="OrderInfoInputPage" element={<InputInfo />} />
-              <Route path="DCSS" element={<DCSS />} />
-              <Route path="PaymentConfirm" element={<PaymentConfirm />} />
+              <Route path="/DCSS/:orderId" element={<DCSS />} />
+              <Route path="PaymentConfirm/:orderId" element={<PaymentConfirm />} />
               <Route path="PaymentCompleted" element={<PaymentCompleted />} />
               <Route path="Receipt" element={<Receipt />}/>
               <Route path="DriverDetail" element={<DriverDetail />} />

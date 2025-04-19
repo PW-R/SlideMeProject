@@ -1,39 +1,61 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function OrderConfirmation() {
-  const [orderInfo, setOrderInfo] = useState({
-    customer: "เจนณิรา สุขไปเดอะ",
-    startLocation:
-      "กรุง ออร์ แอร์ 61 ถ. หลังสวน แขวงลุมพินี เขตปทุมวัน กรุงเทพฯ 10330",
-    endLocation:
-      "บัวรถโสติเคร์ 67/8 หมู่ที่ 7 ตำบลมหาสวัสดิ์ อำเภอบางกรวย นนทบุรี 11130",
-    car: {
-      brand: "Honda",
-      type: "SUV",
-      plate: "กก-5578",
-    },
-    note: "รถยางแตกบนทางด่วน รั่วจนแนบขันต่อไม่ได้ หม้อระเบิดเกิดเป็นน้ำมันดิบ",
-    images: [],
-  });
+  const navigate = useNavigate();
+  const [completeDetail, setCompleteDetail] = useState("");
+  const [images, setImages] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [orderInfo, setOrderInfo] = useState(null);
+  const orderId = 1;
 
   // อัปโหลดภาพหลายภาพ
   const handleMultipleImagesChange = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
-    setOrderInfo((prev) => ({
-      ...prev,
-      images: [...prev.images, ...newImages],
-    }));
+    setSelectedFiles(files);
+    setImages(files.map((file) => URL.createObjectURL(file)));
   };
 
   // ลบภาพ
   const deleteImage = (indexToDelete) => {
-    setOrderInfo((prev) => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== indexToDelete),
-    }));
+    setImages((prev) => prev.filter((_, i) => i !== indexToDelete));
+    setSelectedFiles((prev) => prev.filter((_, i) => i !== indexToDelete));
   };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("orderId", orderId);
+    formData.append("completeDetail", completeDetail);
+    if (selectedFiles[0]) {
+      formData.append("completePhoto", selectedFiles[0]);
+    }
+
+    try {
+      await axios.post("http://localhost:3000//complete-order/:OrderDetail_ID", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      navigate("/OrderStatusList");
+    } catch (err) {
+      console.error("Error submitting complete order:", err);
+    }
+  };
+
+  useEffect(() => {
+    const fetchOrderDetail = async () => {
+      try {
+        const res = await axios.get(
+          `http://localhost:3000/api/OrderDetail/${orderId}`
+        );
+        setOrderInfo(res.data);
+      } catch (err) {
+        console.error("Error loading order detail:", err);
+      }
+    };
+
+    fetchOrderDetail();
+  }, [orderId]);
 
   return (
     <div className="pb-32 bg-white min-h-screen">
@@ -47,58 +69,68 @@ function OrderConfirmation() {
 
       {/* Main content */}
       <div className="pt-[130px] px-4 space-y-4">
-        {/* Customer Info */}
-        <div className="flex items-center space-x-3">
-          <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
-            <i className="bi bi-person text-2xl text-white"></i>
-          </div>
-          <div>
-            <div className="text-sm text-gray-500">ลูกค้า</div>
-            <div className="font-semibold">{orderInfo.customer}</div>
-          </div>
-        </div>
-
-        {/* Locations */}
-        <div className="text-sm space-y-2">
-          <div className="flex items-start space-x-2">
-            <div className="text-red-500 mt-1">
-              <i className="bi bi-geo-alt-fill"></i>
+        {orderInfo ? (
+          <>
+            {/* Customer Info */}
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center">
+                <i className="bi bi-person text-2xl text-white"></i>
+              </div>
+              <div>
+                <div className="text-sm text-gray-500">ลูกค้า</div>
+                <div className="font-semibold">{orderInfo.customer}</div>
+              </div>
             </div>
-            <div>{orderInfo.startLocation}</div>
-          </div>
-          <div className="flex items-start space-x-2">
-            <div className="text-green-500 mt-1">
-              <i className="bi bi-geo-alt-fill"></i>
+
+            {/* Locations */}
+            <div className="text-sm space-y-2">
+              <div className="flex items-start space-x-2">
+                <div className="text-red-500 mt-1">
+                  <i className="bi bi-geo-alt-fill"></i>
+                </div>
+                <div>{orderInfo.startLocation}</div>
+              </div>
+              <div className="flex items-start space-x-2">
+                <div className="text-green-500 mt-1">
+                  <i className="bi bi-geo-alt-fill"></i>
+                </div>
+                <div>{orderInfo.endLocation}</div>
+              </div>
             </div>
-            <div>{orderInfo.endLocation}</div>
-          </div>
-        </div>
 
-        {/* Car Info */}
-        <div className="text-sm space-y-1">
-          <div>
-            <strong>ยี่ห้อ:</strong> {orderInfo.car.brand}
-          </div>
-          <div>
-            <strong>ประเภท:</strong> {orderInfo.car.type}
-          </div>
-          <div>
-            <strong>เลขทะเบียนรถ:</strong> {orderInfo.car.plate}
-          </div>
-        </div>
+            {/* Car Info */}
+            <div className="text-sm space-y-1">
+              <div>
+                <strong>ยี่ห้อ:</strong> {orderInfo.car.brand}
+              </div>
+              <div>
+                <strong>ประเภท:</strong> {orderInfo.car.type}
+              </div>
+              <div>
+                <strong>เลขทะเบียนรถ:</strong> {orderInfo.car.plate}
+              </div>
+            </div>
 
-        {/* Note */}
-        <div className="text-sm">
-          <strong>หมายเหตุ:</strong>
-          <br />
-          {orderInfo.note}
-        </div>
+            {/* Note */}
+            <div className="text-sm">
+              <strong>หมายเหตุ:</strong>
+              <br />
+              {orderInfo.note}
+            </div>
+          </>
+        ) : (
+          <div className="text-center text-gray-500">
+            กำลังโหลดข้อมูลออเดอร์...
+          </div>
+        )}
 
         {/* Additional Input */}
         <textarea
           placeholder="ข้อมูลเพิ่มเติม"
           className="w-full h-24 border !border-green-400 rounded-lg p-2 text-sm resize-none"
-        ></textarea>
+          value={completeDetail}
+          onChange={(e) => setCompleteDetail(e.target.value)}
+        />
 
         {/* Image Upload + Preview */}
         <div>
@@ -117,14 +149,13 @@ function OrderConfirmation() {
             id="image-upload"
             type="file"
             accept="image/*"
-            multiple
             onChange={handleMultipleImagesChange}
             className="hidden"
           />
 
           {/* Preview รูปภาพ */}
           <div className="grid grid-cols-2 gap-2 mt-3">
-            {orderInfo.images.map((img, idx) => (
+            {images.map((img, idx) => (
               <div key={idx} className="relative">
                 <img
                   src={img}
@@ -144,7 +175,10 @@ function OrderConfirmation() {
 
         {/* Submit Button */}
         <div className="flex justify-center pt-2">
-          <button className="bg-[#0dc964] text-white px-10 py-2 rounded-full shadow font-semibold">
+          <button
+            onClick={handleSubmit}
+            className="bg-[#0dc964] text-white px-10 py-2 rounded-full shadow font-semibold"
+          >
             ส่งงาน
           </button>
         </div>

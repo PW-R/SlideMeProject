@@ -19,11 +19,17 @@ app.get("/", (req, res) => {
   res.json({ message: "Hello from the Express server!" });
 });
 
-
+//use api
 app.use("/api/InputOrder", InputOrderRoutes); // ใช้เส้นทางใน auth.routes
 app.use("/api", InputOrderRoutes); 
 app.use("/api/nearby-shops", NearbyShopsRoutes)
 app.use("/:orderId", SelectDriverRoutes)
+
+//driver api
+app.use("/api/order-history", getOrderHistory);
+app.use("/complete-order/:OrderDetail_ID", upload.single("CompletePhoto"), completeOrder)
+app.use("/order-status-driver", orderStatusController.getOrderStatuses)
+app.use("/order-status-driver/:id", orderStatusController.getOrderStatusById)
 
 
 // Start the server

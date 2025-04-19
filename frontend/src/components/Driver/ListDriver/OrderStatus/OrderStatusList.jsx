@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 function OrderStatusList() {
-  const [show, setShow] = useState(false);
+  const [orders, setOrders] = useState([]);
 
+  const [show, setShow] = useState(false);
   const handleCancel = () => setShow(true);
   const handleClose = () => setShow(false);
   const deleteClick = () => {
     console.log("งานถูกยกเลิก");
     setShow(false);
   };
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get("http://localhost:3000/api/order-status");
+        setOrders(res.data);
+      } catch (err) {
+        console.error("Error fetching order statuses:", err);
+      }
+    };
+
+    fetchOrders();
+  }, []);
 
   return (
     <div className="overflow-hidden h-screen">
@@ -63,48 +78,32 @@ function OrderStatusList() {
       </div>
 
       {/* รายการงาน 1 */}
-      <div className="flex mt-4 ml-4 font-bold w-full">
-        <img src="./car_location.svg" className="w-20 h-15" />
-        <div className="ml-2 w-full">
-          <p className="text-[#15BC11]">Don Muang Toll Way, Khwaeng</p>
-          <p className="text-[#004AAD]">คุณพร บ่าวแม็ค : กำลังดำเนินงาน</p>
-          <div className="bg-[#E5E5E5] w-[270px] rounded-2xl p-4">
-            <p>รถสไลด์ขนาดกลาง</p>
-            <p>2130 ฿</p>
-            <p>07 มกราคม 2567 เวลา 10.00</p>
-          </div>
-          <div className="flex items-center mt-2 ml-4 gap-x-6">
-            <Link to="/OrderConfirmation">
-              <button className="btn btn-success">สำเร็จงาน</button>
-            </Link>
-            <button className="btn btn-danger" onClick={handleCancel}>
-              ยกเลิกงาน
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* รายการงาน 2 */}
-      <div className="flex mt-4 ml-4 font-bold w-full">
-        <img src="./car_location.svg" className="w-20 h-15" />
-        <div className="ml-2 w-full">
-          <p className="text-[#15BC11]">Near Soi Vibhavadi Rangsit 20</p>
-          <p className="text-[#004AAD]">คุณอเล็กซ์ หวังไป๋ : รอยืนยัน</p>
-          <div className="bg-[#E5E5E5] w-[270px] rounded-2xl p-4">
-            <p>รถสไลด์ขนาดกลาง</p>
-            <p>2130 ฿</p>
-            <p>07 มกราคม 2567 เวลา 10.00</p>
-          </div>
-          <div className="flex items-center mt-2 ml-4 gap-x-6">
-            <Link to="/OrderConfirmation">
-              <button className="btn btn-success">สำเร็จงาน</button>
-            </Link>
-            <button className="btn btn-danger" onClick={handleCancel}>
-              ยกเลิกงาน
-            </button>
+      {orders.map((order, index) => (
+        <div key={index} className="flex mt-4 ml-4 font-bold w-full">
+          <img src="./car_location.svg" className="w-20 h-15" />
+          <div className="ml-2 w-full">
+            <p className="text-[#15BC11]">{order.startLocation}</p>
+            <p className="text-[#004AAD]">
+              {order.customerName} : {order.status}
+            </p>
+            <div className="bg-[#E5E5E5] w-[270px] rounded-2xl p-4">
+              <p>{order.carType}</p>
+              <p>{order.price} ฿</p>
+              <p>
+                {order.date} เวลา {order.time}
+              </p>
+            </div>
+            <div className="flex items-center mt-2 ml-4 gap-x-6">
+              <Link to={`/OrderConfirmation?id=${order.orderId}`}>
+                <button className="btn btn-success">สำเร็จงาน</button>
+              </Link>
+              <button className="btn btn-danger" onClick={handleCancel}>
+                ยกเลิกงาน
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+      ))}
     </div>
   );
 }

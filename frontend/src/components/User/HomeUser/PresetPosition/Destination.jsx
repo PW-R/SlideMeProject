@@ -1,49 +1,137 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import MapViewSearch from "../../MapViewSearch";
+import React, { useState, useRef, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
+import { usePosition } from "../../MAP/PositionContext";
 
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMapEvents,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import L from "leaflet";
 
 function Destination() {
   const navigate = useNavigate();
+  const mapRef = useRef(null);
+  const location = useLocation();
+
+  const [position, setPosition] = useState(null);
+  const { origin, destination, setOrigin, setDestination } = usePosition();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [selectedLocation, setSelectedLocation] = useState(null);
-  const [address, setAddress] = useState("");
-  const [placeName, setPlaceName] = useState("");
-  const [map, setMap] = useState(null);
+  // const [selectedLocation, setSelectedLocation] = useState(null);
+  // const [address, setAddress] = useState("");
+  // const [placeName, setPlaceName] = useState("");
   const [infoWindowOpen, setInfoWindowOpen] = useState(false);
 
+  
+  // แก้ไอคอน
+  const customIcon = L.divIcon({
+    className: "leaflet-div-icon",
+    html: `
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
+          <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"
+          stroke="gray" stroke-width="0.5" />
+        </svg>
+      `,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32],
+  });
+
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      if (searchQuery.trim()) {
+        handleSearch(searchQuery);
+      } else {
+        setSearchResults([]);
+      }
+    }, 500); // รอ 500ms หลังจากที่ผู้ใช้หยุดพิมพ์
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchQuery]);
+
+  // ค้นหาตำแหน่งจากชื่อสถานที่
   const handleSearch = async (query) => {
     setSearchQuery(query);
-    if (query.trim() && map) {
-      const service = new window.google.maps.places.PlacesService(map);
-      const request = {
-        query: query,
-        fields: ["formatted_address", "geometry", "name"],
-      };
-      service.textSearch(request, (results, status) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          setSearchResults(results);
-        }
-      });
-    } else {
+
+    const trimmedQuery = query.trim();
+
+    if (!trimmedQuery || /^[^\wก-๙]+$/.test(trimmedQuery)) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(trimmedQuery)}&addressdetails=1&limit=5&countrycodes=TH&accept-language=th,en`
+      );
+      const data = await res.json();
+
+      // จัดลำดับให้ภาษาไทยก่อนภาษาอังกฤษ
+      if (Array.isArray(data)) {
+        // ถ้าเป็น array ให้ใช้ map ได้
+        const processedResults = data.map((result) => {
+          const displayName = result.display_name;
+          const isThai = /[\u0E00-\u0E7F]/.test(displayName); // ตรวจสอบว่ามีภาษาไทยหรือไม่
+          return {
+            ...result,
+            display_name: isThai ? displayName : `${displayName} (EN)`, // ภาษาไทยเป็นหลัก หากไม่มีเพิ่ม "(EN)"
+          };
+        });
+
+        setSearchResults(processedResults);
+      } else {
+        // ถ้าไม่ใช่ array ให้แสดงข้อผิดพลาดหรือทำอย่างอื่น
+        console.error("Expected an array, but got:", data);
+        setSearchResults([]);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
       setSearchResults([]);
     }
   };
 
+  const MapClickHandler = () => {
+    useMapEvents({
+      click: (e) => {
+        setPosition([e.latlng.lat, e.latlng.lng]);
+      },
+    });
+    return null;
+  };
+
   const handleSelectResult = (place) => {
-    const lat = place.geometry.location.lat();
-    const lng = place.geometry.location.lng();
-    setSelectedLocation({ lat, lng });
-    setPlaceName(place.name);
-    setAddress(place.formatted_address);
+    const lat = parseFloat(place.lat);
+    const lng = parseFloat(place.lon);
+
+    const selectedData = {
+      position: {
+        lat,
+        lng,
+      },
+      name: place.display_name.split(",")[0],
+      address: place.display_name,
+      // const lat = parseFloat(place.lat);
+      // const lng = parseFloat(place.lon);
+      // setPosition([lat, lng]);
+      // setSelectedLocation({ lat, lng });
+      // setPlaceName(place.display_name.split(",")[0]); // ชื่อสถานที่ (เลือกแค่ส่วนแรก)
+      // setAddress(place.display_name); // ที่อยู่เต็ม
+      // setSearchResults([]);
+      // setInfoWindowOpen(true);
+    };
+    // sessionStorage.setItem("setDestination", JSON.stringify(selectedData));
+    setDestination(selectedData);
     setSearchResults([]);
     setInfoWindowOpen(true);
   };
-
-  const onMapLoad = (mapInstance) => {
-    setMap(mapInstance);
-  };
+  
+  // const onMapLoad = (mapInstance) => {
+  //   setMap(mapInstance);
+  // };
 
   // ฟังก์ชั่นสำหรับย้อนกลับ
   const handleBack = () => {
@@ -51,16 +139,15 @@ function Destination() {
   };
 
   const handleConfirmDestination = () => {
-    const selectedData = {
-      lat: selectedLocation.lat,
-      lng: selectedLocation.lng,
-      name: placeName, // ชื่อสถานที่
-      address: address,
-    };
-    sessionStorage.setItem("destination", JSON.stringify(selectedData));
+    if (!destination || !destination.position) {
+      alert("กรุณาเลือกตำแหน่งก่อนยืนยัน");
+      return;
+    }
+    // setDestination(selectedData);
+    // sessionStorage.setItem("setDestination", JSON.stringify(destination));
     navigate(-1);
   };
-
+  
   return (
     <div>
       {/* header */}
@@ -91,8 +178,10 @@ function Destination() {
                   className="search-result-item"
                   onClick={() => handleSelectResult(result)}
                 >
-                  <p>{result.name}</p>
-                  <p>{result.formatted_address}</p>
+                  <p className="font-medium">
+                    {result.display_name.split(",")[0]}
+                  </p>
+                  <p className="text-sm text-gray-600">{result.display_name}</p>
                 </div>
               ))}
             </div>
@@ -100,22 +189,40 @@ function Destination() {
         </div>
 
         {/* MapView */}
-        <MapViewSearch
-          selectedLocation={selectedLocation}
-          address={address}
-          showInfoWindow={infoWindowOpen}
-          onInfoClose={() => setInfoWindowOpen(false)}
-          onMapLoad={onMapLoad}
-        />
+        <MapContainer
+          center={[13.736717, 100.523186]} // Bangkok default
+          zoom={13}
+          style={{ height: "80vh", width: "100%" }}
+          whenCreated={(map) => (mapRef.current = map)}
+          zoomControl={false}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution="&copy; OpenStreetMap contributors"
+          />
+          <MapClickHandler />
+          {destination && destination.position && (
+            <Marker
+              position={[destination.position.lat, destination.position.lng]}
+              icon={customIcon}
+            >
+              <Popup>
+                <b>{destination.name}</b>
+                <br />
+                {destination.address}
+              </Popup>
+            </Marker>
+          )}
+        </MapContainer>
 
         {/* ตำแหน่งที่เลือก */}
         <div className="w-full h-[170px] bg-amber-50 flex flex-col gap-3 items-center justify-center mt-2 mb-4 px-6">
           <div className="mb-0 text-center">
             <p className="font-bold text-2xl mb-0">ตำแหน่งที่เลือก</p>
             <p className="font-bold text-lg mb-0">
-              {placeName || "ยังไม่เลือกสถานที่"}
+              {destination?.name || "ยังไม่เลือกสถานที่"}
             </p>
-            <p className="text-sm mb-0">{address}</p>
+            <p className="text-sm mb-0">{destination?.address}</p>
           </div>
           <button
             onClick={handleConfirmDestination}

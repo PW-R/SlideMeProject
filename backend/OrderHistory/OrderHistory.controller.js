@@ -1,38 +1,46 @@
-// controllers
-const pool = require("../db/index");
+const pool = require("../db");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const getOrderHistory = async (req, res, next) => {
   try {
-    const conn = await pool; // ใช้ conn แทน pool ซ้ำ
-    const result = await conn.request().query(`
+    const conn = await pool.getConnection(); // ✅ ใช้ getConnection
+    const [rows] = await conn.query(`
       SELECT 
-        oh.ID,
-        oh.Total_Price,
-        oh.Discount,
-        oh.Equipment,
-        oh.Start_Location,
-        oh.End_location,
-        oh.Car_Brand,
-        oh.UserCar_type,
-        oh.License_Plate,
-        oh.Note,
-        oh.Order_Date_time,
-        oh.Order_Budget,
-        od.* 
-      FROM 
-        OrderHistory oh
-      JOIN 
-        OrderDetail od ON oh.OrderDetail_ID = od.ID
+        OrderDetail_ID AS ID,
+        Status,
+        Discount,
+        Start_Location,
+        End_location,
+        Car_Brand,
+        UserCar_type,
+        Vehicle_condition,
+        CarYear,
+        License_Plate,
+        Note,
+        DriverCar_type,
+        Order_Date_time,
+        Order_Budget,
+        Total_Price,
+        Equipment,
+        Current_Location,
+        ShopQRcode,
+        OfferStatus,
+        Order_UserName,
+        Order_DriverName,
+        Rating_ID AS Rating
+      FROM OrderDetail
+      ORDER BY Order_Date_time DESC
     `);
 
-    res.status(200).json(result.recordset);
+    conn.release(); // ✅ คืน connection กลับ pool
+    res.status(200).json(rows);
   } catch (error) {
-    next(error); // ส่งไปที่ middleware จัดการ error
+    console.error("Error fetching order history:", error);
+    next(error);
   }
 };
 
 module.exports = {
-  getOrderHistory
+  getOrderHistory,
 };

@@ -1,14 +1,20 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { usePosition } from "../../MAP/PositionContext";
 
 import axios from "axios";
 
 function OrderInfoInputPage() {
   const navigate = useNavigate();
 
-  const [start, setStart] = useState(null);
-  const [destination, setDestination] = useState(null);
+  const { origin, setOrigin, destination, setDestination } = usePosition();
+  const [originAddress, setOriginAddress] = useState(null);
+  const [destinationAddress, setDestinationAddress] = useState(null);
+  // const [selectedOrigin, setSelectedOrigin] = useState(null);
+
+  // const [start, setStart] = useState(null);
+  // const [destination, setDestination] = useState(null);
   const [carBrand, setCarBrand] = useState("");
   const [userCarType, setUserCarType] = useState("");
   const [vehicleCondition, setVehicleCondition] = useState("");
@@ -23,13 +29,45 @@ function OrderInfoInputPage() {
   });
   const [orderBudget, setOrderBudget] = useState("");
 
-  useEffect(() => {
-    const storedData = JSON.parse(sessionStorage.getItem("formData"));
-    const storedStart = JSON.parse(sessionStorage.getItem("start"));
-    const storedDestination = JSON.parse(sessionStorage.getItem("destination"));
-    if (storedStart) setStart(storedStart);
-    if (storedDestination) setDestination(storedDestination);
 
+  // ฟังก์ชันแปลงพิกัดเป็นที่อยู่
+  // const fetchAddress = async (lat, lon) => {
+  //   try {
+  //     const response = await fetch(
+  //       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=th,en`
+  //     );
+  //     const data = await response.json();
+  //     return data.display_name || "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+  //   } catch (error) {
+  //     console.error("Error fetching address:", error);
+  //     return "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+  //   }
+  // };
+
+  // อัปเดตที่อยู่เมื่อ origin หรือ destination เปลี่ยน
+  useEffect(() => {
+    if (origin?.address) {
+      setOriginAddress(origin.address);
+    }
+  }, [origin]);
+
+  useEffect(() => {
+    if (destination?.address) {
+      setDestinationAddress(destination.address);
+    }
+  }, [destination]);
+
+  console.log("origin:", origin);
+  console.log("destination:", destination);
+
+  useEffect(() => {
+    // const storedStart = JSON.parse(sessionStorage.getItem("start"));
+    // const storedDestination = JSON.parse(sessionStorage.getItem("destination"));
+
+    // if (storedStart) setOrigin(storedStart);
+    // if (storedDestination) setDestination(storedDestination);
+
+    const storedData = JSON.parse(sessionStorage.getItem("formData"));
     if (storedData) {
       setCarBrand(storedData.carBrand || "");
       setUserCarType(storedData.userCarType || "");
@@ -81,11 +119,16 @@ function OrderInfoInputPage() {
       dateTime = `${orderDateTime.date}T${orderDateTime.time}:00`;
     }
 
+    if (!origin || !destination) {
+      alert("กรุณาเลือกจุดเริ่มต้นและจุดหมายปลายทางก่อน");
+      return;
+    }
+
     const InputOrderData = {
-      startLat: start?.lat,
-      startLng: start?.lng,
-      endLat: destination?.lat,
-      endLng: destination?.lng,
+      startLat: origin?.position?.lat || null,
+      startLng: origin?.position?.lng || null,
+      endLat: destination?.position?.lat || null,
+      endLng: destination?.position?.lng || null,
       carBrand,
       userCarType,
       vehicleCondition,
@@ -97,22 +140,41 @@ function OrderInfoInputPage() {
       orderDateTime: serviceType === "กำหนดเรียก" ? dateTime : null,
       orderBudget,
     };
+    console.log(InputOrderData); // เพื่อดูว่าใน `InputOrderData` มีค่าตำแหน่งที่ถูกต้องหรือไม่
 
     sessionStorage.setItem("slideCarInfo", JSON.stringify(InputOrderData));
 
     try {
       const res = await axios.post(
-        "http://localhost:3000/api/InputOrder",
+        "http://localhost:3000/api/input-order",
         InputOrderData
       );
       const orderId = res.data.orderId;
       console.log("✅ Data saved");
+      
       navigate(`/DCSS/${orderId}`);
+
     } catch (err) {
       console.error("❌ Error saving data:", err);
       alert("ไม่สามารถส่งข้อมูลไปยังเซิร์ฟเวอร์ได้");
     }
   };
+  
+
+  // useEffect(() => {
+  //   const storedOrigin = sessionStorage.getItem("setOrigin");
+  //   const storedDestination = JSON.parse(sessionStorage.getItem("setDestination"));
+
+  //   if (storedOrigin) {
+  //     const parsedOrigin = JSON.parse(storedOrigin);
+  //     setSelectedOrigin(parsedOrigin);  // ตั้งค่าตำแหน่งต้นทางที่ได้รับ
+  //     setOrigin(parsedOrigin);  // กำหนดค่า origin ใน PositionContext
+  //   }
+  //   if (storedDestination) {
+  //     setDestination([storedDestination.lat, storedDestination.lng]);
+  //     setDestinationAddress(storedDestination.address); // ✅ was wrongly using setOriginAddress
+  //   }
+  // }, []);
 
   return (
     <div style={{ minHeight: "100vh", overflow: "hidden" }}>
@@ -140,14 +202,16 @@ function OrderInfoInputPage() {
               onClick={() => navigate("/StartPosition")}
               className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              {start?.name ? start.name : "ตำแหน่งต้นทาง"}
+              {originAddress ? `${originAddress}` : "เลือกตำแหน่งต้นทาง"}
             </button>
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/Destination")}
               className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              {destination?.name ? destination.name : "ตำแหน่งปลายทาง"}
+              {destinationAddress
+                ? `${destinationAddress}`
+                : "เลือกตำแหน่งปลายทาง"}
             </button>
           </div>
         </div>
@@ -237,9 +301,9 @@ function OrderInfoInputPage() {
             >
               <option value="">เลือกรถ</option>
               <option value="รถสไลด์ขนาดเล็ก">รถสไลด์ขนาดเล็ก</option>
-              <option value="รถสไลด์ขนาดกลา">รถสไลด์ขนาดกลาง</option>
+              <option value="รถสไลด์ขนาดกลาง">รถสไลด์ขนาดกลาง</option>
               <option value="รถสไลด์ขนาดใหญ่">รถสไลด์ขนาดใหญ่</option>
-              <option value="รถสไลด์บรรทุ">รถสไลด์บรรทุก</option>
+              <option value="รถสไลด์บรรทุก">รถสไลด์บรรทุก</option>
             </select>
           </div>
         </div>

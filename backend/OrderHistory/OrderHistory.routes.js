@@ -1,9 +1,7 @@
-//routes
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const  getOrderHistory  = require('./OrderHistory.controller');
+const { getOrderHistory } = require("./OrderHistory.controller");
 
-router.get('/order-history', getOrderHistory);
+router.get("/", getOrderHistory); // Handles /api/order-history
 
 module.exports = router;
-

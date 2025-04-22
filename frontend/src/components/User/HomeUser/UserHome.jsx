@@ -1,19 +1,82 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button, Carousel } from "react-bootstrap";
+import { usePosition } from "../MAP/PositionContext";
 import { useEffect, useState } from "react";
 
 function UserHome() {
   const navigate = useNavigate();
 
-  const [start, setStart] = useState(null);
-  const [destination, setDestination] = useState(null);
+  const { origin, setOrigin, destination, setDestination } = usePosition();
+  const [originAddress, setOriginAddress] = useState(null);
+  const [destinationAddress, setDestinationAddress] = useState(null);
 
+  // const [start, setStart] = useState(null);
+  // const [destination, setDestination] = useState(null);
+
+  console.log("DEST:", destination);
+
+  // ฟังก์ชันแปลงพิกัดเป็นที่อยู่
+  const fetchAddress = async (lat, lon) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=th,en`
+      );
+      const data = await response.json();
+      return data.display_name || "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+    }
+  };
+  
+  if (destination && destination.position) {
+    fetchAddress(destination.position.lat, destination.position.lng)
+      .then(address => console.log(address)); // ใช้ address ที่ได้จาก API
+  }
+  
   useEffect(() => {
     const storedStart = JSON.parse(sessionStorage.getItem("start"));
     const storedDestination = JSON.parse(sessionStorage.getItem("destination"));
     if (storedStart) setStart(storedStart);
     if (storedDestination) setDestination(storedDestination);
   }, []);
+
+  useEffect(() => {
+    const stored = sessionStorage.getItem("setDestination");
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      setDestination(parsed); // หรือทำอย่างอื่นกับข้อมูลนี้
+    }
+  }, []);
+
+  // อัปเดตที่อยู่เมื่อ origin หรือ destination เปลี่ยน
+  useEffect(() => {
+    if (origin?.address) {
+      setOriginAddress(origin.address);
+    }
+  }, [origin]);
+  
+  useEffect(() => {
+    if (destination?.address) {
+      setDestinationAddress(destination.address);
+    }
+  }, [destination]);
+
+  // useEffect(() => {
+  //   const storedOrigin = JSON.parse(sessionStorage.getItem("setOrigin"));
+  //   const storedDestination = JSON.parse(
+  //     sessionStorage.getItem("setDestination")
+  //   );
+
+  //   if (storedOrigin) {
+  //     setOrigin([storedOrigin.lat, storedOrigin.lng]);
+  //     setOriginAddress(storedOrigin.address);
+  //   }
+  //   if (storedDestination) {
+  //     setDestination([storedDestination.lat, storedDestination.lng]);
+  //     setDestinationAddress(storedDestination.address); // ✅ was wrongly using setOriginAddress
+  //   }
+  // }, [setOrigin, setDestination]);
 
   return (
     <div>
@@ -53,14 +116,16 @@ function UserHome() {
               onClick={() => navigate("/StartPosition")}
               className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              {start?.name ? start.name : "ตำแหน่งต้นทาง"}
+              {originAddress ? `${originAddress}` : "เลือกตำแหน่งต้นทาง"}
             </button>
             <button
               style={{ borderRadius: "15px" }}
               onClick={() => navigate("/Destination")}
               className="h-[52px] bg-gray-100 text-gray-600 px-3 py-3 text-left w-[270px] overflow-hidden whitespace-nowrap text-ellipsis"
             >
-              {destination?.name ? destination.name : "ตำแหน่งปลายทาง"}
+              {destinationAddress
+                ? `${destinationAddress}`
+                : "เลือกตำแหน่งปลายทาง"}
             </button>
           </div>
         </div>
@@ -140,6 +205,11 @@ function UserHome() {
             </Carousel>
           </Link>
         </div>
+        <Link to="/AllCoupon" className="mb-4 w-[291px] h-[50px]">
+          <div className="bg-[#48d065] text-white w-full h-full rounded-[20px] font-bold text-lg flex items-center justify-center hover:bg-[#2ea144] transition">
+            Coupon
+          </div>
+        </Link>
       </div>
     </div>
   );

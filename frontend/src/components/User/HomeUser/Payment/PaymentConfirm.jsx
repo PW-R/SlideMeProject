@@ -2,24 +2,39 @@ import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { Carousel } from "react-bootstrap";
+import { usePosition } from "../../MAP/PositionContext";
 
 function PaymentConfirm() {
   const navigate = useNavigate();
-
   const [orderData, setOrderData] = useState(null);
   const { orderId } = useParams();
+
+  const { origin, destination } = usePosition();
   const [isLoadingStoreTab, setIsLoadingStoreTab] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingStores, setIsLoadingStores] = useState(false);
 
+  const [nearbyStores, setNearbyStores] = useState([]);
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
-  const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
+
+  // ดึงข้อมูลที่เลือกจากหน้าที่แล้วมาแสดง
+  const [selectedTotalPrice, setSelectedPrice] = useState(0);
+  const [selectedEquipmentPrice, setEquipmentPrice] = useState(0);
+  useEffect(() => {
+    setSelectedPrice(Number(sessionStorage.getItem("selectedTotalPrice") || 0));
+    setEquipmentPrice(
+      Number(sessionStorage.getItem("selectedEquipmentPrice") || 0)
+    );
+  }, []);
+  const selectedDriverName = sessionStorage.getItem("selectedDriverName");
+  const selectedDriverYear = sessionStorage.getItem("selectedDriverYear");
+  const selectedShopPhone = sessionStorage.getItem("selectedShop_Phone");
 
   const reverseGeocode = async (lat, lng) => {
     try {
       const res = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse`,
+        // `https://nominatim.openstreetmap.org/reverse`,
         {
           params: {
             lat,
@@ -39,8 +54,7 @@ function PaymentConfirm() {
   useEffect(() => {
     if (orderData) {
       console.log("ข้อมูลที่ได้จาก API:", orderData);
-      const { startLat, startLng, endLat, endLng, serviceType, driverCarType } =
-        orderData;
+      const { startLat, startLng, endLat, endLng } = orderData;
       console.log("StartLat:", startLat, "StartLng:", startLng); // Check values
       console.log("EndLat:", endLat, "EndLng:", endLng);
 
@@ -54,6 +68,7 @@ function PaymentConfirm() {
     }
   }, [orderData]);
 
+  // ดึงข้อมูลคำสั่งซื้อจาก backend
   useEffect(() => {
     console.log("orderId:", orderId);
     if (orderId) {
@@ -70,6 +85,31 @@ function PaymentConfirm() {
         });
     }
   }, [orderId]);
+
+  // ส่งข้อมูลไปหน้าคนขับ
+  const handleDriverDetail = () => {
+    sessionStorage.setItem("selectedDriverName", selectedDriverName);
+    sessionStorage.setItem("selectedDriverYear", selectedDriverYear);
+    sessionStorage.setItem("selectedShopPhone", selectedShopPhone);
+    navigate(`/DriverDetail/${orderId}`);
+  };
+
+  useEffect(() => {
+    console.log("Origin:", origin); // ตรวจสอบค่าของ origin
+    console.log("Destination:", destination); // ตรวจสอบค่าของ destination
+
+    // ถ้าค่าของ origin หรือ destination ยังไม่ถูกตั้งค่าให้แสดงข้อความ
+    if (!origin || !destination) {
+      console.log("ยังไม่ได้ตั้งค่าตำแหน่งต้นทางหรือปลายทาง");
+    }
+  }, [origin, destination]);
+
+  useEffect(() => {
+    if (origin?.lat && origin?.lng && destination?.lat && destination?.lng) {
+      reverseGeocode(origin.lat, origin.lng).then(setStartAddress);
+      reverseGeocode(destination.lat, destination.lng).then(setEndAddress);
+    }
+  }, [origin, destination]);
 
   return (
     <div style={{ overflow: "hidden" }}>
@@ -106,7 +146,7 @@ function PaymentConfirm() {
         {/* 3ปุ่ม ข้อมูลผู้ให้บริการ / โทรหาผู้ให้บริการ / ส่งข้อความ */}
         <div className="grid grid-cols-3 mt-6 gap-2">
           <button
-            onClick={() => navigate("/DriverDetail")}
+            onClick={handleDriverDetail}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-[100px] h-[30px] text-[10px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
@@ -168,11 +208,11 @@ function PaymentConfirm() {
         <div className="mb-2 items-center text-lg font-semibold">
           <div className="grid grid-cols-[3fr_1fr]">
             <p className="mb-0 ">ค่าบริการ</p>
-            <p className="mb-0 text-end">2,230</p>
+            <p className="mb-0 text-end">{selectedTotalPrice}</p>
           </div>
           <div className="grid grid-cols-[3fr_1fr]">
             <p className="mb-0">ค่าอุปกรณ์</p>
-            <p className="mb-0 text-end">500</p>
+            <p className="mb-0 text-end">{selectedEquipmentPrice}</p>
           </div>
           {/* แสดงหลังจากที่กดใช้ส่วนลด */}
           {/* <div className="grid grid-cols-[3fr_1fr]">
@@ -192,7 +232,7 @@ function PaymentConfirm() {
         {/* ปุ่มคูปองส่วนลด */}
         <div className="mb-6">
           <button
-            onClick={() => navigate("/UseCoupon")}
+            onClick={() => navigate(`/UseCoupon/${orderId}`)}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FFC4FF] text-black w-full h-[30px] flex items-center justify-center hover:bg-[#FFA3BA] transition"
           >
@@ -203,15 +243,14 @@ function PaymentConfirm() {
         {/* ปุ่มชำระเงิน / ยกเลิก */}
         <div className="flex justify-center gap-4">
           <button
-            onClick={() => navigate("/Receipt")}
+            onClick={() => navigate(`/Receipt/${orderId}`)}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#0DC964] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#43af56] transition"
           >
             ชำระเงิน
           </button>
-          {/* ลองลิ้งไปหน้า สถานะรถสไลด์ ก่อนนะ */}
           <button
-            onClick={() => navigate("/DCSS")}
+            onClick={() => navigate(`/DCSS/${orderId}`)}
             style={{ fontSize: "13px", borderRadius: "10px" }}
             className="bg-[#FF0A0A] text-white w-full h-[30px] flex items-center justify-center hover:bg-[#EF1D33] transition"
           >

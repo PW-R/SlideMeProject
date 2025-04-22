@@ -1,16 +1,15 @@
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
 
 function CreateStore() {
-  const [showPassword, setShowPassword] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState({ model: "", license: "" });
+  const navigate = useNavigate();
   const [storeInfo, setStoreInfo] = useState({
     images: [],
     promptpay: null,
   });
-  
 
   const addRowData = () => {
     if (task.model.trim() !== "" && task.license.trim() !== "") {
@@ -26,10 +25,10 @@ function CreateStore() {
 
   const handleMultipleImagesChange = (e) => {
     const files = Array.from(e.target.files);
-    const newImages = files.map((file) => URL.createObjectURL(file));
     setStoreInfo((prev) => ({
       ...prev,
-      images: [...prev.images, ...newImages],
+      images: [...prev.images, ...files.map((f) => URL.createObjectURL(f))],
+      imagesFiles: [...(prev.imagesFiles || []), ...files],
     }));
   };
 
@@ -47,9 +46,62 @@ function CreateStore() {
       setStoreInfo((prev) => ({
         ...prev,
         [type]: imageUrl,
+        [`${type}File`]: file,
       }));
     }
   };
+
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append("name", storeInfo.name || "");
+    formData.append("address", storeInfo.address || "");
+    formData.append("phone", storeInfo.phone || "");
+    formData.append("password", storeInfo.password || "");
+    formData.append("managerName", storeInfo.managerName || "");
+    formData.append("info", storeInfo.info || "");
+    formData.append("service", storeInfo.service || "");
+    formData.append("vehicles", JSON.stringify(tasks)); // รถหลายคัน
+  
+    storeInfo.imagesFiles?.forEach((file) => {
+      formData.append("images", file);
+    });
+  
+    if (storeInfo.promptpayFile) {
+      formData.append("promptpay", storeInfo.promptpayFile);
+    }
+  
+    // ✅ Log ข้อมูลที่อยู่ใน formData ออกมาดู
+    for (let [key, value] of formData.entries()) {
+      console.log(`${key}:`, value);
+    }
+  
+    try {
+      const res = await fetch("http://localhost:3000/api/store", {
+        method: "POST",
+        credentials: "include", 
+        body: formData,
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+        // 👇 ดึง user เดิมจาก localStorage แล้วเปลี่ยน role
+        const user = JSON.parse(localStorage.getItem("user"));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({ ...user, role: "manager" })
+        );
+      
+        alert("✅ สร้างร้านสำเร็จ!");
+        navigate("/HomeCustomize");
+      }else {
+        alert("❌ สร้างร้านไม่สำเร็จ: " + data.error);
+      }
+    } catch (err) {
+      console.error("Error:", err);
+      alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
+    }
+  };
+  
 
   return (
     <AppWrapper>
@@ -70,58 +122,67 @@ function CreateStore() {
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-2"
               type="text"
               placeholder="ชื่อร้าน"
+              value={storeInfo.name || ""}
+              onChange={(e) =>
+                setStoreInfo((prev) => ({ ...prev, name: e.target.value }))
+              }
             />
 
             <input
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
               type="text"
               placeholder="ที่อยู่ร้าน"
+              value={storeInfo.address || ""}
+              onChange={(e) =>
+                setStoreInfo((prev) => ({ ...prev, address: e.target.value }))
+              }
             />
 
             <input
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
               type="text"
               placeholder="เบอร์โทรศัพท์ร้าน"
+              value={storeInfo.phone || ""}
+              onChange={(e) =>
+                setStoreInfo((prev) => ({ ...prev, phone: e.target.value }))
+              }
             />
 
             <input
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
               type="text"
               placeholder="ชื่อผู้ดูแลร้าน"
+              value={storeInfo.managerName || ""}
+              onChange={(e) =>
+                setStoreInfo((prev) => ({
+                  ...prev,
+                  managerName: e.target.value,
+                }))
+              }
             />
 
             <input
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
-              type="text"
-              placeholder="เบอร์โทรศัพท์ผู้ดูแล"
+              type="password"
+              placeholder="Password"
+              value={storeInfo.password || ""}
+              onChange={(e) =>
+                setStoreInfo((prev) => ({ ...prev, password: e.target.value }))
+              }
             />
-
-            <div className="relative ">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-5 top-1/2 transform -translate-y-1/2 text-gray-500"
-                >
-                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                </button>
-
-                <p className="text-[#A09D9D] text-sm mt-2 ml-4">
-                  Your password must be 8-20 characters.
-                </p>
-              </div>
-            </div>
+            <p className="text-[#A09D9D] text-sm mt-2 ml-4">
+              Your password must be 8-20 characters.
+            </p>
 
             <div className="flex flex-col space-y-4">
               <div className="relative mt-2">
                 <textarea
                   className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[100px] rounded-[15px] p-4 !text-lg"
                   id="floatingTextarea1"
+                  value={storeInfo.info || ""}
+                  onChange={(e) =>
+                    setStoreInfo((prev) => ({ ...prev, info: e.target.value }))
+                  }
                 ></textarea>
                 <label
                   htmlFor="floatingTextarea1"
@@ -135,6 +196,13 @@ function CreateStore() {
                 <textarea
                   className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[100px] rounded-[15px] p-8 !text-lg"
                   id="floatingTextarea2"
+                  value={storeInfo.service || ""}
+                  onChange={(e) =>
+                    setStoreInfo((prev) => ({
+                      ...prev,
+                      service: e.target.value,
+                    }))
+                  }
                 ></textarea>
                 <label
                   htmlFor="floatingTextarea2"
@@ -233,40 +301,40 @@ function CreateStore() {
           </div>
 
           <div className="mt-4">
-  <label className="block mb-1">QR Code PromptPay:</label>
+            <label className="block mb-1">QR Code PromptPay:</label>
 
-  {/* ปุ่มเลือก QR */}
-  <label
-    htmlFor="qrPromptpay"
-    className="inline-block cursor-pointer text-center border border-green-400 text-green-600 px-4 py-2 rounded-lg w-full text-sm hover:bg-green-50 transition"
-  >
-    เพิ่มรูปภาพ QR
-  </label>
+            {/* ปุ่มเลือก QR */}
+            <label
+              htmlFor="qrPromptpay"
+              className="inline-block cursor-pointer text-center border border-green-400 text-green-600 px-4 py-2 rounded-lg w-full text-sm hover:bg-green-50 transition"
+            >
+              เพิ่มรูปภาพ QR
+            </label>
 
-  <input
-    id="qrPromptpay"
-    type="file"
-    accept="image/*"
-    onChange={(e) => handleFileChange(e, "promptpay")}
-    className="hidden"
-  />
+            <input
+              id="qrPromptpay"
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleFileChange(e, "promptpay")}
+              className="hidden"
+            />
 
-  {/* Preview QR ถ้าอัปโหลดแล้ว */}
-  {storeInfo.promptpay && (
-    <img
-      src={storeInfo.promptpay}
-      alt="QR Code"
-      className="mt-2 rounded shadow w-full max-w-xs"
-    />
-  )}
-</div>
+            {/* Preview QR ถ้าอัปโหลดแล้ว */}
+            {storeInfo.promptpay && (
+              <img
+                src={storeInfo.promptpay}
+                alt="QR Code"
+                className="mt-2 rounded shadow w-full max-w-xs"
+              />
+            )}
+          </div>
 
-
-          <Link to="/HomeCustomize" className="mb-4 w-[291px] h-[50px] mt-5">
-            <div className="bg-[#48d065] text-white w-[320px] h-[45px] rounded-[20px] font-bold text-lg flex !items-center justify-center hover:bg-[#43af56] transition ">
-              สร้างร้าน
-            </div>
-          </Link>
+          <button
+            onClick={handleSubmit}
+            className="bg-[#48d065] text-white w-[320px] h-[45px] rounded-[20px] font-bold text-lg flex !items-center justify-center hover:bg-[#43af56] transition"
+          >
+            สร้างร้าน
+          </button>
         </div>
       </div>
     </AppWrapper>

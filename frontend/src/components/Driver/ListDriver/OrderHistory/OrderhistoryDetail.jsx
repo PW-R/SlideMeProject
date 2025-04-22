@@ -1,19 +1,47 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 function OrderhistoryDetail() {
   const location = useLocation();
-  const order = location.state?.order;
+  const { id } = useParams();
+  const [order, setOrder] = useState(location.state?.order || null);
+  const [loading, setLoading] = useState(!location.state?.order);
 
-  if (!order) {
-    return <div className="p-4 text-center">ไม่พบข้อมูล Order</div>;
-  }
+  useEffect(() => {
+    const fetchOrderById = async () => {
+      if (!order) {
+        try {
+          const token = localStorage.getItem("token");
+          const response = await axios.get(`http://localhost:3000/api/order-history/${id}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          setOrder(response.data);
+        } catch (error) {
+          console.error("Error fetching order by ID:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
+
+    fetchOrderById();
+  }, [id, order]);
+
+  if (loading) return <div className="p-4 text-center">Loading...</div>;
+
+  if (!order) return <div className="p-4 text-center">ไม่พบข้อมูล Order</div>;
 
   return (
     <div className="OrderhistoryDetail">
+      {/* ส่วน header */}
       <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
         <h1 className="text-white text-center">ประวัติการทำงาน</h1>
       </div>
 
+      {/* ส่วนรายละเอียด */}
       <div className="flex flex-col items-center mt-4 px-4">
         <h3 className="text-xl font-semibold">Order status</h3>
         <h5 className="text-lg font-medium text-gray-600">#{order.ID}</h5>
@@ -50,5 +78,4 @@ function OrderhistoryDetail() {
     </div>
   );
 }
-
 export default OrderhistoryDetail;

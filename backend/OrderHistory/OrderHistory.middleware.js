@@ -5,7 +5,7 @@ dotenv.config();
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1]; 
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Access token not found" });
@@ -19,7 +19,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-//errorHandler
 const errorHandler = (err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
@@ -28,6 +27,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
-
-module.exports = authenticateToken;
+module.exports = { authenticateToken, errorHandler };

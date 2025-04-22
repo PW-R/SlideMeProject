@@ -1,24 +1,35 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useLocation, Link, useNavigate, useParams } from "react-router-dom";
+import { usePosition } from "../../MAP/PositionContext";
 import axios from "axios";
-import MapDistance from "../../MapDistance";
+
+import MapDistance from "../../MAP/MapDistance";
+import L from "leaflet";
 
 function DCSS() {
   const navigate = useNavigate();
-
   const { orderId } = useParams(); // รับ orderId จาก URL
-  // console.log("รหัสร้านที่เลือก:", orderId);
   const [orderData, setOrderData] = useState(null);
+
+  const { origin, destination } = usePosition();
+  // const { setOrigin, setDestination } = usePosition();
+  const location = useLocation();
+  const mapContainerRef = useRef(null);
 
   const [tab, setTab] = useState("details");
   const [nearbyStores, setNearbyStores] = useState([]);
+
   const [isLoadingStoreTab, setIsLoadingStoreTab] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingStores, setIsLoadingStores] = useState(false);
 
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
-  const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
+  const [route, setRoute] = useState(null);
+  const [routeInfo, setRouteInfo] = useState({
+    distance: null,
+    duration: null,
+  });
 
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -32,6 +43,7 @@ function DCSS() {
           },
         }
       );
+
       console.log("ที่อยู่ที่ได้จาก reverse geocode:", res.data.display_name); // พิมพ์ที่อยู่ที่ได้
       return res.data.display_name; // ที่อยู่แบบเต็ม
     } catch (error) {
@@ -105,7 +117,33 @@ function DCSS() {
     }
   }, [orderId]);
 
-  // เลือกคนขับ
+    // "รอสักครู่..."
+    const handleTabChange = (newTab) => {
+      if (newTab === "chooseStore") {
+        setIsLoadingStoreTab(true);
+        setTab("chooseStore");
+        // ตั้ง timeout 3 วินาที
+        setTimeout(() => {
+          setIsLoadingStoreTab(false);
+        }, 2000);
+      } else {
+        setTab(newTab);
+      }
+    };
+
+  // กดไปดูข้อมูลร้าน
+  const handleChooseStore = async (store) => {
+    sessionStorage.setItem("selectedShop_Name", store.name);
+    sessionStorage.setItem("selectedShop_Info", store.shop_info);
+    sessionStorage.setItem("selectedShop_service", store.shop_service);
+    sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
+
+    sessionStorage.setItem("selectedShop_Lat", store.lat);
+    sessionStorage.setItem("selectedShop_Lng", store.lng);
+    navigate(`/ShopDetail/${orderId}`);
+  };
+
+  // ปุ่ม เลือก ( ไปหน้าถัดไป )
   const handleSelectShops = async (store) => {
     const driverId = Number(store.Driver_ID);
     console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
@@ -115,16 +153,25 @@ function DCSS() {
       alert("ไม่พบข้อมูลคนขับ");
       return;
     }
-    
+
     try {
       // const orderId = /* ดึงมาจาก useParams หรือ state */;
 
-      await axios.post(`http://localhost:3000/api/SelectDriver/${orderId}`, {
+      await axios.post(`http://localhost:3000/api/select-driver/${orderId}`, {
         Driver_ID: driverId,
       });
 
       console.log("✅ บันทึกคนขับเรียบร้อย");
 
+      // ส่งข้อมูล
+      sessionStorage.setItem("selectedTotalPrice", store.total_price);
+      sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
+
+      sessionStorage.setItem("selectedDriverName", store.driver_name);
+      sessionStorage.setItem("selectedDriverYear", store.driver_year);
+      sessionStorage.setItem("selectedShop_Lat", store.lat);
+      sessionStorage.setItem("selectedShop_Lng", store.lng);
+      sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
       // ไปหน้า PaymentConfirm
       navigate(`/PaymentConfirm/${orderId}`);
     } catch (err) {
@@ -133,28 +180,51 @@ function DCSS() {
     }
   };
 
+  useEffect(() => {
+    console.log("Origin:", origin); // ตรวจสอบค่าของ origin
+    console.log("Destination:", destination); // ตรวจสอบค่าของ destination
+
+    // ถ้าค่าของ origin หรือ destination ยังไม่ถูกตั้งค่าให้แสดงข้อความ
+    if (!origin || !destination) {
+      console.log("ยังไม่ได้ตั้งค่าตำแหน่งต้นทางหรือปลายทาง");
+    }
+  }, [origin, destination]);
+
+  useEffect(() => {
+    if (origin?.lat && origin?.lng && destination?.lat && destination?.lng) {
+      reverseGeocode(origin.lat, origin.lng).then(setStartAddress);
+      reverseGeocode(destination.lat, destination.lng).then(setEndAddress);
+    }
+  }, [origin, destination]);
+
+  useEffect(() => {
+    console.log("🔁 routeInfo updated:", routeInfo);
+  }, [routeInfo]);
+
   //  ปุ่มถัดไป
   const handleNextChooseStore = () => {
     handleTabChange("chooseStore");
   };
 
-  // "รอสักครู่..."
-  const handleTabChange = (newTab) => {
-    if (newTab === "chooseStore") {
-      setIsLoadingStoreTab(true);
-      setTab("chooseStore");
-      // ตั้ง timeout 3 วินาที
-      setTimeout(() => {
-        setIsLoadingStoreTab(false);
-      }, 2000);
-    } else {
-      setTab(newTab);
-    }
+  console.log("origin MAP:", origin);
+  console.log("destination MAP:", destination);
+
+  const handleRouteCalculated = (routeData) => {
+    console.log("📦 Route received in DCSS:", routeData);
+    setRoute(routeData); // เก็บข้อมูลใน state
   };
 
-  const handleRouteCalculated = (distance, duration) => {
-    setRouteInfo({ distance, duration }); // เก็บข้อมูลระยะทางและเวลา
-  };
+  useEffect(() => {
+    if (route && route.distance) {
+      console.log("Route calculated:", route.distance); // ตรวจสอบว่า route.distance ถูกต้อง
+    } else {
+      console.log("ยังไม่มีข้อมูลเส้นทาง");
+    }
+  }, [route]);
+
+  if (!origin?.position?.lat || !destination?.position?.lat) {
+    return <p>Loading map...</p>; // หรือแสดง loading spinner
+  }
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -172,25 +242,17 @@ function DCSS() {
 
       <div className="pt-[115px] flex flex-col h-full">
         {/* MAP */}
-        <div className="relative z-[1000]">
-          {orderData && orderData.startLat && orderData.startLng && (
-            <MapDistance
-              startLocation={{
-                lat: parseFloat(orderData.startLat),
-                lng: parseFloat(orderData.startLng),
-              }}
-              endLocation={{
-                lat: parseFloat(orderData.endLat),
-                lng: parseFloat(orderData.endLng),
-              }}
-              selectedLocation={{ lat: 13.736717, lng: 100.523186 }}
-              onMapLoad={(map) => console.log("Map loaded!", map)}
-              onRouteCalculated={handleRouteCalculated}
-            />
-          )}
+        <div className="relative z-[10] h-[500px]">
+          <MapDistance
+            onRouteCalculated={handleRouteCalculated}
+            // originLat={origin.position.lat}
+            // originLng={origin.position.lng}
+            // destinationLat={destination.position.lat}
+            // destinationLng={destination.position.lng}
+          />
         </div>
 
-        {/* รายละเอียด / เลือกร้าน */}
+        {/* แถบ รายละเอียด / เลือกร้าน */}
         <div className="absolute bottom-0 w-full h-[370px] bg-white  z-[5000]">
           <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2">
             <div className="flex justify-between items-center w-full">
@@ -238,36 +300,33 @@ function DCSS() {
                     </div>
                   </div>
                 </div>
-
                 {/* เส้นแบ่ง */}
                 <div className="w-full border-t-2 border-gray-300 mt-3 mb-2"></div>
 
                 {/* รายละเอียดเพิ่มเติม */}
-                {routeInfo.distance && (
-                  <div className="grid grid-cols-2 gap-x-4">
-                    <div className="flex flex-col space-y-1">
+                <div className="grid grid-cols-2 gap-x-4">
+                  <div className="flex flex-col space-y-1">
+                    {route && route.distance ? (
                       <div className="grid grid-cols-[1fr_3fr] items-center">
                         <i className="bi bi-sign-turn-right"></i>
-                        <p className="mb-1">{routeInfo.distance}</p>
+                        <p className="mb-1">{route.distance}</p>
                       </div>
-                      <div className="grid grid-cols-[1fr_3fr] items-center">
-                        <i className="bi bi-car-front"></i>
-                        <p className="mb-1">{orderData?.driverCarType}</p>
-                      </div>
-                      <div className="grid grid-cols-[1fr_3fr] items-center">
-                        <i className="bi bi-clock"></i>
-                        <p className="mb-1">{orderData?.serviceType}</p>
-                      </div>
+                    ) : (
+                      <div>กำลังคำนวณ...</div> // ถ้าไม่มีข้อมูลเส้นทางหรือยังคำนวณไม่เสร็จ
+                    )}
+                    <div className="grid grid-cols-[1fr_3fr] items-center">
+                      <i className="bi bi-car-front"></i>
+                      <p className="mb-1">{orderData?.driverCarType}</p>
                     </div>
-                    <div className="flex justify-end items-center">
-                      <img
-                        className="w-[90px]"
-                        src="logo-black.svg"
-                        alt="Logo"
-                      />
+                    <div className="grid grid-cols-[1fr_3fr] items-center">
+                      <i className="bi bi-clock"></i>
+                      <p className="mb-1">{orderData?.serviceType}</p>
                     </div>
                   </div>
-                )}
+                  <div className="flex justify-end items-center">
+                    <img className="w-[90px]" src="logo-black.svg" alt="Logo" />
+                  </div>
+                </div>
 
                 {/* ปุ่มถัดไป */}
                 <div className="flex justify-center mt-2">
@@ -293,7 +352,7 @@ function DCSS() {
                     {nearbyStores.length > 0 ? (
                       nearbyStores.map((store) => (
                         <div
-                          // key={store.driverId}
+                          key={store.driverId}
                           className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3 mt-3"
                         >
                           <div>
@@ -306,7 +365,7 @@ function DCSS() {
                           <div>
                             <button
                               style={{ fontSize: "20px" }}
-                              // onClick={handleChooseStore}
+                              onClick={() => handleChooseStore(store)}
                               className="text-[#0DC964] font-bold mb-0"
                             >
                               {store.name}
@@ -314,8 +373,9 @@ function DCSS() {
                           </div>
                           <div className="flex flex-col items-center space-y-1">
                             <p className="mb-0 font-semibold">
-                              {store.price !== null && store.price !== undefined
-                                ? store.price
+                              {store.total_price !== null &&
+                              store.total_price !== undefined
+                                ? store.total_price
                                 : "Price not available"}
                             </p>
                             <button

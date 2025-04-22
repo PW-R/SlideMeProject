@@ -41,12 +41,21 @@ exports.NearbyShops = async (req, res) => {
     const [Shops] = await pool.execute(`
       SELECT 
         d.Driver_ID,
-        d.Shop_Name,
-        d.Shop_Lat,
-        d.Shop_Lng,
-        o.Total_Price
+        s.Shop_ID,
+        s.Shop_Name,
+        s.Shop_Lat,
+        s.Shop_Phone,
+        s.Shop_Lng,
+        s.Shop_Info,
+        s.Shop_service,
+        o.Total_Price,
+        o.Equipment,
+        d.Driver_Year,
+        d.Driver_Name,
+        d.DriverRating
       FROM Driver_info d
       LEFT JOIN Driver_Offer o ON d.Driver_ID = o.Driver_ID
+      LEFT JOIN Shop_Info s ON d.Shop_ID = s.Shop_ID
     `);
     console.log("Shops:", Shops);
     console.log("Found shops:", Shops.length);
@@ -64,7 +73,6 @@ exports.NearbyShops = async (req, res) => {
       return distance <= 3;
     });
     console.log("Nearby shops:", nearbyShop.length);
-    // console.log("Nearby shops with price:", storesWithPrice);
 
     // 4. ส่งข้อมูลร้านที่อยู่ใกล้ไปยัง frontend
     res.status(200).json({
@@ -73,8 +81,16 @@ exports.NearbyShops = async (req, res) => {
         name: shop.Shop_Name,
         lat: shop.Shop_Lat,
         lng: shop.Shop_Lng,
-        price: shop.Total_Price,
-        Driver_ID: shop.Driver_ID
+        shop_info: shop.Shop_Info,
+        shop_phone: shop.Shop_Phone,
+        shop_service: shop.Shop_service,
+        total_price: shop.Total_Price,
+        equipment: shop.Equipment,
+
+        Driver_ID: shop.Driver_ID,
+        driver_name: shop.Driver_Name,
+        driver_year: shop.Driver_Year,
+        rating: shop.DriverRating
       }))
     });
     console.log("Nearby shops with price:", nearbyShop);

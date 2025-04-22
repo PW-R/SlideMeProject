@@ -1,40 +1,93 @@
-import { Link } from "react-router-dom";
+// ✅ loginDriver.jsx
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react"; // ไอคอนจาก lucide-react
-
+import { Eye, EyeOff } from "lucide-react";
 
 function LoginDriver() {
   const [showPassword, setShowPassword] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+
+  const handleLogin = async () => {
+    try {
+      const res = await fetch(
+        "http://localhost:3000/api/login-driver/login-driver",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ username, password }),
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.message || "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง");
+        return;
+      }
+
+      // ✅ เก็บข้อมูล
+      sessionStorage.setItem("role", data.user.role);
+      sessionStorage.setItem("user", JSON.stringify(data.user));
+
+      // ✅ เงื่อนไขตาม role และการอนุมัติ
+      if (data.user.role === "driver") {
+        if (!data.user.isApproved) {
+          if (data.user.hasJoinRequest) {
+            navigate("/JoinStore"); // กำลังรออนุมัติ
+          } else {
+            navigate("/CreateAndjoin"); // ยังไม่เคยขอ join ร้าน
+          }
+          return;
+        }
+
+        // ✅ ผ่านการอนุมัติแล้ว
+        if (data.user.storeId) {
+          navigate("/HomeCustomize");
+        } else {
+          navigate("/CreateAndjoin");
+        }
+      } else if (data.user.role === "manager") {
+        navigate("/HomeCustomize");
+      }
+    } catch (err) {
+      console.error("❌ Login error:", err);
+      setError("ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้");
+    }
+  };
 
   return (
     <AppWrapper>
       <div className="flex flex-col items-center p-4">
-        {/* โลโก้ */}
         <div className="flex justify-center mb-4">
           <img
-           src="/slideme.svg"
+            src="/slideme.svg"
             alt="Logo"
             className="w-60 h-60 object-contain"
           />
         </div>
 
-        {/* หัวข้อ */}
-        <h1 className="mb-6 !text-[#33b44f] text-2xl font-extrabold text-center">
+        <h1 className="mb-6 text-[#33b44f] text-2xl font-extrabold text-center">
           Login!
         </h1>
 
-        {/* Input: Phone */}
         <input
           type="text"
           placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
           className="w-[320px] h-[52px] text-[18px] bg-gray-100 text-gray-600 placeholder-gray-400 px-4 mb-4 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f]"
         />
 
-        {/* Input: Password */}
         <div className="relative w-[320px] mb-4">
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full h-[52px] text-[18px] bg-gray-100 text-gray-600 placeholder-gray-400 px-4 pr-12 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#33b44f]"
           />
           <button
@@ -46,26 +99,15 @@ function LoginDriver() {
           </button>
         </div>
 
-        {/* Checkbox + Forgot */}
-        <div className="flex justify-between items-center w-[320px] mb-6 text-sm text-gray-600">
-          <label className="flex items-center">
-            <input type="checkbox" className="accent-[#33b44f] mr-2" />
-            Remember me
-          </label>
+        {error && <p className="text-red-500 mb-2">{error}</p>}
 
-          <Link to="/Forgotpass" className="hover:underline">
-            Forgot Password?
-          </Link>
-        </div>
+        <button
+          onClick={handleLogin}
+          className="mb-4 w-[291px] h-[50px] bg-[#48d065] text-white rounded-[20px] font-bold text-lg hover:bg-[#43af56] transition"
+        >
+          Login
+        </button>
 
-        {/* Login Button */}
-        <Link to="/CreateAndJoin" className="mb-4 w-[291px] h-[50px]">
-          <div className="bg-[#48d065] text-white w-full h-full rounded-[20px] font-bold text-lg flex items-center justify-center hover:bg-[#43af56] transition">
-            Login
-          </div>
-        </Link>
-
-        {/* Sign In Button */}
         <Link to="/RegisterDriver" className="mb-4 w-[291px] h-[50px]">
           <div className="bg-[#48d065] text-white w-full h-full rounded-[20px] font-bold text-lg flex items-center justify-center hover:bg-[#2ea144] transition">
             Sign In
@@ -78,7 +120,7 @@ function LoginDriver() {
 
 function AppWrapper({ children }) {
   return (
-    <div className="w-[390px] h-[844px] mx-auto border border-red-300 shadow-xl overflow-auto relative">
+    <div className="w-[390px] h-[844px] mx-auto border border-gray-300 shadow-xl overflow-auto relative">
       {children}
     </div>
   );

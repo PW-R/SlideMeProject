@@ -70,7 +70,8 @@ exports.InputOrder = async (req, res) => {
     !carBrand || !userCarType ||
     !vehicleCondition || !carYear ||
     !licensePlate || !serviceType ||
-    !driverCarType || !orderBudget
+    !orderBudget
+    // !driverCarType || !orderBudget
   ) {
     return res.status(400).json({
       error: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
@@ -136,29 +137,41 @@ exports.getOrderById = async (req, res) => {
   console.log("Fetching order for ID:", orderId);
 
   const sql = `
-    SELECT 
-      OrderDetail_ID,
-      Status,
-      Start_Lat AS startLat,
-      Start_Lng AS startLng,
-      End_Lat AS endLat,
-      End_Lng AS endLng,
-      Car_Brand AS carBrand,
-      UserCar_type AS userCarType,
-      Vehicle_condition AS vehicleCondition,
-      CarYear AS carYear,
-      License_Plate AS licensePlate,
-      Note,
-      ServiceType AS serviceType,
-      DriverCar_type AS driverCarType,
-      Order_Date_time AS orderDateTime,
-      Order_Budget AS orderBudget
-    FROM OrderDetail
-    WHERE OrderDetail_ID = ?
+  SELECT 
+    o.OrderDetail_ID,
+    o.Status,
+    o.Start_Lat AS startLat,
+    o.Start_Lng AS startLng,
+    o.End_Lat AS endLat,
+    o.End_Lng AS endLng,
+    o.Car_Brand AS carBrand,
+    o.UserCar_type AS userCarType,
+    o.Vehicle_condition AS vehicleCondition,
+    o.CarYear AS carYear,
+    o.License_Plate AS licensePlate,
+    o.Note,
+    o.ServiceType AS serviceType,
+    o.DriverCar_type AS driverCarType,
+    o.Order_Date_time AS orderDateTime,
+    o.Order_Budget AS orderBudget,
+    o.Driver_ID,
+
+    d.Driver_Name AS driverName,
+    d.Shop_Name AS shopName,
+    d.DriverRating AS driverRating,
+
+    s.Shop_Lat AS shopLat,
+    s.Shop_Lng AS shopLng,
+    s.Shop_Phone AS shopPhone
+  FROM OrderDetail o
+  LEFT JOIN Driver_info d ON o.Driver_ID = d.Driver_ID
+  LEFT JOIN Shop_Info s ON d.Shop_Name = s.Shop_Name
+  WHERE o.OrderDetail_ID = ?
   `;
 
   try {
     const [rows] = await pool.query(sql, [orderId]);
+    console.log("Query result:", rows);
     if (rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบข้อมูลคำสั่งซื้อ" });
     }

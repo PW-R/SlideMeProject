@@ -6,57 +6,72 @@ function JoinStore() {
   const [storeCode, setStoreCode] = useState("");
   const [result, setResult] = useState("");
   const [foundStore, setFoundStore] = useState(null);
-  const [requestStatus, setRequestStatus] = useState("idle"); // idle, pending, approved
+  const [requestStatus, setRequestStatus] = useState("idle"); // idle, pending
   const navigate = useNavigate();
 
-  const dummyStores = [
-    {
-      name: "ร้าน",
-      code: "123",
-      logo: "advert_car1.svg",
-    },
-  ];
+  const handleSearch = async () => {
+    if (!storeName.trim() || !storeCode.trim()) {
+      setResult("กรุณากรอกชื่อร้านและรหัสร้านให้ครบถ้วน");
+      return;
+    }
 
-  const handleSearch = () => {
-    const found = dummyStores.find(
-      (store) =>
-        store.name === storeName.trim() && store.code === storeCode.trim()
-    );
+    try {
+      const res = await fetch("http://localhost:3000/api/join-store/search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // ✅ สำคัญมาก
+        body: JSON.stringify({ storeName, storeCode }),
+      });
 
-    if (found) {
-      setFoundStore(found);
-      setResult("");
-    } else {
-      setResult("...ขออภัยไม่พบร้านที่คุณค้นหา...");
-      setFoundStore(null);
+      const data = await res.json();
+      if (res.ok) {
+        setFoundStore({ name: data.shopName, id: data.shopId });
+        setResult("");
+      } else {
+        setFoundStore(null);
+        setResult(data.message);
+      }
+    } catch (err) {
+      setResult("เกิดข้อผิดพลาด");
     }
   };
 
-  const handleJoinStore = () => {
+  const handleJoinStore = async () => {
     setRequestStatus("pending");
 
-    // จำลองการรอเจ้าของร้านกด "อนุมัติ" ภายใน 5 วิ
-    setTimeout(() => {
-      setRequestStatus("approved");
-      navigate("/HomeCustomize");
-    }, 5000);
+    const res = await fetch("http://localhost:3000/api/join-store/request", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  credentials: "include", // ✅ สำคัญเหมือนกัน
+  body: JSON.stringify({ shopId: foundStore.id }),
+});
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setRequestStatus("idle");
+      alert(data.message);
+    }
   };
 
   return (
     <AppWrapper>
       <div>
+        {/* Header */}
         <div className="relative bg-[#0dc964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
-          {/* ปุ่มย้อนกลับ */}
           <Link to="/CreateAndjoin">
             <i className="bi bi-chevron-left text-white text-2xl absolute left-4 bottom-4"></i>
           </Link>
-
-          {/* หัวข้อหน้า */}
           <div className="text-center">
             <h1 className="text-white font-bold text-xl">Join Store</h1>
           </div>
         </div>
 
+        {/* Body */}
         <div className="flex justify-center items-center bg-white">
           <div className="flex flex-col gap-4 p-4 items-center">
             <input
@@ -90,11 +105,6 @@ function JoinStore() {
 
             {foundStore && (
               <div className="flex flex-col items-center mt-2 gap-2">
-                <img
-                  src={foundStore.logo}
-                  alt="store-logo"
-                  className="w-[60px] h-[60px] rounded-full shadow-md"
-                />
                 <p className="text-lg font-semibold text-gray-800">
                   {foundStore.name}
                 </p>
@@ -109,7 +119,7 @@ function JoinStore() {
                 )}
 
                 {requestStatus === "pending" && (
-                  <p className="text-black-600 animate-pulse">
+                  <p className="text-yellow-600 font-semibold animate-pulse">
                     ⏳ รอเจ้าของร้านอนุมัติ...
                   </p>
                 )}

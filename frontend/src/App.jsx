@@ -1,9 +1,11 @@
 import { HashRouter, Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
+import "leaflet/dist/leaflet.css";
+import { PositionProvider } from "./components/User/MAP/PositionContext";
 
 import { useLoadScript } from "@react-google-maps/api";
-import MapViewSearch from "./components/User/MapViewSearch";
-import MapDistance from "./components/User/MapDistance";
+// import MapViewSearch from "./components/User/MapViewSearch";
+// import MapDistance from "./components/User/MapDistance";
 const libraries = ["places"];
 
 //Login and Register
@@ -32,11 +34,12 @@ import PaymentConfirm from "./components/User/HomeUser/Payment/PaymentConfirm";
 import PaymentCompleted from "./components/User/HomeUser/Payment/PaymentCompleted";
 import Receipt from "./components/User/HomeUser/Payment/Receipt";
 import DriverDetail from "./components/User/HomeUser/DCSS/DriverDetail";
+import ShopDetail from "./components/User/HomeUser/DCSS/ShopDetail";
 import UseCoupon from "./components/User/HomeUser/Payment/UseCoupon";
 import OrderStatusListUser from "./components/User/ListUser/PendingOrder/OrderStatusList";
-
+import AllCoupon from "./components/User/HomeUser/AllCoupon";
 import ListPendingOrder from "./components/User/ListUser/ListPendingOrder";
-import Review from "./components/User/ListUser/PendingOrder/Review";  
+import Review from "./components/User/ListUser/PendingOrder/Review";
 import ListOrderHistory from "./components/User/ListUser/ListOrderHistory";
 import NotiUser from "./components/User/NotificationUser/NotiUser";
 
@@ -66,6 +69,7 @@ import OrderPayment from "./components/Driver/ListDriver/IncomingOrder/OrderPaym
 import OrderConfirmation from "./components/Driver/ListDriver/IncomingOrder/OrderConfirmation";
 import OrderSchedue from "./components/Driver/ListDriver/OrderSchedue";
 import PendingOrderLocation from "./components/Driver/ListDriver/OrderLocation/PendingOrderLocation";
+import DriverMessage from "./components/Driver/DriverMessage";
 
 
 import "./index.css";
@@ -83,6 +87,7 @@ function App() {
   }
 
   return (
+    <PositionProvider>
     <div className="app">
       <div className="app-router">
         
@@ -101,27 +106,35 @@ function App() {
             
             {/* User */}
             <Route element={<UserLayout />}>
-              <Route path="UserHome" element={<UserHome />} />
-              <Route path="StartPosition" element={<StartPosition />} />
-              <Route path="Destination" element={<Destination />} />
-              <Route path="ShopReccommend" element={<ShopReccommend />} />
-              <Route path="OrderInfoInputPage" element={<InputInfo />} />
-              <Route path="/DCSS/:orderId" element={<DCSS />} />
-              <Route path="PaymentConfirm/:orderId" element={<PaymentConfirm />} />
-              <Route path="PaymentCompleted" element={<PaymentCompleted />} />
-              <Route path="Receipt" element={<Receipt />}/>
-              <Route path="DriverDetail" element={<DriverDetail />} />
-              <Route path="UseCoupon" element={<UseCoupon />} />
-              <Route path="OrderStatusListUser" element={<OrderStatusListUser />} />
-              <Route path="ListPendingOrder" element={<ListPendingOrder />} />
-              <Route path="ListOrderHistory" element={<ListOrderHistory />} />
-              <Route path="NotiUser" element={<NotiUser />} />
-              <Route path="UserAccount" element={<UserAccount />} />
-              <Route path="PresetPosition" element={<PresetPosition />} />
-              <Route path="EditUserProfile" element={<EditUserProfile />} />
-              <Route path="Review" element={<Review />} />
-              <Route path="UserMassage" element={<UserMassage />} />
-            </Route>
+                <Route path="UserHome" element={<UserHome />} />
+                <Route path="StartPosition" element={<StartPosition />} />
+                <Route path="Destination" element={<Destination />} />
+                <Route path="ShopReccommend" element={<ShopReccommend />} />
+                <Route path="OrderInfoInputPage" element={<InputInfo />} />
+                <Route path="/DCSS/:orderId" element={<DCSS />} />
+                <Route path="DriverDetail/:orderId" element={<DriverDetail />} />
+                <Route path="ShopDetail/:orderId" element={<ShopDetail />} />
+                <Route
+                  path="PaymentConfirm/:orderId"
+                  element={<PaymentConfirm />}
+                />
+                <Route path="PaymentCompleted/:orderId" element={<PaymentCompleted />} />
+                <Route path="Receipt/:orderId" element={<Receipt />} />
+                <Route path="UseCoupon/:orderId" element={<UseCoupon />} />
+                <Route
+                  path="OrderStatusListUser/:orderId"
+                  element={<OrderStatusListUser />}
+                />
+                <Route path="ListPendingOrder" element={<ListPendingOrder />} />
+                <Route path="ListOrderHistory" element={<ListOrderHistory />} />
+                <Route path="NotiUser" element={<NotiUser />} />
+                <Route path="UserAccount" element={<UserAccount />} />
+                <Route path="PresetPosition" element={<PresetPosition />} />
+                <Route path="EditUserProfile" element={<EditUserProfile />} />
+                <Route path="Review" element={<Review />} />
+                <Route path="UserMassage" element={<UserMassage />} />
+                <Route path="AllCoupon" element={<AllCoupon />} />
+              </Route>
 
             {/* Driver */}
             <Route element={<DriverLayout />}>
@@ -145,12 +158,14 @@ function App() {
               <Route path="/OrderConfirmation" element={<OrderConfirmation />} />
               <Route path="/OrderSchedue" element={<OrderSchedue />} />
               <Route path="/PendingOrderLocation" element={<PendingOrderLocation />} />
+              <Route path="DriverMessage" element={<DriverMessage />} />
               
             </Route>
           </Routes>
         </HashRouter>
       </div>
     </div>
+    </PositionProvider>
   );
 }
 

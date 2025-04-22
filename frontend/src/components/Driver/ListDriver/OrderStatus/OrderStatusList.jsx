@@ -17,7 +17,7 @@ function OrderStatusList() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const res = await axios.get("http://localhost:3000/api/order-status");
+        const res = await axios.get("http://localhost:3000/api/order-status-driver");
         setOrders(res.data);
       } catch (err) {
         console.error("Error fetching order statuses:", err);

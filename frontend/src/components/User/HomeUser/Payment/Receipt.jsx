@@ -1,37 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom"; // Add this import
+import { useNavigate, useParams } from "react-router-dom";
 
 function Receipt() {
-  const [timeLeft, setTimeLeft] = useState(300); // 5 minutes timer
+  const [timeLeft, setTimeLeft] = useState(30); // ตั้งเวลา
   const [timerActive, setTimerActive] = useState(true);
-  const navigate = useNavigate(); // Initialize navigate function
+  const navigate = useNavigate();
+  const { orderId } = useParams(); // ✅ ดึง orderId จาก URL
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNuLkhPGNWIidkCJNKzzUm7mw3b2e4F9sUQA&s"
+      );
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "QR-code_image.jpg";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("ดาวน์โหลดไม่สำเร็จ:", error);
+    }
+  };
 
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
-      const timer = setInterval(() => setTimeLeft(timeLeft - 1), 1000);
+      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearInterval(timer);
     }
   }, [timeLeft, timerActive]);
 
+  useEffect(() => {
+    if (timeLeft === 0 && orderId) {
+      const updateOrderStatus = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:3000/api/order?orderId=${orderId}`,
+            {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ status: "expired" }),
+            }
+          );
+
+          if (!response.ok) throw new Error("Failed to update order status");
+          console.log("✅ Order status updated");
+        } catch (error) {
+          console.error("❌ Error updating order status:", error);
+        }
+      };
+
+      updateOrderStatus();
+    }
+  }, [timeLeft, orderId]);
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secondsLeft = seconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(
-      2,
-      "0"
-    )}`;
+    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(2, "0")}`;
   };
 
   return (
     <div className="h-full w-full bg-[#0dc964] flex flex-col items-center py-10 p-2">
-      {/* Header */}
       <div>
         <h1 className="text-white text-center text-xl font-semibold mt-4">
           QR Payment
         </h1>
       </div>
 
-      {/* Content wrapped in white rounded box */}
       <div className="bg-white rounded-3xl p-8 mt-8 w-11/12 max-w-md shadow-lg">
         <div className="text-center text-lg font-medium">
           <p className="font-semibold text-2xl">
@@ -39,27 +80,37 @@ function Receipt() {
             {formatTime(timeLeft)}
           </p>
         </div>
+
         <div className="mt-4">
           <img
-            src="qr-code-placeholder.png" // Replace with the actual QR code image source
+            src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
             alt="QR Code"
             className="w-60 h-60 mx-auto"
           />
         </div>
+
         <div className="mt-4 text-center text-[#0dc964]">
           <p>กรุณาสแกน QR Code ด้วยแอปพลิเคชัน Mobile Banking ของคุณ</p>
         </div>
-        <div className="mt-6 flex gap-4 justify-center">
+
+        <div className="flex justify-center mt-4">
           <button
-            style={{ borderRadius: "10px" }}
-            onClick={() => navigate("/PaymentCompleted")}
-            className="bg-[#0dc964] text-white px-6 py-2 rounded-xl"
+            onClick={handleDownload}
+            className="bg-[#007bff] text-white px-6 py-2 rounded-xl"
           >
             บันทึกรูป
           </button>
+        </div>
+
+        <div className="mt-6 flex gap-4 justify-center">
+          <button
+            onClick={() => navigate(`/PaymentCompleted/${orderId}`)}
+            className="bg-[#0dc964] text-white px-6 py-2 rounded-xl"
+          >
+            ชำระเงินเสร็จสิ้น
+          </button>
           <button
             onClick={() => navigate("/UserHome")}
-            style={{ borderRadius: "10px" }}
             className="bg-[#ff0000] text-white px-6 py-2 rounded-xl"
           >
             กลับไปหน้าแรก

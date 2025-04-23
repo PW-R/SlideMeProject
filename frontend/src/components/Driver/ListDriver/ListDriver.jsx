@@ -13,13 +13,7 @@ function ListDriver() {
           </div>
         </Link>
 
-        <Link to="/LocationStore">
-          <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300">
-            <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">
-              Location
-            </div>
-          </div>
-        </Link>
+        
 
         <Link to="/OrderStatusList">
           <div className="w-[300px] h-[70px] bg-[#68E797] text-white border-none rounded-[15px] hover:bg-[#25D150] transition duration-300 pt-4">

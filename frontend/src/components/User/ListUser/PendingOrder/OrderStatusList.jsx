@@ -1,112 +1,60 @@
-import { useState, useEffect, useRef } from "react";
-import { useLocation, Link, useNavigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 // import { usePosition } from "../../MAP/PositionContext";
-import axios from "axios";
-
 import MapStatus from "../../MAP/MapStatus";
-import L from "leaflet";
 
 function OrderStatusListUser() {
   const navigate = useNavigate();
-  const { orderId } = useParams(); // รับ orderId จาก URL
+  const { orderId } = useParams();
   const [orderData, setOrderData] = useState(null);
 
-  const [isLoading, setIsLoading] = useState(true);
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
-  
+
   const [origin, setOrigin] = useState({ lat: null, lng: null });
   const [destination, setDestination] = useState({ lat: null, lng: null });
-  console.log("Origin:", origin);
-  console.log("Destination:", destination);
 
-  const selectedDriverName = sessionStorage.getItem("selectedDriverName");
+  const selectedDriverName = sessionStorage.getItem("selectedDriverName") || "คุณสมหมาย";
   const selectedShopLat = sessionStorage.getItem("selectedShop_Lat");
   const selectedShopLng = sessionStorage.getItem("selectedShop_Lng");
-  
-  console.log("Parsed ShopLat:", selectedShop_Lat, "ShopLng:", selectedShop_Lng);
 
+  // Mock reverse geocode
   const reverseGeocode = async (lat, lng) => {
-    try {
-      const res = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse`,
-        {
-          params: {
-            lat,
-            lon: lng,
-            format: "json",
-          },
-        }
-      );
-
-      console.log("ที่อยู่ที่ได้จาก reverse geocode:", res.data.display_name); // พิมพ์ที่อยู่ที่ได้
-      return res.data.display_name; // ที่อยู่แบบเต็ม
-    } catch (error) {
-      console.error("Reverse geocoding failed:", error);
-      return "ไม่พบที่อยู่";
-    }
+    console.log(`Reverse geocode mock (${lat}, ${lng})`);
+    if (lat === 13.7563) return "อนุสาวรีย์ชัยสมรภูมิ, กรุงเทพฯ";
+    if (lat === 13.7367) return "สนามหลวง, กรุงเทพฯ";
+    return "ไม่พบที่อยู่";
   };
 
   useEffect(() => {
+    // Mock ตำแหน่งร้านต้นทาง
     if (selectedShopLat && selectedShopLng) {
       const lat = parseFloat(selectedShopLat);
       const lng = parseFloat(selectedShopLng);
-
       setOrigin({ lat, lng });
       reverseGeocode(lat, lng).then(setStartAddress);
     }
   }, [selectedShopLat, selectedShopLng]);
 
   useEffect(() => {
-    if (orderData) {
-      const { End_Lat, End_Lng } = orderData;
+    // Mock order data
+    const mockData = {
+      orderId,
+      DriverCar_type: "รถสไลด์ 4 ล้อ",
+      ServiceType: "ฉุกเฉินกลางคืน",
+      driverName: selectedDriverName,
+      End_Lat: 13.7367,
+      End_Lng: 100.5231,
+    };
 
-      // ตรวจสอบว่า End_Lat และ End_Lng มีค่าและไม่เป็น null หรือ undefined
-      if (End_Lat && End_Lng) {
-        // แปลงจาก string เป็น number
-        const lat = parseFloat(End_Lat);
-        const lng = parseFloat(End_Lng);
+    setOrderData(mockData);
 
-        if (!isNaN(lat) && !isNaN(lng)) {
-          // ตั้งค่า destination
-          setDestination({ lat, lng });
+    // ปลายทาง (destination)
+    const endLat = parseFloat(mockData.End_Lat);
+    const endLng = parseFloat(mockData.End_Lng);
+    setDestination({ lat: endLat, lng: endLng });
 
-          // ทำการ reverseGeocode เพื่อหาที่อยู่
-          reverseGeocode(lat, lng).then((address) => {
-            setDestination((prev) => ({ ...prev, address }));
-          });
-        } else {
-          console.error(
-            "ค่าของ End_Lat หรือ End_Lng ไม่ถูกต้อง:",
-            End_Lat,
-            End_Lng
-          );
-        }
-      } else {
-        console.error("ข้อมูล End_Lat หรือ End_Lng ไม่สมบูรณ์");
-      }
-    }
-  }, [orderData]);
-  
-  console.log("ข้อมูลที่ได้จาก API:", orderData);
-
-
-  // ดึงข้อมูลคำสั่งซื้อจาก backend
-  useEffect(() => {
-    console.log("orderId:", orderId);
-    if (orderId) {
-      axios
-        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
-        .then((response) => {
-          console.log("ข้อมูลคำสั่งซื้อ:", response.data);
-          setOrderData(response.data);
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching order data:", error);
-          setIsLoading(false);
-        });
-    }
+    reverseGeocode(endLat, endLng).then(setEndAddress);
   }, [orderId]);
 
   const handleBack = () => {
@@ -125,7 +73,7 @@ function OrderStatusListUser() {
       </div>
 
       <div className="pt-[115px] flex flex-col h-full">
-        {/* พื้นที่แสดง MAP */}
+        {/* แผนที่ */}
         <div className="relative z-[1] h-[500px] flex-grow">
           <MapStatus
             origin={origin}
@@ -139,7 +87,6 @@ function OrderStatusListUser() {
         <div className="absolute bottom-0 w-full h-[270px] bg-white rounded-t-3xl z-[5000] p-6 overflow-y-auto shadow-[0_-4px_10px_rgba(0,0,0,0.2)] flex flex-col gap-3">
           {/* รายละเอียดรถ */}
           <div className="grid grid-cols-[2fr_1fr] m-0">
-            {/* ฝั่งซ้าย */}
             <div className="mx-2">
               <h4 className="font-bold">
                 <i className="bi bi-car-front pr-2"></i>
@@ -150,13 +97,11 @@ function OrderStatusListUser() {
                 {orderData?.ServiceType}
               </h4>
             </div>
-            {/* ฝั่งขวา */}
             <div className="mx-2 flex flex-col items-center justify-center">
               <img src="logo-black.svg" className="w-[80px]" />
             </div>
           </div>
 
-          {/* เส้นสีเทา */}
           <hr className="border-t-2 border-gray-500 w-full mt-0 mb-0" />
 
           {/* ข้อมูลคนขับ */}
@@ -185,7 +130,7 @@ function OrderStatusListUser() {
             </button>
           </div>
 
-          {/* ปุ่มกลับ  */}
+          {/* ปุ่มกลับ */}
           <div className="flex justify-center items-center">
             <button
               onClick={() => navigate("/ListPendingOrder")}

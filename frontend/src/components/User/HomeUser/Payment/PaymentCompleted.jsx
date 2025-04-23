@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 
 function PaymentCompleted() {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ function PaymentCompleted() {
   const [discount, setDiscount] = useState(0);
   const [finalPrice, setFinalPrice] = useState(0);
 
-  const selectedDriverName = sessionStorage.getItem("selectedDriverName");
+  const selectedDriverName = sessionStorage.getItem("selectedDriverName") || "คุณสมหมาย";
 
   const InfoItem = ({ iconClass, label }) => (
     <div className="flex flex-col items-center text-[#0DC964]">
@@ -24,64 +23,50 @@ function PaymentCompleted() {
     </div>
   );
 
+  // mock reverse geocode
   const reverseGeocode = async (lat, lng) => {
-    try {
-      const res = await axios.get(
-        `https://nominatim.openstreetmap.org/reverse`,
-        {
-          params: {
-            lat,
-            lon: lng,
-            format: "json",
-          },
-        }
-      );
-      return res.data.display_name;
-    } catch (error) {
-      console.error("Reverse geocoding failed:", error);
-      return "ไม่พบที่อยู่";
-    }
+    console.log(`Reverse geocoding mock (${lat}, ${lng})`);
+    if (lat === 13.7563) return "อนุสาวรีย์ชัยสมรภูมิ, กรุงเทพฯ";
+    if (lat === 13.7367) return "สนามหลวง, กรุงเทพฯ";
+    return "ไม่พบที่อยู่";
   };
 
+  // mock fetch order data
+  useEffect(() => {
+    const mockData = {
+      id: orderId,
+      startLat: 13.7563,
+      startLng: 100.5018,
+      endLat: 13.7367,
+      endLng: 100.5231,
+      total_price: 2000,
+      discount: 300,
+    };
+
+    setOrderData(mockData);
+    setIsLoading(false);
+
+    const price = mockData.total_price || 0;
+    const discountVal = mockData.discount || 0;
+
+    setTotalPrice(price);
+    setDiscount(discountVal);
+
+    const afterDiscount = price - discountVal;
+    const withVAT = afterDiscount * 1.07;
+    const final = withVAT * 1.05;
+
+    setFinalPrice(final.toFixed(2));
+  }, [orderId]);
+
+  // mock reverse address
   useEffect(() => {
     if (orderData) {
       const { startLat, startLng, endLat, endLng } = orderData;
-      if (startLat && startLng) {
-        reverseGeocode(startLat, startLng).then(setStartAddress);
-      }
-      if (endLat && endLng) {
-        reverseGeocode(endLat, endLng).then(setEndAddress);
-      }
+      if (startLat && startLng) reverseGeocode(startLat, startLng).then(setStartAddress);
+      if (endLat && endLng) reverseGeocode(endLat, endLng).then(setEndAddress);
     }
   }, [orderData]);
-
-  useEffect(() => {
-    if (orderId) {
-      axios
-        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
-        .then((response) => {
-          const data = response.data;
-          setOrderData(data);
-          setIsLoading(false);
-
-          const price = data.total_price || 0;
-          const discountVal = data.discount || 0;
-
-          setTotalPrice(price);
-          setDiscount(discountVal);
-
-          const afterDiscount = price - discountVal;
-          const withVAT = afterDiscount * 1.07;
-          const final = withVAT * 1.05;
-
-          setFinalPrice(final.toFixed(2));
-        })
-        .catch((error) => {
-          console.error("Error fetching order data:", error);
-          setIsLoading(false);
-        });
-    }
-  }, [orderId]);
 
   return (
     <div className="flex justify-center items-center py-8 bg-[#0DC964] h-full w-full p-4">

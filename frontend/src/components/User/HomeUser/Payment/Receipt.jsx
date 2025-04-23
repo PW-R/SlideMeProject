@@ -4,20 +4,46 @@ import { useNavigate, useParams } from "react-router-dom";
 function Receipt() {
   const [timeLeft, setTimeLeft] = useState(30);
   const [timerActive, setTimerActive] = useState(true);
-  const [qrPath, setQrPath] = useState(""); // Store image path like /uploads/xxx.png
+  const [qrPath, setQrPath] = useState(""); // mock path รูป QR
   const navigate = useNavigate();
   const { orderId } = useParams();
 
-  const BASE_URL = "http://localhost:3000"; // Adjust if deploying
+  const BASE_URL = "http://localhost:3000"; // ใช้ไว้ต่อ prefix path รูป QR
 
+  // mock function โหลดรูป QR
+  useEffect(() => {
+    if (orderId) {
+      // จำลอง path QR code (ในโปรเจกต์อาจจะใส่ใน public/)
+      const fakePath = "/uploads/mock_qr_code.png";
+      setQrPath(fakePath);
+      console.log("✅ Mock QR code loaded:", fakePath);
+    }
+  }, [orderId]);
+
+  // mock countdown
+  useEffect(() => {
+    if (timerActive && timeLeft > 0) {
+      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
+      return () => clearInterval(timer);
+    }
+  }, [timeLeft, timerActive]);
+
+  // mock update order status เมื่อหมดเวลา
+  useEffect(() => {
+    if (timeLeft === 0 && orderId) {
+      console.log(`⏰ คำสั่งซื้อ ${orderId} หมดเวลา — MOCK UPDATE STATUS เป็น expired`);
+      // mock log แทนการยิง API PUT
+    }
+  }, [timeLeft, orderId]);
+
+  // mock download image
   const handleDownload = async () => {
     try {
       if (!qrPath) return;
-  
-      const response = await fetch(`${BASE_URL}${qrPath}`);
+      const imageUrl = `${BASE_URL}${qrPath}`;
+      const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
-  
       const link = document.createElement("a");
       link.href = url;
       link.download = "QR-code_image.png";
@@ -29,63 +55,11 @@ function Receipt() {
       console.error("ดาวน์โหลดไม่สำเร็จ:", error);
     }
   };
-  
-
-  useEffect(() => {
-    if (timerActive && timeLeft > 0) {
-      const timer = setInterval(() => setTimeLeft((prev) => prev - 1), 1000);
-      return () => clearInterval(timer);
-    }
-  }, [timeLeft, timerActive]);
-
-  useEffect(() => {
-    if (timeLeft === 0 && orderId) {
-      const updateOrderStatus = async () => {
-        try {
-          const response = await fetch(
-            `http://localhost:3000/api/order?orderId=${orderId}`,
-            {
-              method: "PUT",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({ status: "expired" }),
-            }
-          );
-          if (!response.ok) throw new Error("Failed to update order status");
-          console.log("✅ Order status updated");
-        } catch (error) {
-          console.error("❌ Error updating order status:", error);
-        }
-      };
-
-      updateOrderStatus();
-    }
-  }, [timeLeft, orderId]);
-
-  useEffect(() => {
-    const fetchQRCode = async () => {
-      try {
-        const res = await fetch(`${BASE_URL}/api/qr?orderId=${orderId}`);
-        const data = await res.json();
-        setQrPath(data.qrCode); // ✅ backend ส่ง path มา เช่น /uploads/promptpay_abc.png
-      } catch (error) {
-        console.error("❌ Error fetching QR Code:", error);
-      }
-    };
-
-    if (orderId) {
-      fetchQRCode();
-    }
-  }, [orderId]);
 
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secondsLeft = seconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(
-      2,
-      "0"
-    )}`;
+    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(2, "0")}`;
   };
 
   return (
@@ -106,11 +80,7 @@ function Receipt() {
 
         <div className="mt-4">
           <img
-            src={
-              qrPath
-                ? `${BASE_URL}${qrPath}`
-                : "https://via.placeholder.com/240"
-            }
+            src={qrPath ? `${BASE_URL}${qrPath}` : "https://via.placeholder.com/240"}
             alt="QR Code"
             className="w-60 h-60 mx-auto"
           />

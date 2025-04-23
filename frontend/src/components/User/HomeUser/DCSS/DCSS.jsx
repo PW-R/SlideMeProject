@@ -156,43 +156,29 @@ const handleTabChange = (newTab) => {
   };
 
   // ปุ่ม เลือก ( ไปหน้าถัดไป )
-  const handleSelectShops = async (store) => {
-    if (store.offerstatus !== "ตกลง") {
-      alert("ยังไม่สามารถเลือกร้านนี้ได้ เพราะยังไม่ได้ตกลงราคา");
-      return;
-    }
+  const handleSelectShops = (store) => {
+    // ✅ ข้ามเช็ค offerStatus ไปก่อน (สมมุติทุกอันตกลงแล้วใน mock)
+    // ✅ หรือถ้าจะเช็ค ก็ควร disable ปุ่มไว้แล้ว ไม่ต้อง alert
   
-    const driverId = Number(store.Driver_ID);
-    console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
+    // ✅ ข้ามตรวจสอบ Driver_ID
+    // ✅ จำลองการเลือกแล้วไปหน้า PaymentConfirm ได้เลย
   
-    if (isNaN(driverId) || driverId <= 0) {
-      console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
-      alert("ไม่พบข้อมูลคนขับ");
-      return;
-    }
+    console.log("📦 กำลังเลือกคนขับ mock:", store.driver_name);
   
-    try {
-      await axios.post(`http://localhost:3000/api/select-driver/${orderId}`, {
-        Driver_ID: driverId,
-      });
+    // จำลองการเลือก (mock เท่านั้น)
+    sessionStorage.setItem("selectedTotalPrice", store.total_price || 0);
+    sessionStorage.setItem("selectedEquipmentPrice", store.equipment || "ไม่มี");
+    sessionStorage.setItem("selectedDriverName", store.driver_name || "ไม่ระบุ");
+    sessionStorage.setItem("selectedDriverYear", store.driver_year || "0");
+    sessionStorage.setItem("selectedShop_Lat", store.lat);
+    sessionStorage.setItem("selectedShop_Lng", store.lng);
+    sessionStorage.setItem("selectedShop_Phone", store.shop_phone || "ไม่ระบุ");
   
-      console.log("✅ บันทึกคนขับเรียบร้อย");
-  
-      // ส่งข้อมูล
-      sessionStorage.setItem("selectedTotalPrice", store.total_price);
-      sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
-      sessionStorage.setItem("selectedDriverName", store.driver_name);
-      sessionStorage.setItem("selectedDriverYear", store.driver_year);
-      sessionStorage.setItem("selectedShop_Lat", store.lat);
-      sessionStorage.setItem("selectedShop_Lng", store.lng);
-      sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
-  
-      navigate(`/PaymentConfirm/${orderId}`);
-    } catch (err) {
-      console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
-      alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
-    }
+    // ✅ ไปหน้าถัดไปเลย
+    navigate(`/PaymentConfirm/${orderId}`);
   };
+  
+  
   
 
   useEffect(() => {

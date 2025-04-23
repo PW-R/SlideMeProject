@@ -77,87 +77,139 @@
  *       500:
  *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์
  */
+// NearbyShops.controller.js
 
+// 🔧 ใส่ไว้ด้านบนสุดของไฟล์ NearbyShops.controller.js
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // รัศมีของโลก หน่วยเป็นกิโลเมตร
+  const dLat = toRad(lat2 - lat1);
+  const dLon = toRad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
 
-const pool = require("../db/index");
-const dotenv = require("dotenv");
-dotenv.config();
+function toRad(deg) {
+  return (deg * Math.PI) / 180;
+}
+
 
 exports.NearbyShops = async (req, res) => {
-  console.log("📥 Request received with orderId:", req.params.orderId);
+  console.log("📥 [MOCK] Request received with orderId:", req.params.orderId);
   const { orderId } = req.params;
 
-  try {
-    // 1. ดึงตำแหน่งต้นทาง
-    const [orderRows] = await pool.execute(
-      "SELECT Start_Lat, Start_Lng FROM OrderDetail WHERE OrderDetail_ID = ?",
-      [orderId]
-    );
-    if (orderRows.length === 0) {
-      return res.status(404).json({ error: "Order not found" });
+  // MOCK พิกัดต้นทางของ order
+  const Start_Lat = 13.7563;
+  const Start_Lng = 100.5018;
+
+  // Mock function สำหรับคำนวณระยะทางแบบคร่าวๆ (ไม่ใช้ Haversine)
+  const calculateDistance = (lat1, lon1, lat2, lon2) => {
+    const dx = lat1 - lat2;
+    const dy = lon1 - lon2;
+    return Math.sqrt(dx * dx + dy * dy) * 111; // 1 degree ~ 111km
+  };
+
+  // Mock data ร้านค้า + คนขับ
+  const allShops = [
+    {
+      Shop_Name: "ร้าน A",
+      Shop_Lat: 13.757,
+      Shop_Lng: 100.503,
+      Shop_Info: "ให้บริการ 24 ชม.",
+      Shop_Phone: "0812345678",
+      Shop_service: "รถสไลด์ฉุกเฉิน",
+      Total_Price: 1500,
+      Equipment: "สายลาก, ล้อสำรอง",
+      Driver_ID: "D001",
+      Driver_Name: "สมปอง",
+      Driver_Year: 3,
+      DriverRating: 4.8,
+      Offer_Status: "ตกลง"
+    },
+    {
+      Shop_Name: "ร้าน B",
+      Shop_Lat: 13.760,
+      Shop_Lng: 100.510,
+      Shop_Info: "บริการกลางวัน",
+      Shop_Phone: "0898765432",
+      Shop_service: "เปลี่ยนยาง, ลากรถ",
+      Total_Price: 1800,
+      Equipment: "แม่แรง, ไฟฉาย",
+      Driver_ID: "D002",
+      Driver_Name: "สมศักดิ์",
+      Driver_Year: 5,
+      DriverRating: 4.3,
+      Offer_Status: "ตกลง"
+    },
+    {
+      Shop_Name: "ร้าน C (ไกลเกิน)",
+      Shop_Lat: 13.900,
+      Shop_Lng: 100.800,
+      Shop_Info: "ไกลเกิน 10 กม.",
+      Shop_Phone: "0877777777",
+      Shop_service: "ลากรถ",
+      Total_Price: 3000,
+      Equipment: "ชุดลากรถ",
+      Driver_ID: "D003",
+      Driver_Name: "สมใจ",
+      Driver_Year: 10,
+      DriverRating: 4.9,
+      Offer_Status: "ตกลง"
+    },
+    {
+      Shop_Name: "ร้าน D (ไม่ตกลง)",
+      Shop_Lat: 13.758,
+      Shop_Lng: 100.502,
+      Shop_Info: "ไม่รับงานนี้",
+      Shop_Phone: "0890000000",
+      Shop_service: "ลากรถ",
+      Total_Price: 1400,
+      Equipment: "แม่แรง",
+      Driver_ID: "D004",
+      Driver_Name: "สมหมาย",
+      Driver_Year: 2,
+      DriverRating: 4.0,
+      Offer_Status: "ปฏิเสธ"
     }
+  ];
 
-    const Start_Lat = parseFloat(orderRows[0].Start_Lat);
-    const Start_Lng = parseFloat(orderRows[0].Start_Lng);
+  // กรองร้านที่อยู่ในรัศมี <= 10 กม.
+  const nearbyShops = allShops.filter((shop) => {
+    const distance = calculateDistance(
+      Start_Lat,
+      Start_Lng,
+      shop.Shop_Lat,
+      shop.Shop_Lng
+    );
+    return distance <= 10;
+  });
 
-    // 2. ดึงข้อมูลร้านทั้งหมด พร้อม Offer_Status
-    const [Shops] = await pool.execute(`
-      SELECT 
-        d.Driver_ID,
-        s.Shop_ID,
-        s.Shop_Name,
-        s.Shop_Lat,
-        s.Shop_Phone,
-        s.Shop_Lng,
-        s.Shop_Info,
-        s.Shop_service,
-        o.Total_Price,
-        o.Equipment,
-        o.Offer_Status,
-        d.Driver_Year,
-        d.Driver_Name,
-        d.DriverRating
-      FROM Driver_info d
-      LEFT JOIN Driver_Offer o ON d.Driver_ID = o.Driver_ID AND o.OrderDetail_ID = ?
-      LEFT JOIN Shop_Info s ON d.Shop_ID = s.Shop_ID
-    `, [orderId]);
+  // กรองเฉพาะที่ offerStatus === "ตกลง"
+  const acceptedShops = nearbyShops.filter(
+    (shop) => shop.Offer_Status === "ตกลง"
+  );
 
-    // 3. ร้านที่อยู่ใกล้ 3 กม.
-    const nearbyShop = Shops.filter((shop) => {
-      if (!shop.Shop_Lat || !shop.Shop_Lng) return false;
-      const distance = calculateDistance(
-        Start_Lat, Start_Lng,
-        parseFloat(shop.Shop_Lat),
-        parseFloat(shop.Shop_Lng)
-      );
-      return distance <= 10;
-    });
-
-    // 4. กรองเฉพาะร้านที่ "ตกลง"
-    const acceptedShops = nearbyShop.filter(shop => shop.Offer_Status === "ตกลง");
-
-    // 5. ส่งกลับ
-    res.status(200).json({
-      message: "Nearby accepted shops found",
-      stores: acceptedShops.map(shop => ({
-        name: shop.Shop_Name,
-        lat: shop.Shop_Lat,
-        lng: shop.Shop_Lng,
-        shop_info: shop.Shop_Info,
-        shop_phone: shop.Shop_Phone,
-        shop_service: shop.Shop_service,
-        total_price: shop.Total_Price,
-        equipment: shop.Equipment,
-        Driver_ID: shop.Driver_ID,
-        driver_name: shop.Driver_Name,
-        driver_year: shop.Driver_Year,
-        rating: shop.DriverRating,
-        offerStatus: shop.Offer_Status
-      }))
-    });
-
-  } catch (err) {
-    console.error("❌ Error fetching nearby drivers:", err);
-    res.status(500).json({ message: "Database error", error: err });
-  }
+  return res.status(200).json({
+    message: "Nearby accepted shops found",
+    stores: acceptedShops.map((shop) => ({
+      name: shop.Shop_Name,
+      lat: shop.Shop_Lat,
+      lng: shop.Shop_Lng,
+      shop_info: shop.Shop_Info,
+      shop_phone: shop.Shop_Phone,
+      shop_service: shop.Shop_service,
+      total_price: shop.Total_Price,
+      equipment: shop.Equipment,
+      Driver_ID: shop.Driver_ID,
+      driver_name: shop.Driver_Name,
+      driver_year: shop.Driver_Year,
+      rating: shop.DriverRating,
+      offerStatus: shop.Offer_Status
+    }))
+  });
 };

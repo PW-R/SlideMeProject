@@ -1,3 +1,105 @@
+/**
+ * @swagger
+ * /api/orders/updateStatus:
+ *   put:
+ *     summary: อัปเดตสถานะคำสั่งซื้อเป็น "ยกเลิกคำสั่งซื้อ"
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: orderId
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของคำสั่งซื้อที่ต้องการอัปเดตสถานะ
+ *     responses:
+ *       200:
+ *         description: อัปเดตสถานะคำสั่งซื้อสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความสำเร็จ
+ *       400:
+ *         description: ขาดพารามิเตอร์ orderId
+ *       404:
+ *         description: ไม่พบคำสั่งซื้อ
+ *       500:
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์ขณะอัปเดตสถานะคำสั่งซื้อ
+ */
+
+/**
+ * @swagger
+ * /api/orders/getOrder:
+ *   get:
+ *     summary: ดึงรายละเอียดคำสั่งซื้อจาก ID ของคำสั่งซื้อ
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: orderId
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของคำสั่งซื้อที่ต้องการดึงรายละเอียด
+ *     responses:
+ *       200:
+ *         description: ดึงรายละเอียดคำสั่งซื้อสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 OrderDetail_ID:
+ *                   type: string
+ *                   description: ID ของรายละเอียดคำสั่งซื้อ
+ *                 Status:
+ *                   type: string
+ *                   description: สถานะของคำสั่งซื้อ
+ *       400:
+ *         description: ขาดพารามิเตอร์ orderId
+ *       404:
+ *         description: ไม่พบคำสั่งซื้อ
+ *       500:
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์ขณะดึงรายละเอียดคำสั่งซื้อ
+ */
+
+/**
+ * @swagger
+ * /api/orders/getQRCode:
+ *   get:
+ *     summary: ดึง QR Code ของร้านจาก ID ของคำสั่งซื้อ
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: orderId
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของคำสั่งซื้อที่ต้องการดึง QR Code
+ *     responses:
+ *       200:
+ *         description: ดึง QR Code สำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 qrCode:
+ *                   type: string
+ *                   description: QR Code ของร้านในรูปแบบ base64
+ *       400:
+ *         description: ขาดพารามิเตอร์ orderId
+ *       404:
+ *         description: ไม่พบ QR Code
+ *       500:
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์ขณะดึง QR Code
+ */
+
 // order.controller.js
 const pool = require("../db");
 // Update order status

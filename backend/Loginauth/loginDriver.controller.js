@@ -1,101 +1,120 @@
-// paths:
-//   /driver/login:
-//     post:
-//       summary: เข้าสู่ระบบ (Driver)
-//       tags:
-//         - Driver
-//       requestBody:
-//         required: true
-//         content:
-//           application/json:
-//             schema:
-//               type: object
-//               properties:
-//                 username:
-//                   type: string
-//                   example: driver01
-//                 password:
-//                   type: string
-//                   example: 123456
-//       responses:
-//         200:
-//           description: เข้าสู่ระบบสำเร็จ
-//           content:
-//             application/json:
-//               schema:
-//                 type: object
-//                 properties:
-//                   message:
-//                     type: string
-//                   user:
-//                     type: object
-//                     properties:
-//                       id:
-//                         type: integer
-//                       username:
-//                         type: string
-//                       role:
-//                         type: string
-//                       storeId:
-//                         type: integer
-//                         nullable: true
-//                       isApproved:
-//                         type: boolean
-//                       hasJoinRequest:
-//                         type: boolean
-//         400:
-//           description: ข้อมูลไม่ครบ
-//         401:
-//           description: ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
-//         500:
-//           description: เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์
+/**
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: API for handling driver login and registration
+ */
 
-//   /driver/register:
-//     post:
-//       summary: ลงทะเบียนคนขับใหม่
-//       tags:
-//         - Driver
-//       requestBody:
-//         required: true
-//         content:
-//           multipart/form-data:
-//             schema:
-//               type: object
-//               properties:
-//                 username:
-//                   type: string
-//                   example: driver01
-//                 password:
-//                   type: string
-//                   example: 123456
-//                 birthdate:
-//                   type: string
-//                   format: date
-//                   example: "2000-01-01"
-//                 phone:
-//                   type: string
-//                   example: "0812345678"
-//                 licenseImage:
-//                   type: string
-//                   format: binary
-//                 profileImage:
-//                   type: string
-//                   format: binary
-//       responses:
-//         201:
-//           description: สมัครสมาชิกเรียบร้อยแล้ว
-//           content:
-//             application/json:
-//               schema:
-//                 type: object
-//                 properties:
-//                   message:
-//                     type: string
-//                     example: สมัครสมาชิกเรียบร้อยแล้ว
-//         400:
-//           description: ข้อมูลไม่ครบหรือชื่อผู้ใช้นี้มีอยู่แล้ว
-//         500:
-//           description: เกิดข้อผิดพลาดจาก server
+/**
+ * @swagger
+ * /authentication/driver/login:
+ *   post:
+ *     summary: เข้าสู่ระบบ (Driver)
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: driver01
+ *               password:
+ *                 type: string
+ *                 example: 123456
+ *     responses:
+ *       200:
+ *         description: เข้าสู่ระบบสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "เข้าสู่ระบบสำเร็จ"
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     username:
+ *                       type: string
+ *                       example: "driver01"
+ *                     role:
+ *                       type: string
+ *                       example: "driver"
+ *                     storeId:
+ *                       type: integer
+ *                       nullable: true
+ *                       example: 101
+ *                     isApproved:
+ *                       type: boolean
+ *                       example: true
+ *                     hasJoinRequest:
+ *                       type: boolean
+ *                       example: true
+ *       400:
+ *         description: ข้อมูลไม่ครบ
+ *       401:
+ *         description: ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง
+ *       500:
+ *         description: เกิดข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+
+/**
+ * @swagger
+ * /authentication/driver/register:
+ *   post:
+ *     summary: ลงทะเบียนคนขับใหม่
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: driver01
+ *               password:
+ *                 type: string
+ *                 example: 123456
+ *               birthdate:
+ *                 type: string
+ *                 format: date
+ *                 example: "2000-01-01"
+ *               phone:
+ *                 type: string
+ *                 example: "0812345678"
+ *               licenseImage:
+ *                 type: string
+ *                 format: binary
+ *               profileImage:
+ *                 type: string
+ *                 format: binary
+ *     responses:
+ *       201:
+ *         description: สมัครสมาชิกเรียบร้อยแล้ว
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "สมัครสมาชิกเรียบร้อยแล้ว"
+ *       400:
+ *         description: ข้อมูลไม่ครบหรือชื่อผู้ใช้นี้มีอยู่แล้ว
+ *       500:
+ *         description: เกิดข้อผิดพลาดจาก server
+ */
 
 
 const pool = require("../db");

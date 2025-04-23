@@ -1,3 +1,45 @@
+/**
+ * @swagger
+ * /api/locations:
+ *   get:
+ *     summary: ดึงข้อมูลตำแหน่งเริ่มต้นและตำแหน่งปลายทางตาม ID ที่ให้มา
+ *     tags:
+ *       - User
+ *     parameters:
+ *       - name: start
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของตำแหน่งเริ่มต้น
+ *       - name: end
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของตำแหน่งปลายทาง
+ *     responses:
+ *       200:
+ *         description: ดึงข้อมูลตำแหน่งเริ่มต้นและตำแหน่งปลายทางสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 startLocation:
+ *                   type: object
+ *                   description: ข้อมูลตำแหน่งเริ่มต้น
+ *                 endLocation:
+ *                   type: object
+ *                   description: ข้อมูลตำแหน่งปลายทาง
+ *       400:
+ *         description: ต้องการตำแหน่งเริ่มต้นและปลายทางทั้งสอง
+ *       404:
+ *         description: ไม่พบข้อมูลตำแหน่ง
+ *       500:
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์
+ */
+
 const pool = require("../db");
 exports.getLocations = async (req, res) => {
     try {

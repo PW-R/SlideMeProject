@@ -1,10 +1,9 @@
-
 /**
  * @swagger
  * /register:
  *   post:
- *     summary: Registers a new user
- *     description: This API allows a new user to register by providing their phone number, birthday, password, and profile picture.
+ *     summary: ลงทะเบียนผู้ใช้ใหม่
+ *     description: API นี้ช่วยให้ผู้ใช้ใหม่สามารถลงทะเบียนได้โดยการกรอกหมายเลขโทรศัพท์ วันเกิด รหัสผ่าน และรูปโปรไฟล์
  *     requestBody:
  *       required: true
  *       content:
@@ -14,30 +13,30 @@
  *             properties:
  *               phone:
  *                 type: string
- *                 description: The user's phone number.
+ *                 description: หมายเลขโทรศัพท์ของผู้ใช้
  *                 example: "1234567890"
  *               birthday:
  *                 type: string
  *                 format: date
- *                 description: The user's birth date.
+ *                 description: วันเกิดของผู้ใช้
  *                 example: "1990-01-01"
  *               password:
  *                 type: string
- *                 description: The user's password.
+ *                 description: รหัสผ่านของผู้ใช้
  *                 example: "password123"
  *               profilePicture:
  *                 type: string
  *                 format: binary
- *                 description: The user's profile picture file.
+ *                 description: ไฟล์รูปโปรไฟล์ของผู้ใช้
  *     responses:
  *       201:
- *         description: User successfully registered
+ *         description: ผู้ใช้ลงทะเบียนสำเร็จ
  *       400:
- *         description: Bad request, missing required fields
+ *         description: ข้อความผิดพลาดจากคำขอที่ไม่สมบูรณ์ ขาดข้อมูลที่จำเป็น
  *       500:
- *         description: Internal server error
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์ภายใน
  *     tags:
- *       - User
+ *       - Authentication
  */
 
 

@@ -1,38 +1,94 @@
-// controllers/updateOfferStatus.controller.js
+/**
+ * @swagger
+ * /api/offers/update/{OrderDetail_ID}/{ID}:
+ *   put:
+ *     summary: อัปเดตสถานะข้อเสนอเป็น "ตกลง" (ยอมรับ) สำหรับทั้ง OrderDetail และ Driver_Offer
+ *     tags:
+ *       - Driver
+ *     parameters:
+ *       - name: OrderDetail_ID
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของรายละเอียดคำสั่งซื้อที่ต้องการอัปเดต
+ *       - name: ID
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID ของข้อเสนอคนขับที่ต้องการอัปเดต
+ *     responses:
+ *       200:
+ *         description: อัปเดตสถานะข้อเสนอสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความสำเร็จ
+ *                 rowsAffected:
+ *                   type: object
+ *                   properties:
+ *                     orderDetail:
+ *                       type: number
+ *                       description: จำนวนแถวที่ได้รับผลกระทบจากการอัปเดตในตาราง OrderDetail
+ *                     driverOffer:
+ *                       type: number
+ *                       description: จำนวนแถวที่ได้รับผลกระทบจากการอัปเดตในตาราง Driver_Offer
+ *       400:
+ *         description: ข้อมูลที่ป้อนไม่ถูกต้องหรือขาดพารามิเตอร์
+ *       404:
+ *         description: ไม่พบคำสั่งซื้อหรือข้อเสนอ
+ *       500:
+ *         description: ข้อผิดพลาดจากเซิร์ฟเวอร์หรือไม่สามารถอัปเดตสถานะได้
+ */
+
+
 const pool = require("../db");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const updateOfferStatus = async (req, res) => {
-  const { orderDetailId, driverOfferId } = req.body;
 
+
+  const connection = await pool.getConnection();
   try {
-    const connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    // 1. อัปเดต OrderDetail
-    await connection.query(
+    // อัปเดต OfferStatus ใน OrderDetail
+    const [orderResult] = await connection.query(
       `UPDATE OrderDetail
        SET OfferStatus = 'ตกลง'
        WHERE OrderDetail_ID = ? AND (OfferStatus = 'รอ' OR OfferStatus IS NULL)`,
-      [orderDetailId]
+      [req.params.OrderDetail_ID]
     );
 
-    // 2. อัปเดต Driver_Offer
-    await connection.query(
+    // อัปเดต Offer_Status ใน Driver_Offer
+    const [driverOfferResult] = await connection.query(
       `UPDATE Driver_Offer
        SET Offer_Status = 'ตกลง'
-       WHERE ID = ? AND (Offer_Status = 'รอ' OR Offer_Status IS NULL)`,
-      [driverOfferId]
+       WHERE ID = ? AND Offer_Status = 'รอ'`,
+      [req.params.ID]
     );
 
     await connection.commit();
-    connection.release();
 
-    return res.status(200).json({ message: "อัปเดตสถานะข้อเสนอเรียบร้อยแล้ว" });
+    return res.status(200).json({
+      message: "OfferStatus updated successfully",
+      rowsAffected: {
+        orderDetail: orderResult.affectedRows,
+        driverOffer: driverOfferResult.affectedRows,
+      },
+    });
   } catch (error) {
-    console.error("❌ Error:", error);
-    return res.status(500).json({ error: "ไม่สามารถอัปเดตสถานะข้อเสนอได้" });
+    await connection.rollback();
+    console.error("Error updating offer status:", error);
+    return res.status(500).json({ error: "Failed to update offer status" });
+  } finally {
+    connection.release();
   }
 };
 

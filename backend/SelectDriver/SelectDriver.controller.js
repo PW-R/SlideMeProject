@@ -1,3 +1,73 @@
+/**
+ * @swagger
+ * /api/orders/{orderId}/select-driver:
+ *   put:
+ *     summary: เลือกคนขับและอัปเดตชื่อคนขับในคำสั่งซื้อ
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: orderId
+ *         in: path
+ *         required: true
+ *         description: รหัสคำสั่งซื้อที่ต้องการเลือกคนขับ
+ *         schema:
+ *           type: string
+ *       - name: Driver_ID
+ *         in: body
+ *         required: true
+ *         description: รหัสคนขับที่เลือก
+ *         schema:
+ *           type: object
+ *           properties:
+ *             Driver_ID:
+ *               type: string
+ *               description: รหัสคนขับ
+ *     responses:
+ *       200:
+ *         description: เลือกคนขับสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความยืนยันว่าเลือกคนขับสำเร็จ
+ *       400:
+ *         description: ข้อมูลไม่ครบ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความแจ้งเตือนเมื่อข้อมูลไม่ครบ
+ *       404:
+ *         description: ไม่พบข้อมูลคนขับหรือคำสั่งซื้อ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความแจ้งว่าไม่พบข้อมูล
+ *       500:
+ *         description: ข้อผิดพลาดจาก server
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: ข้อความแจ้งข้อผิดพลาดจาก server
+ */
+
+
+// SelectDriver.controller.js
+
 const pool = require("../db/index");
 const dotenv = require("dotenv");
 dotenv.config();

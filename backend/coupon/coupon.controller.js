@@ -1,3 +1,159 @@
+/**
+ * @swagger
+ * /api/coupons:
+ *   get:
+ *     summary: ดึงข้อมูลคูปองทั้งหมดที่ผู้ใช้ยังไม่เคยเก็บ
+ *     tags:
+ *       - Coupon
+ *     parameters:
+ *       - in: query
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: รหัสผู้ใช้
+ *     responses:
+ *       200:
+ *         description: รายการคูปองที่ยังไม่ถูกเก็บโดยผู้ใช้
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   coupon_ID:
+ *                     type: integer
+ *                   name_coupon:
+ *                     type: string
+ *                   expiry_date:
+ *                     type: string
+ *                   discount_price:
+ *                     type: number
+ *                   discount_description:
+ *                     type: string
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+/**
+ * @swagger
+ * /api/user-coupon:
+ *   post:
+ *     summary: เก็บคูปองเข้าในบัญชีผู้ใช้
+ *     tags:
+ *       - Coupon
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *               coupon_ID:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: เก็บคูปองเรียบร้อยแล้ว
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Coupon collected successfully"
+ *       400:
+ *         description: คูปองนี้ถูกเก็บไปแล้ว
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+/**
+ * @swagger
+ * /api/user-coupon:
+ *   get:
+ *     summary: ดึงข้อมูลคูปองที่ผู้ใช้เคยเก็บแล้ว
+ *     tags:
+ *       - Coupon
+ *     parameters:
+ *       - in: query
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: รายการคูปองของผู้ใช้
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+/**
+ * @swagger
+ * /api/user-coupon-details/{user_id}:
+ *   get:
+ *     summary: ดึงราคาส่วนลดของคูปองที่ผู้ใช้เก็บไว้
+ *     tags:
+ *       - Coupon
+ *     parameters:
+ *       - in: path
+ *         name: user_id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: ราคาส่วนลดที่สามารถใช้ได้
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 discount_price:
+ *                   type: number
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+/**
+ * @swagger
+ * /api/user-coupon:
+ *   delete:
+ *     summary: ลบคูปองที่ผู้ใช้เก็บไว้และลบข้อมูลคูปองออกจากระบบ
+ *     tags:
+ *       - Coupon
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_id:
+ *                 type: integer
+ *               coupon_ID:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: ลบคูปองเรียบร้อยแล้ว
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "User coupon and coupon detail deleted successfully"
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+
+
 // coupon.controller.js
 const pool = require("../db");
 

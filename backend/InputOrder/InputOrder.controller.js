@@ -1,3 +1,167 @@
+/**
+ * @swagger
+ * /api/orders:
+ *   post:
+ *     summary: สร้างคำสั่งซื้อใหม่
+ *     tags:
+ *       - Orders
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - startLat
+ *               - startLng
+ *               - endLat
+ *               - endLng
+ *               - carBrand
+ *               - userCarType
+ *               - vehicleCondition
+ *               - carYear
+ *               - licensePlate
+ *               - serviceType
+ *               - driverCarType
+ *               - orderBudget
+ *               - username
+ *             properties:
+ *               startLat:
+ *                 type: number
+ *                 example: 13.7563
+ *               startLng:
+ *                 type: number
+ *                 example: 100.5018
+ *               endLat:
+ *                 type: number
+ *                 example: 13.7367
+ *               endLng:
+ *                 type: number
+ *                 example: 100.5231
+ *               carBrand:
+ *                 type: string
+ *                 example: "Toyota"
+ *               userCarType:
+ *                 type: string
+ *                 example: "กระบะ"
+ *               vehicleCondition:
+ *                 type: string
+ *                 example: "ดี"
+ *               carYear:
+ *                 type: integer
+ *                 example: 2018
+ *               licensePlate:
+ *                 type: string
+ *                 example: "1กข 1234"
+ *               note:
+ *                 type: string
+ *                 example: "ช่วยยกของด้วย"
+ *               serviceType:
+ *                 type: string
+ *                 example: "เรียกทันที"
+ *               driverCarType:
+ *                 type: string
+ *                 example: "รถกระบะ"
+ *               orderDateTime:
+ *                 type: string
+ *                 format: date-time
+ *                 example: "2025-04-25T14:00:00Z"
+ *               orderBudget:
+ *                 type: number
+ *                 example: 1000
+ *               username:
+ *                 type: string
+ *                 example: "noey_n123"
+ *     responses:
+ *       200:
+ *         description: บันทึกคำสั่งซื้อเรียบร้อย
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Order saved and username updated successfully"
+ *                 orderId:
+ *                   type: integer
+ *                   example: 123
+ *       400:
+ *         description: ข้อมูลไม่ครบ
+ *       500:
+ *         description: เกิดข้อผิดพลาดในระบบ
+ */
+/**
+ * @swagger
+ * /api/orders/{orderId}:
+ *   get:
+ *     summary: ดึงข้อมูลคำสั่งซื้อจาก ID
+ *     tags:
+ *       - Orders
+ *     parameters:
+ *       - name: orderId
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: รหัสคำสั่งซื้อ
+ *     responses:
+ *       200:
+ *         description: แสดงรายละเอียดคำสั่งซื้อ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 OrderDetail_ID:
+ *                   type: integer
+ *                 Status:
+ *                   type: string
+ *                 Start_Lat:
+ *                   type: number
+ *                 ...
+ *       404:
+ *         description: ไม่พบคำสั่งซื้อ
+ *       500:
+ *         description: เกิดข้อผิดพลาดจากเซิร์ฟเวอร์
+ */
+/**
+ * @swagger
+ * /api/register:
+ *   post:
+ *     summary: ลงทะเบียนผู้ใช้ใหม่
+ *     tags:
+ *       - Authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *               - role_id
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: "noey_n123"
+ *               password:
+ *                 type: string
+ *                 example: "securepass123"
+ *               role_id:
+ *                 type: integer
+ *                 example: 2
+ *     responses:
+ *       201:
+ *         description: ลงทะเบียนสำเร็จ
+ *       400:
+ *         description: Username ซ้ำ
+ *       500:
+ *         description: เกิดข้อผิดพลาดในระบบ
+ */
+
+
 // InputOrder.controller.js
 
 const pool = require("../db/index");

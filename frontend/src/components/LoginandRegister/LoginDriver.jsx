@@ -70,7 +70,7 @@ function LoginDriver() {
           />
         </div>
 
-        <h1 className="mb-6 text-[#33b44f] text-2xl font-extrabold text-center">
+        <h1 className="mb-6 !text-[#33b44f] text-2xl font-extrabold text-center ">
           Login!
         </h1>
 
@@ -103,7 +103,7 @@ function LoginDriver() {
 
         <button
           onClick={handleLogin}
-          className="mb-4 w-[291px] h-[50px] bg-[#48d065] text-white rounded-[20px] font-bold text-lg hover:bg-[#43af56] transition"
+          className="mb-4 w-[291px] h-[50px] bg-[#48d065] text-white !rounded-[20px] font-bold text-lg hover:bg-[#43af56] transition"
         >
           Login
         </button>

@@ -1,3 +1,46 @@
+/**
+ * @swagger
+ * /api/driver-info:
+ *   get:
+ *     summary: ดึงข้อมูลคนขับจาก Driver_ID
+ *     tags:
+ *       - Driver
+ *     parameters:
+ *       - in: query
+ *         name: driverID
+ *         required: true
+ *         schema:
+ *           type: integer
+ *         description: รหัสของคนขับ
+ *     responses:
+ *       200:
+ *         description: ข้อมูลของคนขับที่ค้นหาได้
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Driver_ID:
+ *                   type: integer
+ *                 first_name:
+ *                   type: string
+ *                 last_name:
+ *                   type: string
+ *                 phone_number:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *                 ...:
+ *                   description: ฟิลด์อื่น ๆ ตามในตาราง driver_info
+ *       400:
+ *         description: ไม่ได้ส่ง driverID มาใน query
+ *       404:
+ *         description: ไม่พบคนขับที่มี ID นี้
+ *       500:
+ *         description: ข้อผิดพลาดภายในเซิร์ฟเวอร์
+ */
+
+
 const pool = require("../db");
 
 exports.getDriverinfo = async (req, res) => {

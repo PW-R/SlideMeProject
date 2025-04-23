@@ -12,7 +12,6 @@ function DCSS() {
   const [orderData, setOrderData] = useState(null);
 
   const { origin, destination } = usePosition();
-  // const { setOrigin, setDestination } = usePosition();
   const location = useLocation();
   const mapContainerRef = useRef(null);
 
@@ -25,7 +24,6 @@ function DCSS() {
 
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
-
   const [AstartAddress, setAStartAddress] = useState("");
   const [AendAddress, setAEndAddress] = useState("");
 
@@ -34,13 +32,6 @@ function DCSS() {
     distance: null,
     duration: null,
   });
-
-  // const storedData = JSON.parse(sessionStorage.getItem("formData"));
-
-  // if (storedData) {
-  //   console.log("ประเภทรถ", storedData.carBrand);
-  //   storedData.serviceType, storedData.orderDateTime
-  // }
 
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -66,16 +57,8 @@ function DCSS() {
   useEffect(() => {
     if (orderData) {
       console.log("ข้อมูลที่ได้จาก API:", orderData);
-      const {
-        startLat,
-        startLng,
-        endLat,
-        endLng,
-        Start_Lat,
-        Start_Lng,
-        End_Lat,
-        End_Lng,
-      } = orderData;
+      const { startLat, startLng, endLat, endLng, Start_Lat, Start_Lng, End_Lat, End_Lng } =
+        orderData;
       console.log("StartLat:", startLat, "StartLng:", startLng); // Check values
       console.log("EndLat:", endLat, "EndLng:", endLng);
 
@@ -97,6 +80,7 @@ function DCSS() {
     }
   }, [orderData]);
 
+
   // ดึงข้อมูลคำสั่งซื้อจาก backend
   useEffect(() => {
     console.log("orderId:", orderId);
@@ -115,38 +99,49 @@ function DCSS() {
     }
   }, [orderId]);
 
-  // "เปลี่ยนแท็บ รายละเอียด / เลือกร้าน "
-  const handleTabChange = (newTab) => {
-    setTab(newTab);
-    if (newTab === "chooseStore") {
-      setIsLoadingStores(true);
-    }
-  };
+// ดึงข้อมูลร้านที่อยู่ใกล้ // เช็คทุก 3 วินาที
+// ดึงข้อมูลร้านที่อยู่ใกล้ // เช็คทุก 3 วินาที
+useEffect(() => {
+  if (!orderId) return;
 
-  // ดึงข้อมูลร้านที่อยู่ใกล้ // เช็คทุก 3 วินาที
-  useEffect(() => {
-    if (!orderId) return;
-    const interval = setInterval(() => {
-      axios
-        .get(`http://localhost:3000/api/nearby-shops/${orderId}`)
-        .then((response) => {
-          const stores = response.data.stores;
-          console.log("เช็คข้อมูลร้านรอบใหม่:", stores);
+  const interval = setInterval(() => {
+    axios
+      .get(`http://localhost:3000/api/nearby-shops/${orderId}`)
+      .then((response) => {
+        const allStores = response.data.stores;
 
-          if (stores.length > 0) {
-            setNearbyStores(stores);
-            clearInterval(interval); // หยุด polling เมื่อมีข้อมูลแล้ว
-            setIsLoadingStores(false);
-          }
-        })
-        .catch((error) => {
-          console.error("Error polling nearby stores:", error);
-          setIsLoadingStores(false);
+        // 🔍 Filter stores that have offerStatus === "ตกลง"
+        const agreedStores = allStores.filter((shop) => shop.offerStatus === "ตกลง")
+
+
+        // Log each store found with offerStatus "ตกลง"
+        console.log("อัปเดตร้านที่ตกลง:", agreedStores);
+        
+        // Log each store that is being processed
+        agreedStores.forEach((store) => {
+          console.log("Current store found:", store); // Logs each store
         });
-    }, 3000); // เช็คทุก 3 วินาที
 
-    return () => clearInterval(interval); // เคลียร์เมื่อ unmount หรือเปลี่ยน orderId
-  }, [orderId]);
+        setNearbyStores(agreedStores); // Update only "ตกลง" stores
+      })
+      .catch((error) => {
+        console.error("Error polling nearby stores:", error);
+      });
+  }, 3000); // 🔁 Keep checking every 3 seconds
+
+  return () => clearInterval(interval); // 🧹 Clean up on unmount or orderId change
+}, [orderId]);
+
+
+
+
+// "เปลี่ยนแท็บ รายละเอียด / เลือกร้าน "
+const handleTabChange = (newTab) => {
+  setTab(newTab);
+  if (newTab === "chooseStore") {
+    setIsLoadingStores(true);
+  }
+};
 
   // กดไปดูข้อมูลร้าน
   const handleChooseStore = async (store) => {
@@ -155,57 +150,50 @@ function DCSS() {
     sessionStorage.setItem("selectedShop_service", store.shop_service);
     sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
 
-    // sessionStorage.setItem("selectedShop_Lat", store.lat);
-    // sessionStorage.setItem("selectedShop_Lng", store.lng);
+    sessionStorage.setItem("selectedShop_Lat", store.lat);
+    sessionStorage.setItem("selectedShop_Lng", store.lng);
     navigate(`/ShopDetail/${orderId}`);
   };
 
   // ปุ่ม เลือก ( ไปหน้าถัดไป )
-  // ปุ่ม เลือก ( ไปหน้าถัดไป )
-const handleSelectShops = async (store) => {
-  const driverId = Number(store.Driver_ID);
-  console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
-
-  if (isNaN(driverId) || driverId <= 0) {
-    console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
-    alert("ไม่พบข้อมูลคนขับ");
-    return;
-  }
-
-  try {
-    await axios.post(`http://localhost:3000/api/select-driver/${orderId}`, {
-      Driver_ID: driverId,
-    });
-
-    console.log("✅ บันทึกคนขับเรียบร้อย");
-
-    // ส่งข้อมูล
-    sessionStorage.setItem("selectedTotalPrice", store.total_price);
-    sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
-    sessionStorage.setItem("selectedDriverName", store.driver_name);
-    sessionStorage.setItem("selectedDriverYear", store.driver_year);
-    sessionStorage.setItem("selectedShop_Lat", store.lat);
-    sessionStorage.setItem("selectedShop_Lng", store.lng);
-    sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
-
-    console.log("📦 Store data:", store);
-
-    if (store.Shop_Lat && store.Shop_Lng) {
-      sessionStorage.setItem("selectedShop_Lat", store.Shop_Lat);
-      sessionStorage.setItem("selectedShop_Lng", store.Shop_Lng);
-      console.log("✅ เก็บค่าลง sessionStorage แล้ว:", store.Shop_Lat, store.Shop_Lng);
-    } else {
-      console.warn("❌ ไม่มีค่า Shop_Lat หรือ Shop_Lng:", store.Shop_Lat, store.Shop_Lng);
+  const handleSelectShops = async (store) => {
+    if (store.offerstatus !== "ตกลง") {
+      alert("ยังไม่สามารถเลือกร้านนี้ได้ เพราะยังไม่ได้ตกลงราคา");
+      return;
     }
-
-    // ไปหน้า PaymentConfirm
-    navigate(`/PaymentConfirm/${orderId}`);
-  } catch (err) {
-    console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
-    alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
-  }
-};
-
+  
+    const driverId = Number(store.Driver_ID);
+    console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
+  
+    if (isNaN(driverId) || driverId <= 0) {
+      console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
+      alert("ไม่พบข้อมูลคนขับ");
+      return;
+    }
+  
+    try {
+      await axios.post(`http://localhost:3000/api/select-driver/${orderId}`, {
+        Driver_ID: driverId,
+      });
+  
+      console.log("✅ บันทึกคนขับเรียบร้อย");
+  
+      // ส่งข้อมูล
+      sessionStorage.setItem("selectedTotalPrice", store.total_price);
+      sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
+      sessionStorage.setItem("selectedDriverName", store.driver_name);
+      sessionStorage.setItem("selectedDriverYear", store.driver_year);
+      sessionStorage.setItem("selectedShop_Lat", store.lat);
+      sessionStorage.setItem("selectedShop_Lng", store.lng);
+      sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
+  
+      navigate(`/PaymentConfirm/${orderId}`);
+    } catch (err) {
+      console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
+      alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
+    }
+  };
+  
 
   useEffect(() => {
     console.log("Origin:", origin); // ตรวจสอบค่าของ origin
@@ -320,10 +308,10 @@ const handleSelectShops = async (store) => {
                   {/* ตำแหน่ง */}
                   <div className="flex flex-col gap-2">
                     <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left w-[300px] overflow-hidden whitespace-nowrap text-ellipsis">
-                      {AstartAddress || "ตำแหน่งต้นทาง"}
+                    {AstartAddress || "ตำแหน่งต้นทาง"}
                     </div>
                     <div className="h-[45px] rounded-xl bg-gray-100 text-gray-600 px-3 py-2 text-left w-[300px] overflow-hidden whitespace-nowrap text-ellipsis">
-                      {AendAddress || "ตำแหน่งปลายทาง"}
+                    {AendAddress || "ตำแหน่งปลายทาง"}
                     </div>
                   </div>
                 </div>
@@ -333,21 +321,13 @@ const handleSelectShops = async (store) => {
                 {/* รายละเอียดเพิ่มเติม */}
                 <div className="grid grid-cols-2 gap-x-4">
                   <div className="flex flex-col space-y-1">
-                    {/* {route && route.distance ? (
-                      <div className="grid grid-cols-[1fr_3fr] items-center">
-                        <i className="bi bi-sign-turn-right"></i>
-                        <p className="mb-1">{route.distance}</p>
-                      </div>
-                    ) : (
-                      <div>กำลังคำนวณ...</div> // ถ้าไม่มีข้อมูลเส้นทางหรือยังคำนวณไม่เสร็จ
-                    )} */}
                     <div className="grid grid-cols-[1fr_3fr] items-center">
                       <i className="bi bi-car-front"></i>
                       <p className="mb-1">{orderData?.DriverCar_type}</p>
                     </div>
                     <div className="grid grid-cols-[1fr_3fr] items-center">
                       <i className="bi bi-clock"></i>
-                      <p className="mb-1">{orderData?.ServiceType}</p>
+                      <p className="mb-1">{orderData?.serviceType}</p>
                     </div>
                   </div>
                   <div className="flex justify-end items-center">
@@ -370,74 +350,49 @@ const handleSelectShops = async (store) => {
 
             {/* "เลือกร้าน" */}
             {tab === "chooseStore" && (
-              <div className="mt-2">
-                {isLoadingStoreTab ? (
-                  <p className="text-gray-500 text-center">รอสักครู่...</p>
-                ) : (
-                  <>
-                    {/* รายละเอียดร้าน */}
-                    {nearbyStores.length > 0 ? (
-                      nearbyStores.map((store) => (
-                        <div
-                          key={store.driverId}
-                          className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3 mt-3"
-                        >
-                          <div>
-                            <img
-                              className="w-[50px] h-[50px] rounded-full object-cover"
-                              src="driver_logo.svg"
-                              alt="Driver"
-                            />
-                          </div>
-                          <div>
-                            <button
-                              style={{ fontSize: "20px" }}
-                              onClick={() => handleChooseStore(store)}
-                              className="text-[#0DC964] font-bold mb-0"
-                            >
-                              {store.name}
-                            </button>
-                          </div>
-                          <div className="flex flex-col items-center space-y-1">
-                            <p className="mb-0 font-semibold">
-                              {store.total_price !== null &&
-                              store.total_price !== undefined
-                                ? store.total_price
-                                : "Price not available"}
-                            </p>
-                            <button
-                              style={{ borderRadius: "50px" }}
-                              onClick={() => {
-                                console.log("store:", store); // เพิ่ม log นี้
-                                console.log(
-                                  "เลือก Driver_ID:",
-                                  store.Driver_ID
-                                ); // เพิ่ม log นี้
-                                if (store.Driver_ID) {
-                                  handleSelectShops(store);
-                                  console.log(
-                                    "store.driverId",
-                                    store.Driver_ID
-                                  ); // ตรวจสอบค่า driverId
-                                } else {
-                                  console.error("ไม่มี Driver_ID");
-                                }
-                              }}
-                              className="bg-[#0DC964] text-white w-[80px] h-[28px] text-sm rounded-full hover:bg-[#43af56] transition"
-                            >
-                              เลือก
-                            </button>
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p>ไม่พบร้านที่อยู่ใกล้เคียง</p>
-                    )}
-                  </>
-                )}
-                {/* <div className="w-full border-t-2 border-gray-300"></div> */}
+  <div className="mt-2">
+    {isLoadingStoreTab ? (
+      <p className="text-gray-500 text-center">รอสักครู่...</p>
+    ) : (
+      <>
+        {/* Display only stores where the offer status is 'ตกลง' */}
+        {nearbyStores.length > 0 ? (
+          nearbyStores
+            .filter(store => store.offerStatus === "ตกลง") // Filter stores where offerstatus is "ตกลง"
+            .map((store) => (
+              <div
+                key={store.driverId}
+                className="grid grid-cols-[1fr_3fr_1fr] items-center mb-3 mt-3"
+              >
+                <div>
+                  <img
+                    className="w-[50px] h-[50px] rounded-full object-cover"
+                    src="driver_logo.svg"
+                    alt="Driver"
+                  />
+                </div>
+                <div>
+                  <p>{store.driver_name}</p>
+                  <p>{store.shop_info}</p>
+                </div>
+                <div>
+                  <button
+                    onClick={() => handleSelectShops(store)}
+                    className="bg-[#0DC964] text-white px-4 py-2 rounded-md"
+                  >
+                    เลือกร้าน
+                  </button>
+                </div>
               </div>
-            )}
+            ))
+        ) : (
+          <p className="text-center">ไม่พบร้านที่มีการตกลงราคา</p> // Message if no stores have accepted the offer
+        )}
+      </>
+    )}
+  </div>
+)}
+
           </div>
         </div>
       </div>

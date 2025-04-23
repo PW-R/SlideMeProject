@@ -48,7 +48,7 @@ function DriverDetail() {
     console.log("orderId:", orderId);
     if (orderId) {
       axios
-        .get(`http://localhost:3000/api/InputOrder/order/${orderId}`)
+        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
         .then((response) => {
           console.log("ข้อมูลคำสั่งซื้อ:", response.data);
           // setOrderData(response.data);

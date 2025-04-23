@@ -3,7 +3,8 @@ import { useEffect, useState } from "react";
 function HomeCustomize() {
   const [store, setStore] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [currentIndex, setCurrentIndex] = useState(0); // ✅ เก็บ index รูปปัจจุบัน
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [placeName, setPlaceName] = useState(null); // ✅ ย้ายขึ้นบนสุด
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
@@ -13,9 +14,8 @@ function HomeCustomize() {
   const fetchStoreData = async () => {
     try {
       const res = await fetch("http://localhost:3000/api/store/my-store", {
-        credentials: "include", 
+        credentials: "include",
       });
-
       const data = await res.json();
       if (res.ok) {
         setStore(data);
@@ -29,18 +29,34 @@ function HomeCustomize() {
     }
   };
 
-  // ✅ ทำ Auto Slide
   useEffect(() => {
     if (store?.ShopImages?.length > 1) {
       const interval = setInterval(() => {
         setCurrentIndex(
           (prevIndex) => (prevIndex + 1) % store.ShopImages.length
         );
-      }, 3000); // เปลี่ยนรูปทุก 3 วินาที
-
-      return () => clearInterval(interval); // ล้าง interval เมื่อ unmount
+      }, 3000);
+      return () => clearInterval(interval);
     }
   }, [store]);
+
+  useEffect(() => {
+    if (store?.Shop_Lat && store?.Shop_Lng) {
+      fetchReverseGeocode(store.Shop_Lat, store.Shop_Lng);
+    }
+  }, [store?.Shop_Lat, store?.Shop_Lng]);
+
+  const fetchReverseGeocode = async (lat, lng) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
+      );
+      const data = await res.json();
+      setPlaceName(data.display_name);
+    } catch (err) {
+      console.error("ดึงชื่อสถานที่ล้มเหลว:", err);
+    }
+  };
 
   const toggleStatus = async () => {
     try {
@@ -67,9 +83,10 @@ function HomeCustomize() {
   };
 
   if (loading) return <p>กำลังโหลด...</p>;
-  console.log("🔧 รูป:", store.ShopImages);
-  console.log("✅ รูป index ปัจจุบัน:", currentIndex);
   if (!store) return <p>ไม่พบข้อมูลร้าน</p>;
+
+  
+
 
   return (
     <div>
@@ -131,10 +148,20 @@ function HomeCustomize() {
               <i className="bi bi-geo-alt-fill text-[#0dc964] text-lg mt-[-11px]"></i>
               <p className="font-medium">ที่อยู่ร้าน:</p>
             </div>
-            <p className="text-sm mb-2">{store.Shop_Location}</p>
+
+            <p className="text-sm mb-2">{placeName || store.Shop_Location}</p>
+
+            <a
+              href={`https://www.google.com/maps?q=${store.Shop_Lat},${store.Shop_Lng}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm text-blue-600 underline ml-6"
+            >
+              ดูพิกัดบน Google Maps
+            </a>
 
             {/* เบอร์โทร */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mt-2">
               <i className="bi bi-telephone-fill text-[#0dc964] text-lg mt-[-11px]"></i>
               <p className="font-medium">เบอร์โทรร้าน:</p>
               <p className="text-sm">{store.Shop_Phone}</p>

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import StoreMapPicker from "./StoreMapPicker";
 
 function CreateStore() {
   const [tasks, setTasks] = useState([]);
@@ -9,6 +10,8 @@ function CreateStore() {
   const [storeInfo, setStoreInfo] = useState({
     images: [],
     promptpay: null,
+    lat: null,
+    lng: null,
   });
 
   const addRowData = () => {
@@ -60,28 +63,35 @@ function CreateStore() {
     formData.append("managerName", storeInfo.managerName || "");
     formData.append("info", storeInfo.info || "");
     formData.append("service", storeInfo.service || "");
-    formData.append("vehicles", JSON.stringify(tasks)); // รถหลายคัน
-  
+    formData.append("vehicles", JSON.stringify(tasks));
+    formData.append("lat", storeInfo.lat);
+    formData.append("lng", storeInfo.lng);
+
+    if (!storeInfo.lat || !storeInfo.lng) {
+      alert("กรุณาเลือกตำแหน่งร้านบนแผนที่ก่อน");
+      return;
+    }
+
     storeInfo.imagesFiles?.forEach((file) => {
       formData.append("images", file);
     });
-  
+
     if (storeInfo.promptpayFile) {
       formData.append("promptpay", storeInfo.promptpayFile);
     }
-  
+
     // ✅ Log ข้อมูลที่อยู่ใน formData ออกมาดู
     for (let [key, value] of formData.entries()) {
       console.log(`${key}:`, value);
     }
-  
+
     try {
       const res = await fetch("http://localhost:3000/api/store", {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         body: formData,
       });
-  
+
       const data = await res.json();
       if (res.ok) {
         // 👇 ดึง user เดิมจาก localStorage แล้วเปลี่ยน role
@@ -90,10 +100,10 @@ function CreateStore() {
           "user",
           JSON.stringify({ ...user, role: "manager" })
         );
-      
+
         alert("✅ สร้างร้านสำเร็จ!");
         navigate("/HomeCustomize");
-      }else {
+      } else {
         alert("❌ สร้างร้านไม่สำเร็จ: " + data.error);
       }
     } catch (err) {
@@ -101,7 +111,6 @@ function CreateStore() {
       alert("เกิดข้อผิดพลาดในการส่งข้อมูล");
     }
   };
-  
 
   return (
     <AppWrapper>
@@ -128,15 +137,26 @@ function CreateStore() {
               }
             />
 
-            <input
-              className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"
-              type="text"
-              placeholder="ที่อยู่ร้าน"
-              value={storeInfo.address || ""}
-              onChange={(e) =>
-                setStoreInfo((prev) => ({ ...prev, address: e.target.value }))
-              }
-            />
+            <div className="mt-4">
+              <label className="block mb-2 font-semibold">
+                ตำแหน่งร้าน
+              </label>
+              <StoreMapPicker
+                onSelect={(pos) =>
+                  setStoreInfo((prev) => ({
+                    ...prev,
+                    lat: pos.lat,
+                    lng: pos.lng,
+                  }))
+                }
+              />
+              {storeInfo.lat && storeInfo.lng && (
+                <p className="text-sm text-gray-600 mt-2">
+                  📍 พิกัด: {storeInfo.lat.toFixed(6)},{" "}
+                  {storeInfo.lng.toFixed(6)}
+                </p>
+              )}
+            </div>
 
             <input
               className="bg-[#E5E1E1] text-[#A09D9D] w-[290px] h-[45px] rounded-[30px] p-4 !text-lg mt-4"

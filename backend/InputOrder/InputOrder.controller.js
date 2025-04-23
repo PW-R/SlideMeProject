@@ -47,6 +47,7 @@ testConnection();
 
 exports.InputOrder = async (req, res) => {
   console.log("📥 New request received: ", req.body);
+  const offerStatus = "รอ"; // ✅ บังคับให้เป็น "รอ"
   const {
     startLat,
     startLng,
@@ -62,6 +63,7 @@ exports.InputOrder = async (req, res) => {
     driverCarType,
     orderDateTime,
     orderBudget,
+    username,  // Assuming the username is coming from the request body
   } = req.body;
 
   if (
@@ -70,9 +72,9 @@ exports.InputOrder = async (req, res) => {
     !carBrand || !userCarType ||
     !vehicleCondition || !carYear ||
     !licensePlate || !serviceType ||
-    !orderBudget
-    // !driverCarType || !orderBudget
-  ) {
+    !orderBudget || !driverCarType 
+  )
+  {
     return res.status(400).json({
       error: "กรุณากรอกข้อมูลให้ครบทุกช่อง",
     });
@@ -98,8 +100,9 @@ exports.InputOrder = async (req, res) => {
       ServiceType,
       DriverCar_type,
       Order_Date_time,
-      Order_Budget
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      Order_Budget,
+      OfferStatus
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
   const values = [
@@ -118,12 +121,25 @@ exports.InputOrder = async (req, res) => {
     driverCarType,
     orderDateTime,
     orderBudget,
+    offerStatus
   ];
 
   try {
     const [result] = await pool.query(sql, values);
+    console.log("✅ Order inserted with ID:", result.insertId);
+
+    // After inserting, update the Order_UserName in the OrderDetail table
+    const updateSql = `
+      UPDATE OrderDetail 
+      SET Order_UserName = ? 
+      WHERE OrderDetail_ID = ?
+    `;
+    const updateValues = [username, result.insertId];
+
+    await pool.query(updateSql, updateValues);
+    
     res.status(200).json({
-      message: "Order saved successfully",
+      message: "Order saved and username updated successfully",
       orderId: result.insertId,
     });
   } catch (err) {
@@ -132,52 +148,28 @@ exports.InputOrder = async (req, res) => {
   }
 };
 
+
 exports.getOrderById = async (req, res) => {
   const { orderId } = req.params;
   console.log("Fetching order for ID:", orderId);
 
   const sql = `
-  SELECT 
-    o.OrderDetail_ID,
-    o.Status,
-    o.Start_Lat AS startLat,
-    o.Start_Lng AS startLng,
-    o.End_Lat AS endLat,
-    o.End_Lng AS endLng,
-    o.Car_Brand AS carBrand,
-    o.UserCar_type AS userCarType,
-    o.Vehicle_condition AS vehicleCondition,
-    o.CarYear AS carYear,
-    o.License_Plate AS licensePlate,
-    o.Note,
-    o.ServiceType AS serviceType,
-    o.DriverCar_type AS driverCarType,
-    o.Order_Date_time AS orderDateTime,
-    o.Order_Budget AS orderBudget,
-    o.Driver_ID,
-
-    d.Driver_Name AS driverName,
-    d.Shop_Name AS shopName,
-    d.DriverRating AS driverRating,
-
-    s.Shop_Lat AS shopLat,
-    s.Shop_Lng AS shopLng,
-    s.Shop_Phone AS shopPhone
-  FROM OrderDetail o
-  LEFT JOIN Driver_info d ON o.Driver_ID = d.Driver_ID
-  LEFT JOIN Shop_Info s ON d.Shop_Name = s.Shop_Name
-  WHERE o.OrderDetail_ID = ?
+    SELECT * FROM OrderDetail WHERE OrderDetail_ID = ?
   `;
+  console.log('SQL query:', sql);  // แสดงคำสั่ง SQL ที่จะทำการ query
+  console.log('Query params:', [orderId]);  // แสดงค่าที่จะถูกส่งไปใน query (orderId)
 
   try {
     const [rows] = await pool.query(sql, [orderId]);
-    console.log("Query result:", rows);
+    console.log("✅ Order detail:", rows);
+
     if (rows.length === 0) {
       return res.status(404).json({ error: "ไม่พบข้อมูลคำสั่งซื้อ" });
     }
+
     res.status(200).json(rows[0]);
   } catch (err) {
-    console.error("❌ Error fetching order:", err);
+    console.error("❌ Error fetching order detail:", err);
     res.status(500).json({ error: "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์" });
   }
 };

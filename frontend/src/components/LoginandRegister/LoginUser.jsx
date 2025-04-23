@@ -19,10 +19,11 @@ function LoginUser() {
         },
         body: JSON.stringify({ phone, password }),
       });
-
+  
       const data = await res.json();
-
+  
       if (res.ok) {
+        localStorage.setItem("userPhone", phone); // Save to localStorage
         navigate("/UserHome");
       } else {
         setErrorMsg(data.message || "Login failed");
@@ -31,6 +32,7 @@ function LoginUser() {
       setErrorMsg("Something went wrong. Please try again.");
     }
   };
+  
 
   return (
     <AppWrapper>

@@ -27,9 +27,6 @@ function PaymentConfirm() {
       Number(sessionStorage.getItem("selectedEquipmentPrice") || 0)
     );
   }, []);
-  const selectedDriverName = sessionStorage.getItem("selectedDriverName");
-  const selectedDriverYear = sessionStorage.getItem("selectedDriverYear");
-  const selectedShopPhone = sessionStorage.getItem("selectedShop_Phone");
 
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -73,7 +70,7 @@ function PaymentConfirm() {
     console.log("orderId:", orderId);
     if (orderId) {
       axios
-        .get(`http://localhost:3000/api/InputOrder/order/${orderId}`)
+        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
         .then((response) => {
           console.log("ข้อมูลคำสั่งซื้อ:", response.data);
           setOrderData(response.data);
@@ -88,9 +85,6 @@ function PaymentConfirm() {
 
   // ส่งข้อมูลไปหน้าคนขับ
   const handleDriverDetail = () => {
-    sessionStorage.setItem("selectedDriverName", selectedDriverName);
-    sessionStorage.setItem("selectedDriverYear", selectedDriverYear);
-    sessionStorage.setItem("selectedShopPhone", selectedShopPhone);
     navigate(`/DriverDetail/${orderId}`);
   };
 

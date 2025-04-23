@@ -1,3 +1,133 @@
+// paths:
+//   /store/search:
+//     post:
+//       summary: ค้นหาร้านค้าด้วยชื่อและรหัสผ่าน
+//       tags:
+//         - Store
+//       requestBody:
+//         required: true
+//         content:
+//           application/json:
+//             schema:
+//               type: object
+//               properties:
+//                 storeName:
+//                   type: string
+//                   example: "Coffee Hub"
+//                 storeCode:
+//                   type: string
+//                   example: "secret123"
+//       responses:
+//         200:
+//           description: พบร้านค้าตรงกับข้อมูลที่ให้
+//           content:
+//             application/json:
+//               schema:
+//                 type: object
+//                 properties:
+//                   shopId:
+//                     type: integer
+//                   shopName:
+//                     type: string
+//         404:
+//           description: ไม่พบร้าน หรือรหัสผิด
+//         500:
+//           description: Server error
+
+//   /store/join:
+//     post:
+//       summary: ขอเข้าร่วมร้านค้าในฐานะคนขับ
+//       tags:
+//         - Store
+//       requestBody:
+//         required: true
+//         content:
+//           application/json:
+//             schema:
+//               type: object
+//               properties:
+//                 shopId:
+//                   type: integer
+//                   example: 1
+//       responses:
+//         200:
+//           description: ส่งคำขอสำเร็จ
+//         400:
+//           description: ข้อมูลไม่ครบ หรือมีข้อมูลคนขับอยู่แล้ว
+//         500:
+//           description: Server error
+
+//   /store/join/status:
+//     get:
+//       summary: ตรวจสอบสถานะคำขอเข้าร่วมร้านของคนขับ
+//       tags:
+//         - Store
+//       responses:
+//         200:
+//           description: คืนสถานะการอนุมัติ
+//           content:
+//             application/json:
+//               schema:
+//                 type: object
+//                 properties:
+//                   approved:
+//                     type: string
+//                     enum: [pending, approved, rejected]
+//         404:
+//           description: ยังไม่มีคำขอเข้าร่วมร้าน
+//         500:
+//           description: Server error
+
+//   /store/join/requests:
+//     get:
+//       summary: เจ้าของร้านดูคำขอเข้าร่วมร้านทั้งหมด
+//       tags:
+//         - Store
+//       responses:
+//         200:
+//           description: รายชื่อคำขอที่รออนุมัติ
+//           content:
+//             application/json:
+//               schema:
+//                 type: array
+//                 items:
+//                   type: object
+//                   properties:
+//                     Driver_ID:
+//                       type: integer
+//                     Driver_Name:
+//                       type: string
+//         404:
+//           description: ไม่พบร้านของคุณ
+//         500:
+//           description: Server error
+
+//   /store/join/approve:
+//     put:
+//       summary: อนุมัติหรือปฏิเสธคำขอเข้าร่วมร้าน
+//       tags:
+//         - Store
+//       requestBody:
+//         required: true
+//         content:
+//           application/json:
+//             schema:
+//               type: object
+//               properties:
+//                 driverId:
+//                   type: integer
+//                   example: 3
+//                 approved:
+//                   type: boolean
+//                   example: true
+//       responses:
+//         200:
+//           description: เปลี่ยนสถานะคำขอสำเร็จ
+//         500:
+//           description: Server error
+// 
+
+
 const pool = require("../db");
 
 // 🔍 ค้นหาร้านตามชื่อและรหัสผ่าน

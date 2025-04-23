@@ -1,45 +1,35 @@
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
-import { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect } from "react";
 import L from "leaflet";
-import LeafletGeocoder from "./LeafletGeocoder";
-import "leaflet-control-geocoder/dist/Control.Geocoder.css?inline";
-
 import "leaflet/dist/leaflet.css";
-import LeafletRoutingMachine from "./LeafletRoutingMachine";
-
-const mockOrder = {
-  price: 2130,
-  from: {
-    label: "กรุง ออร์ แอร์ 61 ถ. หลังสวน แขวงลุมพินี เขตปทุมวัน กรุงเทพฯ 10330",
-    icon: "bi bi-geo-alt-fill",
-    color: "text-red-500",
-  },
-  to: {
-    label:
-      "บัวรถโสติเคร์ 67/8 หมู่ที่ 7 ตำบลมหาสวัสดิ์ อำเภอบางกรวย นนทบุรี 11130",
-    icon: "bi bi-geo-alt",
-    color: "text-green-500",
-  },
-  mapImage: "/mock_map.png",
-};
+import "leaflet-routing-machine";
+import "leaflet-control-geocoder/dist/Control.Geocoder.css";
+import RoutingMachine from "./RoutingMachine";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 function PendingOrderLocation() {
   const navigate = useNavigate();
-  const position = [13.736717, 100.523186];
+  const location = useLocation();
+  const offerData = location.state;
+
+  const position =
+    offerData?.startLat && offerData?.startLng
+      ? [offerData.startLat, offerData.startLng]
+      : [13.736717, 100.523186];
 
   const handleMessage = () => {
     navigate("/DriverMessage");
   };
 
-  const defaultIcon = L.icon({
-    iconUrl: "src/pic/placeholder.png",
-    iconSize: [32, 32],
-    iconAnchor: [10, 41],
-    popupAnchor: [1, -40],
-  });
-  L.Marker.prototype.options.icon = defaultIcon;
+  // กำหนด icon ของ marker
+  const customIcon = L.divIcon({
+  html: '<i class="bi bi-geo-alt-fill text-danger fs-3"></i>',
+  className: '', 
+  iconSize: [30, 30],
+  iconAnchor: [15, 30],
+});
+  L.Marker.prototype.options.icon = customIcon;
 
   return (
     <div style={{ overflow: "hidden" }}>
@@ -54,21 +44,44 @@ function PendingOrderLocation() {
       {/* Content */}
       <div className="pt-[125px] pb-[80px]">
         {/* แผนที่ */}
-        <div className="w-full h-[270px]">
-          <MapContainer center={position} zoom={15} scrollWheelZoom={false}>
+        <div className="w-full h-[270px] min-h-[270px]">
+          <MapContainer
+            center={position}
+            zoom={15}
+            scrollWheelZoom={false}
+            style={{ height: "270px", width: "100%" }}
+          >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-            <LeafletGeocoder /> {/* ✅ ใส่ตรงนี้ได้เลย */}
-            <LeafletRoutingMachine />
+
+            <RoutingMachine
+              start={[offerData?.startLat, offerData?.startLng]}
+              end={[offerData?.endLat, offerData?.endLng]}
+            />
+            <Marker position={[offerData?.startLat, offerData?.startLng]}>
+              <Popup>
+                จุดเริ่มต้น
+                <br />
+                {offerData?.startLocation}
+              </Popup>
+            </Marker>
+
+            <Marker position={[offerData?.endLat, offerData?.endLng]}>
+              <Popup>
+                จุดปลายทาง
+                <br />
+                {offerData?.endLocation}
+              </Popup>
+            </Marker>
           </MapContainer>
         </div>
 
         {/* ราคา */}
         <div className="text-center mt-2">
           <p className="text-[#0dc964] text-xl font-bold">
-            {mockOrder.price} THB
+            {offerData?.total} THB
           </p>
         </div>
 
@@ -76,19 +89,15 @@ function PendingOrderLocation() {
 
         {/* จุดเริ่มต้น */}
         <div className="flex items-start px-6 py-1">
-          <i
-            className={`${mockOrder.from.icon} ${mockOrder.from.color} mr-2`}
-          ></i>
           <p className="text-[16px] text-black leading-tight">
-            {mockOrder.from.label}
+            {offerData?.startLocation}
           </p>
         </div>
 
         {/* จุดสิ้นสุด */}
         <div className="flex items-start px-6 py-1">
-          <i className={`${mockOrder.to.icon} ${mockOrder.to.color} mr-2`}></i>
           <p className="text-[16px] text-black leading-tight">
-            {mockOrder.to.label}
+            {offerData?.endLocation}
           </p>
         </div>
 
@@ -97,7 +106,10 @@ function PendingOrderLocation() {
           <button className="bg-[#0dc964] w-[50px] h-[50px] rounded-full shadow text-white">
             <i className="bi bi-telephone-fill text-lg"></i>
           </button>
-          <button className="bg-[#0dc964] w-[50px] h-[50px] rounded-full shadow text-white" onClick={handleMessage}>
+          <button
+            className="bg-[#0dc964] w-[50px] h-[50px] rounded-full shadow text-white"
+            onClick={handleMessage}
+          >
             <i className="bi bi-chat-dots-fill text-lg"></i>
           </button>
         </div>

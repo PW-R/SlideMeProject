@@ -1,8 +1,7 @@
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useEffect, useRef, useState } from "react";
-
 import L from "leaflet";
-import Geocoder from "./LeafletGeocoder";
+import Geocoder from "./Geocoder"; // Assuming this is a component for geocoding
 import "leaflet/dist/leaflet.css";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
@@ -11,14 +10,13 @@ function MapStatus({ origin, destination, onRouteCalculated }) {
   const mapRef = useRef(null);
 
   const [routeInfo, setRouteInfo] = useState({ distance: "", duration: "" });
-  const [route, setRoute] = useState(null);
   const [loadingRoute, setLoadingRoute] = useState(true);
   const [routeError, setRouteError] = useState(null);
 
   // Icon: ต้นทาง
   const originIcon = L.divIcon({
     className: "leaflet-div-icon",
-    html: `<div style="background-color: #F84C4C; width: 32px; height: 32px; border-radius: 50%; border: 2px solid white;"></div>`,
+    html: `<div style="background-color: #F84C4C; width: 32px; height: 32px; border-radius: 50%;"></div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -32],
@@ -37,66 +35,68 @@ function MapStatus({ origin, destination, onRouteCalculated }) {
     popupAnchor: [0, -32],
   });
 
-  // // ✅ คำนวณเส้นทางเมื่อ origin/destination มา
-  // useEffect(() => {
-  //   if (origin?.lat && origin?.lng && destination?.lat && destination?.lng && mapRef.current) {
-  //     const map = mapRef.current;
-  //     setLoadingRoute(true);
-  //     setRouteError(null);
+  // คำนวณเส้นทางเมื่อ origin/destination มา
+  useEffect(() => {
+    if (origin?.lat && origin?.lng && destination?.lat && destination?.lng && mapRef.current) {
+      const map = mapRef.current;
+      setLoadingRoute(true);
+      setRouteError(null);
 
-  //     map.eachLayer((layer) => {
-  //       if (layer instanceof L.Marker && layer.options.icon) {
-  //         map.removeLayer(layer);
-  //       }
-  //     });
+      // ลบ marker และเส้นทางเก่า
+      map.eachLayer((layer) => {
+        if (layer instanceof L.Marker && layer.options.icon) {
+          map.removeLayer(layer);
+        }
+      });
 
-  //     const routingControl = L.Routing.control({
-  //       waypoints: [
-  //         L.latLng(origin.lat, origin.lng),
-  //         L.latLng(destination.lat, destination.lng),
-  //       ],
-  //       routeWhileDragging: false,
-  //       lineOptions: { styles: [{ color: "blue", weight: 6 }] },
-  //       createMarker: () => null,
-  //       name: "RoutingControl",
-  //       show: false,
-  //     });
+      // สร้าง RoutingControl สำหรับคำนวณเส้นทาง
+      const routingControl = L.Routing.control({
+        waypoints: [
+          L.latLng(origin.lat, origin.lng),
+          L.latLng(destination.lat, destination.lng),
+        ],
+        routeWhileDragging: false,
+        lineOptions: { styles: [{ color: "blue", weight: 6 }] },
+        createMarker: () => null, // ไม่ต้องการให้แสดงมาร์คเกอร์
+      });
 
-  //     routingControl.on("routesfound", (event) => {
-  //       setLoadingRoute(false);
-  //       if (event.routes.length === 0) {
-  //         setRouteError("ไม่พบเส้นทาง");
-  //       } else {
-  //         const route = event.routes[0];
-  //         const distanceKm = (route.summary.totalDistance / 1000).toFixed(2) + " กม.";
-  //         const durationMin = Math.ceil(route.summary.totalTime / 60) + " นาที";
+      // เมื่อคำนวณเส้นทางเสร็จ
+      routingControl.on("routesfound", (event) => {
+        setLoadingRoute(false);
+        if (event.routes.length === 0) {
+          setRouteError("ไม่พบเส้นทาง");
+        } else {
+          const route = event.routes[0];
+          const distanceKm = (route.summary.totalDistance / 1000).toFixed(2) + " กม.";
+          const durationMin = Math.ceil(route.summary.totalTime / 60) + " นาที";
 
-  //         const routeData = {
-  //           distance: distanceKm,
-  //           duration: durationMin,
-  //         };
+          const routeData = {
+            distance: distanceKm,
+            duration: durationMin,
+          };
 
-  //         setRoute(routeData);
-  //         onRouteCalculated?.(routeData);
-  //       }
-  //     });
+          setRouteInfo(routeData);
+          onRouteCalculated?.(routeData);
+        }
+      });
 
-  //     routingControl.on("routeerror", () => {
-  //       setLoadingRoute(false);
-  //       setRouteError("ไม่สามารถคำนวณเส้นทางได้");
-  //     });
+      // เมื่อคำนวณเส้นทางไม่สำเร็จ
+      routingControl.on("routeerror", () => {
+        setLoadingRoute(false);
+        setRouteError("ไม่สามารถคำนวณเส้นทางได้");
+      });
 
-  //     routingControl.addTo(map);
-  //     const controlContainer = routingControl.getContainer();
-  //     if (controlContainer) {
-  //       controlContainer.style.display = "none";
-  //     }
+      routingControl.addTo(map);
+      const controlContainer = routingControl.getContainer();
+      if (controlContainer) {
+        controlContainer.style.display = "none";
+      }
 
-  //     return () => {
-  //       map.removeControl(routingControl);
-  //     };
-  //   }
-  // }, [origin, destination, onRouteCalculated]);
+      return () => {
+        map.removeControl(routingControl);
+      };
+    }
+  }, [origin, destination, onRouteCalculated]);
 
   // เช็คว่า origin และ destination มีค่าไหม
   if (!origin?.lat || !origin?.lng || !destination?.lat || !destination?.lng) {
@@ -127,13 +127,14 @@ function MapStatus({ origin, destination, onRouteCalculated }) {
         <div className="leaflet-container">
           <Geocoder origin={origin} destination={destination} />
         </div>
+
       </MapContainer>
 
       {loadingRoute && <p>กำลังคำนวณ...</p>}
-      {route && !loadingRoute && (
+      {routeInfo && !loadingRoute && (
         <div>
-          <p>ระยะทาง: {route.distance}</p>
-          <p>เวลา: {route.duration}</p>
+          <p>ระยะทาง: {routeInfo.distance}</p>
+          <p>เวลา: {routeInfo.duration}</p>
         </div>
       )}
       {routeError && <p>{routeError}</p>}

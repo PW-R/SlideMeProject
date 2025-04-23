@@ -47,3 +47,35 @@ exports.getOrder = async (req, res) => {
         res.status(500).json({ error: "An error occurred while retrieving the order budget" });
     }
 };
+
+// Get QR code from Shop_Info table by joining with OrderDetail
+exports.getQRCode = async (req, res) => {
+    const { orderId } = req.query;
+
+    if (!orderId) {
+        return res.status(400).json({ error: "Order ID is required" });
+    }
+
+    try {
+        const query = `
+            SELECT s.ShopQRcode 
+            FROM orderdetail o
+            JOIN shop_info s ON o.Shop_ID = s.Shop_ID
+            WHERE o.OrderDetail_ID = ?
+        `;
+        const [rows] = await pool.query(query, [orderId]);
+
+        if (rows.length === 0 || !rows[0].ShopQRcode) {
+            return res.status(404).json({ error: "QR Code not found" });
+        }
+
+        // Convert binary to base64
+        const qrBuffer = rows[0].ShopQRcode;
+        const base64QR = qrBuffer.toString("base64");
+
+        res.status(200).json({ qrCode: base64QR });
+    } catch (error) {
+        console.error("Error fetching QR code:", error);
+        res.status(500).json({ error: "An error occurred while fetching the QR code" });
+    }
+};

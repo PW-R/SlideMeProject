@@ -3,13 +3,31 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
+const reverseGeocodeNominatim = async (lat, lon) => {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`;
+
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    const address = data.display_name;
+    return address;
+  } catch (error) {
+    console.error("Nominatim error:", error);
+    return null;
+  }
+};
+
 function OrderConfirmation() {
   const navigate = useNavigate();
   const [completeDetail, setCompleteDetail] = useState("");
   const [images, setImages] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [orderInfo, setOrderInfo] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null); // ใช้สำหรับเก็บข้อความแสดงข้อผิดพลาด
   const orderId = 1;
+  const [startLocation, setStartLocation] = useState("");
+  const [endLocation, setEndLocation] = useState("");
 
   // อัปโหลดภาพหลายภาพ
   const handleMultipleImagesChange = (e) => {
@@ -25,6 +43,18 @@ function OrderConfirmation() {
   };
 
   const handleSubmit = async () => {
+    if (!completeDetail) {
+      setError("กรุณากรอกข้อมูลเพิ่มเติม");
+      return;
+    }
+
+    if (selectedFiles.length === 0) {
+      setError("กรุณาอัปโหลดรูปภาพ");
+      return;
+    }
+
+    setLoading(true);
+    setError(null); // ล้างข้อความข้อผิดพลาดก่อนการส่งคำขอใหม่
     const formData = new FormData();
     formData.append("orderId", orderId);
     formData.append("completeDetail", completeDetail);
@@ -33,29 +63,56 @@ function OrderConfirmation() {
     }
 
     try {
-      await axios.post("http://localhost:3000//complete-order/:OrderDetail_ID", formData, {
+      await axios.post(`http://localhost:3000/complete-order/${orderId}`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       navigate("/OrderStatusList");
     } catch (err) {
       console.error("Error submitting complete order:", err);
+      setError("เกิดข้อผิดพลาดในการส่งคำขอ");
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     const fetchOrderDetail = async () => {
+      setLoading(true);
       try {
-        const res = await axios.get(
-          `http://localhost:3000/api/OrderDetail/${orderId}`
-        );
+        const res = await axios.get(`http://localhost:3000/api/OrderDetail/${orderId}`);
         setOrderInfo(res.data);
       } catch (err) {
         console.error("Error loading order detail:", err);
+        setError("เกิดข้อผิดพลาดในการดึงข้อมูลออเดอร์");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchOrderDetail();
   }, [orderId]);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    if (orderInfo && orderInfo.Start_Lat && orderInfo.Start_Lng && orderInfo.End_Lat && orderInfo.End_Lng) {
+      const fetchLocations = async () => {
+        const startAddress = await reverseGeocodeNominatim(orderInfo.Start_Lat, orderInfo.Start_Lng);
+        const endAddress = await reverseGeocodeNominatim(orderInfo.End_Lat, orderInfo.End_Lng);
+
+        if (isMounted) {
+          setStartLocation(startAddress);
+          setEndLocation(endAddress);
+        }
+      };
+
+      fetchLocations();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [orderInfo]);
 
   return (
     <div className="pb-32 bg-white min-h-screen">
@@ -69,7 +126,9 @@ function OrderConfirmation() {
 
       {/* Main content */}
       <div className="pt-[130px] px-4 space-y-4">
-        {orderInfo ? (
+        {loading ? (
+          <div className="text-center text-gray-500">กำลังโหลดข้อมูล...</div>
+        ) : orderInfo ? (
           <>
             {/* Customer Info */}
             <div className="flex items-center space-x-3">
@@ -88,13 +147,13 @@ function OrderConfirmation() {
                 <div className="text-red-500 mt-1">
                   <i className="bi bi-geo-alt-fill"></i>
                 </div>
-                <div>{orderInfo.startLocation}</div>
+                <div>{startLocation}</div>
               </div>
               <div className="flex items-start space-x-2">
                 <div className="text-green-500 mt-1">
                   <i className="bi bi-geo-alt-fill"></i>
                 </div>
-                <div>{orderInfo.endLocation}</div>
+                <div>{endLocation}</div>
               </div>
             </div>
 
@@ -119,10 +178,11 @@ function OrderConfirmation() {
             </div>
           </>
         ) : (
-          <div className="text-center text-gray-500">
-            กำลังโหลดข้อมูลออเดอร์...
-          </div>
+          <div className="text-center text-gray-500">ไม่พบข้อมูลออเดอร์</div>
         )}
+
+        {/* Error Message */}
+        {error && <div className="text-red-500 text-center">{error}</div>}
 
         {/* Additional Input */}
         <textarea
@@ -135,16 +195,12 @@ function OrderConfirmation() {
         {/* Image Upload + Preview */}
         <div>
           <label className="block mb-1 text-sm font-medium">เพิ่มรูปภาพ:</label>
-
-          {/* ปุ่มแทน input */}
           <label
             htmlFor="image-upload"
             className="inline-block cursor-pointer text-center border !border-green-400 text-green-600 px-4 py-2 rounded-lg w-full text-sm hover:bg-green-50 transition"
           >
             เพิ่มรูปภาพ
           </label>
-
-          {/* ซ่อน input แล้วใช้ label ด้านบนแทน */}
           <input
             id="image-upload"
             type="file"
@@ -152,8 +208,6 @@ function OrderConfirmation() {
             onChange={handleMultipleImagesChange}
             className="hidden"
           />
-
-          {/* Preview รูปภาพ */}
           <div className="grid grid-cols-2 gap-2 mt-3">
             {images.map((img, idx) => (
               <div key={idx} className="relative">
@@ -179,7 +233,7 @@ function OrderConfirmation() {
             onClick={handleSubmit}
             className="bg-[#0dc964] text-white px-10 py-2 rounded-full shadow font-semibold"
           >
-            ส่งงาน
+            {loading ? "กำลังส่งข้อมูล..." : "ส่งงาน"}
           </button>
         </div>
       </div>

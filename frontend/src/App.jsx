@@ -70,6 +70,7 @@ import OrderConfirmation from "./components/Driver/ListDriver/IncomingOrder/Orde
 import OrderSchedue from "./components/Driver/ListDriver/OrderSchedue";
 import PendingOrderLocation from "./components/Driver/ListDriver/OrderLocation/PendingOrderLocation";
 import DriverMessage from "./components/Driver/DriverMessage";
+import StoreMapPicker from "./components/CreatestoreAndJoin/StoreMapPicker";
 
 
 import "./index.css";
@@ -135,6 +136,8 @@ function App() {
                 <Route path="UserMassage" element={<UserMassage />} />
                 <Route path="AllCoupon" element={<AllCoupon />} />
               </Route>
+            {/* Map */}
+              <Route path="/StoreMapPicker" element={<StoreMapPicker/>} />
 
             {/* Driver */}
             <Route element={<DriverLayout />}>

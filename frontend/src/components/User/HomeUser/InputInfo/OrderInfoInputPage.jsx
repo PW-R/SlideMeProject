@@ -31,18 +31,18 @@ function OrderInfoInputPage() {
 
 
   // ฟังก์ชันแปลงพิกัดเป็นที่อยู่
-  // const fetchAddress = async (lat, lon) => {
-  //   try {
-  //     const response = await fetch(
-  //       `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=th,en`
-  //     );
-  //     const data = await response.json();
-  //     return data.display_name || "ไม่สามารถดึงข้อมูลที่อยู่ได้";
-  //   } catch (error) {
-  //     console.error("Error fetching address:", error);
-  //     return "ไม่สามารถดึงข้อมูลที่อยู่ได้";
-  //   }
-  // };
+  const fetchAddress = async (lat, lon) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&accept-language=th,en`
+      );
+      const data = await response.json();
+      return data.display_name || "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+    } catch (error) {
+      console.error("Error fetching address:", error);
+      return "ไม่สามารถดึงข้อมูลที่อยู่ได้";
+    }
+  };
 
   // อัปเดตที่อยู่เมื่อ origin หรือ destination เปลี่ยน
   useEffect(() => {
@@ -124,6 +124,10 @@ function OrderInfoInputPage() {
       return;
     }
 
+    // Fetch the phone number from localStorage
+    const phoneNumber = localStorage.getItem("phoneNumber");
+
+    // Prepare the order data
     const InputOrderData = {
       startLat: origin?.position?.lat || null,
       startLng: origin?.position?.lng || null,
@@ -139,8 +143,9 @@ function OrderInfoInputPage() {
       driverCarType,
       orderDateTime: serviceType === "กำหนดเรียก" ? dateTime : null,
       orderBudget,
+      Order_UserName: phoneNumber // Add phone number to Order_UserName field
     };
-    console.log(InputOrderData); // เพื่อดูว่าใน `InputOrderData` มีค่าตำแหน่งที่ถูกต้องหรือไม่
+    console.log(InputOrderData); // Check if the phone number is correctly added to the data
 
     sessionStorage.setItem("slideCarInfo", JSON.stringify(InputOrderData));
 
@@ -158,8 +163,8 @@ function OrderInfoInputPage() {
       console.error("❌ Error saving data:", err);
       alert("ไม่สามารถส่งข้อมูลไปยังเซิร์ฟเวอร์ได้");
     }
-  };
-  
+};
+
 
   // useEffect(() => {
   //   const storedOrigin = sessionStorage.getItem("setOrigin");

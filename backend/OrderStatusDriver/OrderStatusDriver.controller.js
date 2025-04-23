@@ -7,44 +7,70 @@ exports.getOrderStatuses = async (req, res) => {
     const conn = await pool.getConnection();
     const [rows] = await conn.query(`
       SELECT 
-        os.*, 
-        od.Order_UserName AS customerName,
-        od.Start_Location AS startLocation, 
-        od.End_location AS endLocation
-      FROM OrderStatus_Driver os
-      INNER JOIN OrderDetail od ON os.ID = od.OrderDetail_ID
+      OrderDetail_ID,
+        OfferStatus,
+        Order_UserName,
+        Start_Lat,
+        Start_Lng,
+        End_Lat,
+        End_Lng,
+        DriverCar_type,
+        Car_Brand,
+        UserCar_type,
+        License_Plate,
+        CarYear,
+        Note,
+        Order_Date_time,
+        Order_Budget,
+        Order_Status
+      FROM OrderDetail
     `);
     conn.release();
     res.status(200).json(rows);
   } catch (err) {
-    console.error("Error fetching order statuses:", err);
+    console.error("Error fetching order details:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };
 
+// ดึงข้อมูลตาม ID
 exports.getOrderStatusById = async (req, res) => {
   const { id } = req.params;
   try {
     const conn = await pool.getConnection();
-    const [rows] = await conn.query(`
+    const [rows] = await conn.query(
+      `
       SELECT 
-        os.*, 
-        od.Order_UserName AS customerName,
-        od.Start_Location AS startLocation, 
-        od.End_location AS endLocation
-      FROM OrderStatus_Driver os
-      INNER JOIN OrderDetail od ON os.ID = od.OrderDetail_ID
-      WHERE os.ID = ?
-    `, [id]);
+      OrderDetail_ID,
+        OfferStatus,
+        Order_UserName,
+        Start_Lat,
+        Start_Lng,
+        End_Lat,
+        End_Lng,
+        DriverCar_type,
+        Car_Brand,
+        UserCar_type,
+        License_Plate,
+        CarYear,
+        Note,
+        Order_Date_time,
+        Order_Budget,
+        Order_Status
+      FROM OrderDetail
+      WHERE OrderDetail_ID = ?
+    `,
+      [id]
+    );
     conn.release();
 
     if (rows.length === 0) {
-      return res.status(404).json({ error: "Order status not found" });
+      return res.status(404).json({ error: "Order not found" });
     }
 
     res.status(200).json(rows[0]);
   } catch (err) {
-    console.error("Error fetching order status by ID:", err);
+    console.error("Error fetching order detail by ID:", err);
     res.status(500).json({ error: "Internal server error" });
   }
 };

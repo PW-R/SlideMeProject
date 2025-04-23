@@ -26,6 +26,8 @@ const PresetLocationRoutes = require("./presetLocation/presetLocation.routes");
 // Asia's API
 const couponRoutes = require('./coupon/coupon.routes');
 const orderdetailRoutes = require('./orderdetail/order.routes');
+const reviewRoutes = require('./review/review.routes'); 
+
 
 // -----------------------------Driver----------------------------
 //Bua API
@@ -38,7 +40,10 @@ const completeOrder = require("./CompleteOrder/CompleteOrder.routes");
 const upload = require("./CompleteOrder/CompleteOrder.middleware");
 const orderStatusRoutes = require("./OrderStatusDriver/OrderStatusDriver.routes");
 const driverMessageRoutes = require("./DriverMessage/DriverMessage.routes");
-const acceptAbleWorkRoutes = require('./AcceptAbleWork/AcceptAbleWork.routes.js');
+const acceptableWorkRoutes = require('./AcceptAbleWork/AcceptAbleWork.routes');
+const driverofferRoutes = require('./DriverOffer/DriverOffer.routes');
+// const offerStatusRoutes = require("./OfferStatus/OfferStatus.routes");
+const offerStatusRoutes = require("./OfferStatus/OfferStatus.routes");
 
 const app = express();
 dotenv.config();
@@ -69,6 +74,26 @@ app.get("/", (req, res) => {
 });
 app.use("/uploads", express.static("uploads"));
 
+app.get("/api/route", async (req, res) => {
+  const { start, end } = req.query;
+
+  if (!start || !end) {
+    return res.status(400).json({ error: "Missing start or end query params" });
+  }
+
+  try {
+    const url = `https://router.project-osrm.org/route/v1/driving/${start};${end}?overview=full&geometries=geojson`;
+    const response = await fetch(url);
+    const data = await response.json();
+    res.json(data);
+  } catch (err) {
+    console.error("Error fetching from OSRM:", err);
+    res.status(500).json({ error: "Failed to fetch route from OSRM" });
+  }
+});
+
+
+
 // ----------------------------Use API routes-----------------------------------
 //amm API routes
 app.use("/api/input-order", InputOrderRoutes); // For InputOrder routes
@@ -85,6 +110,7 @@ app.use("/api/loginUser", loginUserRoutes);
 // Asia's API routes
 app.use("/api/coupons", couponRoutes); // For coupon routes
 app.use("/api/order-details", orderdetailRoutes); // For order details routes
+app.use('/api/review', reviewRoutes); // 
 
 //-------------------- Driver API routes-----------------------
 // Bua API routes
@@ -98,7 +124,10 @@ app.use("/api/order-history", orderHistoryRoutes);
 app.use("/api/complete-order/:OrderDetail_ID", upload.single("CompletePhoto"), completeOrder);
 app.use("/api", orderStatusRoutes);
 app.use("/api/driver-message", driverMessageRoutes);
-app.use("/api/accept-able-work", acceptAbleWorkRoutes);
+app.use("/api/acceptable-work", acceptableWorkRoutes);
+app.use("/api/driver-offer", driverofferRoutes);
+// app.use("/api/offer-status", offerStatusRoutes);
+app.use("/api/offer-status", offerStatusRoutes);
 
 
 

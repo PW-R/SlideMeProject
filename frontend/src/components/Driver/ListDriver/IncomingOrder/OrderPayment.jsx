@@ -1,10 +1,37 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+
 function OrderPayment() {
   const navigate = useNavigate();
   const [price, setPrice] = useState("");
   const [items, setItems] = useState([{ name: "", quantity: "", price: "" }]);
   const [total, setTotal] = useState(0);
+  const { state } = useLocation();
+  const order = state?.order;
+
+  const [startPlace, setStartPlace] = useState(null);
+  const [endPlace, setEndPlace] = useState(null);
+  useEffect(() => {
+    if (order?.Start_Lat && order?.Start_Lng) {
+      fetchPlaceName(order.Start_Lat, order.Start_Lng, setStartPlace);
+    }
+    if (order?.End_Lat && order?.End_Lng) {
+      fetchPlaceName(order.End_Lat, order.End_Lng, setEndPlace);
+    }
+  }, [order]);
+
+  const fetchPlaceName = async (lat, lng, setter) => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=17&addressdetails=1`
+      );
+      const data = await res.json();
+      setter(data.display_name);
+    } catch (err) {
+      console.error("❌ ดึงชื่อสถานที่ล้มเหลว:", err);
+      setter(null);
+    }
+  };
 
   useEffect(() => {
     calculateTotal();
@@ -14,14 +41,88 @@ function OrderPayment() {
     const basePrice = parseFloat(price) || 0;
     const accessoryTotal = items.reduce((acc, item) => {
       const itemPrice = parseFloat(item.price) || 0;
-      return acc + itemPrice;
+      const quantity = parseInt(item.quantity) || 0;
+      return acc + itemPrice * quantity;
     }, 0);
     setTotal(basePrice + accessoryTotal);
   };
+  const driverId = sessionStorage.getItem("driverId");
+  const generatePayload = () => ({
+    orderId: order?.Order_ID,
+    basePrice: parseFloat(price),
+    totalPrice: total,
+    driverId: parseInt(driverId),
+    equipment: items.filter((item) => item.name && item.price),
+    serviceType: order?.Service_Type,
+  });
 
-  const handleOfferJob = () => {
-    navigate("/PendingOrderLocation");
+  const submitOffer = async () => {
+    try {
+      const payload = generatePayload();
+
+      const offerResponse = await fetch(
+        `http://localhost:3000/api/driver-offer/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+
+      if (!offerResponse.ok) {
+        const error = await offerResponse.json();
+        alert(
+          "เกิดข้อผิดพลาดในการเสนอราคา: " +
+            (error?.error || "ไม่สามารถส่งข้อมูลได้")
+        );
+        return;
+      }
+
+      const updateStatusResponse = await fetch(
+        `http://localhost:3000/api/offer-status/update-offer-status/${order?.OrderDetail_ID}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            status: "ตกลง",
+            driverId: parseInt(driverId),
+          }),
+        }
+      );
+
+      if (!updateStatusResponse.ok) {
+        const error = await updateStatusResponse.json();
+        alert(
+          "เกิดข้อผิดพลาดในการอัปเดตสถานะ: " +
+            (error?.error || "ไม่สามารถอัปเดตสถานะได้")
+        );
+        return;
+      }
+
+      alert("เสนองานและอัปเดตสถานะสำเร็จ");
+      navigate("/PendingOrderLocation", {
+        state: {
+          orderId: order?.Order_ID,
+          basePrice: parseFloat(price),
+          totalPrice: total,
+          equipment: items.filter((item) => item.name && item.price),
+          startLat: order?.Start_Lat,
+          startLng: order?.Start_Lng,
+          endLat: order?.End_Lat,
+          endLng: order?.End_Lng,
+        },
+      });
+      console.log("📦 OrderDetail_ID ที่ใช้:", order?.OrderDetail_ID);
+    } catch (err) {
+      console.error("Error submitting offer:", err);
+      alert("เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
+    }
   };
+
   const handleChangePrice = (e) => {
     const value = e.target.value;
     if (/^\d*$/.test(value)) {
@@ -61,35 +162,44 @@ function OrderPayment() {
           <i className="bi bi-geo-alt text-[1.5rem] text-[#0dc964] relative z-10 mt-3"></i>
         </div>
 
-        <div className="flex flex-col gap-4 ">
-          <p className="ml-2">
-            ทรูท ออร์ แดร์ 61 ถ. หลังสวน แขวงลุมพินี เขตปทุมวัน กรุงเทพมหานคร
-            10330
+        <div className="flex flex-col gap-4 ml-2 text-sm text-gray-600">
+          <p>
+            จุดเริ่มต้น:{" "}
+            {startPlace || `${order?.Start_Lat}, ${order?.Start_Lng}`}
           </p>
-          <p className="ml-2">
-            บัวรถสไลด์คาร์แคร์ 67/8 หมูู่ที่ 7 ตำบล มหาสวัสดิ์ อำเภอบางกรวย
-            นนทบุรี 11130
+          <p>
+            จุดปลายทาง: {endPlace || `${order?.End_Lat}, ${order?.End_Lng}`}
           </p>
         </div>
       </div>
 
-      <div className=" mt-4 ml-10 font-bold w-[300px] h-auto border-2 border-[#6FBB84] !rounded-[10px] p-3 leading-none ">
-        <p>#56665789-897</p>
-        <p>คุณพร บ่าวแม็ค</p>
-        <p>ประเภทการเรียก: เรียกทันที</p>
-        <p>ประเภทรถ: รถสไลด์ 6 ล้อ</p>
-        <p>ยี่ห้อ: Honda</p>
-        <p>ประเภทรถ: SUV</p>
-        <p>เลขทะเบียนรถ: กก-5578</p>
-        <p>ปีรถ : 2045</p>
+      <div className="mt-4 ml-10 font-bold w-[300px] h-auto border-2 border-[#6FBB84] !rounded-[10px] p-3 leading-none">
+        <p>#{order?.Order_ID}</p>
+        <p>{order?.Order_UserName}</p>
+        <p>ประเภทการเรียก: {order?.Service_Type}</p>
+        <p>ประเภทรถ: {order?.DriverCar_type}</p>
+        <p>ยี่ห้อ: {order?.Car_Brand}</p>
+        <p>ประเภทรถ: {order?.UserCar_type}</p>
+        <p>เลขทะเบียนรถ: {order?.License_Plate}</p>
+        <p>ปีรถ : {order?.CarYear}</p>
+        <p>หมายเหตุ : {order?.Note}</p>
         <p>
-          หมายเหตุ : รถยางแตกบนทางด่วนรั่วจนแบนขับต่อไม่ได้
-          หม้อระเบิดเกิดเป็นน้ำมันดิบ
-          อยากให้มาถึงภายใน10นาทีเนื่องจากต้องไปทำงานคะต้องการให้นำรถเข้าอู่เลย
+          วันที่บริการ :{" "}
+          {new Date(order?.Order_Date_time).toLocaleDateString("th-TH", {
+            weekday: "long",
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
         </p>
-        <p>วันที่บริการ : วันจันทร์ 21 กันยายน 2569</p>
-        <p>เวลา 12.50</p>
-        <p>งบประมาณ : 3,000 บาท</p>
+        <p>
+          เวลา:{" "}
+          {new Date(order?.Order_Date_time).toLocaleTimeString("th-TH", {
+            hour: "2-digit",
+            minute: "2-digit",
+          })}
+        </p>
+        <p>งบประมาณ : {parseFloat(order?.Order_Budget).toLocaleString()} บาท</p>
       </div>
 
       <div className="flex flex-col m-4">
@@ -135,7 +245,7 @@ function OrderPayment() {
                 onChange={(e) =>
                   handleChangeItem(index, "price", e.target.value)
                 }
-                placeholder="ราคารวม"
+                placeholder="ราคาต่อชิ้น"
                 className="border-2 border-[#6FBB84] rounded-lg px-3 py-2 w-full"
               />
             </div>
@@ -156,18 +266,30 @@ function OrderPayment() {
         </button>
 
         <hr className="my-4" />
+        <p className="text-md font-semibold">
+          ราคาที่เสนอ: {parseFloat(price || 0).toLocaleString()} บาท
+        </p>
+        <p className="text-md font-semibold">
+          ค่าอุปกรณ์เสริม:{" "}
+          {items
+            .reduce((acc, item) => {
+              const itemPrice = parseFloat(item.price) || 0;
+              const quantity = parseInt(item.quantity) || 0;
+              return acc + itemPrice * quantity;
+            }, 0)
+            .toLocaleString()}{" "}
+          บาท
+        </p>
         <p className="text-xl font-bold text-green-700">
           ยอดรวมทั้งหมด: {total.toLocaleString()} บาท
         </p>
       </div>
 
-      <button
-        type="button"
-        className="btn btn-success"
-        onClick={handleOfferJob}
-      >
-        เสนองาน
-      </button>
+      <div className="flex justify-center">
+        <button type="button" className="btn btn-success" onClick={submitOffer}>
+          เสนองาน
+        </button>
+      </div>
     </div>
   );
 }

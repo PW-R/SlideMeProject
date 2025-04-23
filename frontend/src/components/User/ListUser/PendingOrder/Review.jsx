@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function StarRating({ label, rating, setRating }) {
   return (
@@ -30,31 +30,49 @@ function Review() {
   const [fairPrice, setFairPrice] = useState(0);
   const [driverAttitude, setDriverAttitude] = useState(0);
   const [comment, setComment] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
+  const [extraDetail, setExtraDetail] = useState("");
+
+  const orderId = 123; // จะปรับให้ dynamic ภายหลังได้
+
+  useEffect(() => {
+    fetch(`/api/review/${orderId}/complete`)
+      .then((res) => res.json())
+      .then((data) => {
+        setPhotoUrl(data.CompletePhoto);
+        setExtraDetail(data.CompleteDetail);
+      })
+      .catch((err) => {
+        console.error("Error loading review info:", err);
+      });
+  }, [orderId]);
 
   return (
     <div style={{ overflow: "hidden" }}>
-      {/* Header */}
       <div className="relative bg-[#0DC964] shadow-[0_0_10px_#969696] h-[115px] flex items-end justify-center pb-2 rounded-b-3xl z-[3000]">
         <h1 className="text-white text-xl font-bold">รีวิว</h1>
       </div>
 
-      {/* Icons */}
-      <div className="flex items-center justify-center mt-4">
-  <div className="w-20 h-20 bg-gray-200 rounded-full flex justify-center items-center z-10">
-    <i className="fas fa-car text-xl text-gray-700"></i>
-  </div>
-  <div className="w-20 h-20 bg-red-200 rounded-full flex justify-center items-center -ml-8 z-0">
-    <i className="fas fa-user text-xl text-gray-700"></i>
-  </div>
-</div>
+      {photoUrl && (
+        <div className="m-4">
+          <img
+            src={photoUrl}
+            alt="ภาพรถ"
+            className="w-full h-auto rounded-lg shadow-md"
+          />
+        </div>
+      )}
 
+      {extraDetail && (
+        <div className="mx-4 mb-4 p-3 border border-gray-300 rounded-md text-sm bg-white shadow-sm">
+          <strong>ข้อมูลเพิ่มเติม:</strong> {extraDetail}
+        </div>
+      )}
 
-      {/* Shop Name */}
       <div className="text-center mt-2 mb-4">
         <h2 className="text-lg font-semibold">ชื่อร้านค้า</h2>
       </div>
 
-      {/* Ratings */}
       <div className="m-6">
         <h3 className="font-semibold text-lg mb-2">ให้คะแนน</h3>
         <StarRating label="ตรงต่อเวลา" rating={onTime} setRating={setOnTime} />
@@ -71,7 +89,6 @@ function Review() {
         />
       </div>
 
-      {/* Comment Section */}
       <div className="m-4 mb-2">
         <textarea
           className="w-full p-3 border border-gray-300 rounded-lg shadow-sm"
@@ -84,9 +101,8 @@ function Review() {
 
       <button
         style={{ borderRadius: "50px" }}
-        className=" w-[340px] mx-auto bg-[#0DC964] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#0bb558] transition duration-200 m-6 block"
+        className="w-[340px] mx-auto bg-[#0DC964] text-white font-semibold py-2 px-4 rounded-lg shadow-md hover:bg-[#0bb558] transition duration-200 m-6 block"
         onClick={() => {
-          // You can replace this alert with your actual submit logic
           alert("ความคิดเห็นถูกบันทึกแล้ว!");
         }}
       >

@@ -3,13 +3,15 @@ import { useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet-routing-machine";
 import "leaflet-routing-machine/dist/leaflet-routing-machine.css";
+import "leaflet-control-geocoder"; 
 
 const LeafletRoutingMachine = ({ onRouteStart }) => {
   const map = useMap();
   const markerOneRef = useRef(null);
   const routingControlRef = useRef(null);
+
   const defaultIcon = L.icon({
-    iconUrl: "src/pic/tow-truck.png",
+    iconUrl: "/pic/tow-truck.png",
     iconSize: [25, 25],
   });
 
@@ -22,11 +24,13 @@ const LeafletRoutingMachine = ({ onRouteStart }) => {
 
     let destinationMarker = null;
 
-    map.on("click", function (e) {
+    const handleMapClick = (e) => {
+      console.log("Map clicked at:", e.latlng);
+
       if (destinationMarker) {
-        destinationMarker.setLatLng([e.latlng.lat, e.latlng.lng]);
+        destinationMarker.setLatLng(e.latlng);
       } else {
-        destinationMarker = L.marker([e.latlng.lat, e.latlng.lng]).addTo(map);
+        destinationMarker = L.marker(e.latlng).addTo(map);
       }
 
       if (routingControlRef.current) {
@@ -42,7 +46,7 @@ const LeafletRoutingMachine = ({ onRouteStart }) => {
           styles: [{ color: "#EF1D33", opacity: 1, weight: 3 }],
         },
         routeWhileDragging: false,
-        geocoder: L.Control.Geocoder.nominatim(),
+        geocoder: L.Control.Geocoder?.nominatim?.(),
         addWaypoints: false,
         draggableWaypoints: false,
         fitSelectedRoutes: true,
@@ -55,6 +59,7 @@ const LeafletRoutingMachine = ({ onRouteStart }) => {
           if (onRouteStart) {
             onRouteStart(totalSteps);
           }
+
           routeCoordinates.forEach((c, i) => {
             setTimeout(() => {
               markerOneRef.current.setLatLng([c.lat, c.lng]);
@@ -62,10 +67,12 @@ const LeafletRoutingMachine = ({ onRouteStart }) => {
           });
         })
         .addTo(map);
-    });
+    };
+
+    map.on("click", handleMapClick);
 
     return () => {
-      map.off("click");
+      map.off("click", handleMapClick);
       if (routingControlRef.current) {
         map.removeControl(routingControlRef.current);
       }

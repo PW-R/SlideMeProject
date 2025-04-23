@@ -1,11 +1,170 @@
+/**
+ * @swagger
+ * /store:
+ *   post:
+ *     summary: สร้างร้านค้าใหม่
+ *     description: ใช้สำหรับผู้จัดการในการสร้างร้านใหม่ พร้อมอัปโหลด PromptPay และภาพร้านหลายรูป
+ *     tags:
+ *       - Store
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - address
+ *               - phone
+ *               - password
+ *               - managerName
+ *               - info
+ *               - service
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: "ร้านคาเฟ่ข้างทาง"
+ *               address:
+ *                 type: string
+ *                 example: "123/4 ถนนสุขุมวิท กทม."
+ *               phone:
+ *                 type: string
+ *                 example: "0812345678"
+ *               password:
+ *                 type: string
+ *                 example: "shop1234"
+ *               managerName:
+ *                 type: string
+ *                 example: "คุณสมชาย"
+ *               info:
+ *                 type: string
+ *                 example: "ร้านกาแฟสดและขนมโฮมเมด"
+ *               service:
+ *                 type: string
+ *                 example: "เครื่องดื่ม ขนม บริการส่ง"
+ *               vehicles:
+ *                 type: string
+ *                 description: JSON string เช่น `[{"model":"Toyota","license":"1234"}]`
+ *               promptpay:
+ *                 type: string
+ *                 format: binary
+ *               images:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *     responses:
+ *       201:
+ *         description: สร้างร้านสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "สร้างร้านสำเร็จ"
+ *       500:
+ *         description: เกิดข้อผิดพลาดในระบบ
+ */
+
+/**
+ * @swagger
+ * /store/me:
+ *   get:
+ *     summary: ดูข้อมูลร้านของฉัน
+ *     description: ใช้ดึงข้อมูลร้านที่ตัวเองเป็นผู้จัดการ หรือร้านที่คนขับสังกัดอยู่ (เฉพาะที่ได้รับการอนุมัติ)
+ *     tags:
+ *       - Store
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: คืนข้อมูลร้านของผู้ใช้
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 Shop_ID:
+ *                   type: integer
+ *                 Shop_Name:
+ *                   type: string
+ *                 Shop_Location:
+ *                   type: string
+ *                 Shop_Phone:
+ *                   type: string
+ *                 Shop_Manager_Name:
+ *                   type: string
+ *                 Shop_Info:
+ *                   type: string
+ *                 Shop_Service:
+ *                   type: string
+ *                 ShopImages:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 ShopQRCode:
+ *                   type: string
+ *                 Shop_Status:
+ *                   type: string
+ *                   enum: [open, closed]
+ *       404:
+ *         description: ไม่พบร้าน
+ *       500:
+ *         description: เกิดข้อผิดพลาดจาก server
+ */
+
+/**
+ * @swagger
+ * /store/toggle-status:
+ *   patch:
+ *     summary: สลับสถานะร้าน (เปิด / ปิด)
+ *     description: ผู้จัดการร้านสามารถเปลี่ยนสถานะร้านของตัวเองได้
+ *     tags:
+ *       - Store
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: เปลี่ยนสถานะร้านสำเร็จ
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "เปลี่ยนสถานะร้านเป็น closed แล้ว"
+ *       404:
+ *         description: ไม่พบร้านของคุณ
+ *       500:
+ *         description: เกิดข้อผิดพลาดจากระบบ
+ */
+
+
+
+
 const path = require("path");
 const fs = require("fs");
 const pool = require("../db");
 
 // ---------------------สร้างร้าน-------------------------
 exports.createStore = async (req, res) => {
-  const { name, address, phone, password, managerName, info, service } =
-    req.body;
+  const {
+    name,
+    address,
+    phone,
+    password,
+    managerName,
+    info,
+    service,
+    lat,
+    lng
+  } = req.body;
+  
 
   const managerId = req.userId;
   const promptpayFile = req.files?.promptpay?.[0];
@@ -37,8 +196,9 @@ exports.createStore = async (req, res) => {
     // 🔽 บันทึกลง Shop_Info
     const [insertResult] = await pool.query(
       `INSERT INTO Shop_Info 
-        (Shop_Name, Shop_Location, Shop_Phone, Shop_Password, Shop_Manager_Name, Shop_Info, Shop_Service, ShopImages, ShopQRCode, ShopManagerID, Shop_Status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open')`,
+        (Shop_Name, Shop_Location, Shop_Phone, Shop_Password, Shop_Manager_Name, Shop_Info, Shop_Service, ShopImages, ShopQRCode, ShopManagerID, Shop_Status, Shop_Lat, Shop_Lng)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'open', ?, ?)`,
+    
       [
         name,
         address,
@@ -50,6 +210,8 @@ exports.createStore = async (req, res) => {
         JSON.stringify(imagePaths), // ✅ เซฟเป็น string JSON
         promptpayPath,
         managerId,
+        parseFloat(lat),
+        parseFloat(lng)
       ]
     );
 

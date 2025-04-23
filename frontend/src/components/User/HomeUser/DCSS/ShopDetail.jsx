@@ -58,7 +58,7 @@ function ShopDetail() {
     console.log("orderId:", orderId);
     if (orderId) {
       axios
-        .get(`http://localhost:3000/api/InputOrder/order/${orderId}`)
+        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
         .then((response) => {
           console.log("ข้อมูลคำสั่งซื้อ:", response.data);
           setOrderData(response.data);
@@ -92,26 +92,31 @@ function ShopDetail() {
           </div>
 
           <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4 overflow-hidden">
-            <i class="bi bi-shop"></i>
-            <p className="mb-0">เกี่ยวกับ</p>
+            <p className="mb-0">
+              <i class="bi bi-shop"></i> เกี่ยวกับ
+            </p>
             <p>{selectedShopInfo}</p>
           </div>
 
           <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4">
-            <i class="bi bi-car-front"></i>
-            <p className="mb-0">บริการ</p>
+            <p className="mb-0">
+              <i class="bi bi-car-front"></i> บริการ
+            </p>
             <p>{selectedShopService}</p>
           </div>
 
           <div className="w-[80%] h-[130px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4 overflow-hidden">
-            <i class="bi bi-geo-alt-fill"></i>
-            <p className="mb-0">ที่อยู่ร้าน</p>
+            <p className="mb-0">
+              <i class="bi bi-geo-alt-fill"></i> ที่อยู่ร้าน
+            </p>
             <p>{shopAddress}</p>
           </div>
 
-          <div className="w-[80%] h-[80px] p-2 mt-2">
-            <i class="bi bi-telephone-fill"></i>
-            <p>{selectedShopPhone}</p>
+          <div className="w-[80%] h-[80px] border-2 border-[#6FBB84] rounded-[15px] p-2 mt-4">
+            <p className="mb-0">
+              <i class="bi bi-telephone-fill"></i> เบอร์โทรศัพท์
+            </p>
+            <p className="mb-0">{selectedShopPhone}</p>
           </div>
         </div>
       </div>

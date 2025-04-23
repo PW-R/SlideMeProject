@@ -2,21 +2,25 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 function Receipt() {
-  const [timeLeft, setTimeLeft] = useState(30); // ตั้งเวลา
+  const [timeLeft, setTimeLeft] = useState(30);
   const [timerActive, setTimerActive] = useState(true);
+  const [qrPath, setQrPath] = useState(""); // Store image path like /uploads/xxx.png
   const navigate = useNavigate();
-  const { orderId } = useParams(); // ✅ ดึง orderId จาก URL
+  const { orderId } = useParams();
+
+  const BASE_URL = "http://localhost:3000"; // Adjust if deploying
 
   const handleDownload = async () => {
     try {
-      const response = await fetch(
-        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTNuLkhPGNWIidkCJNKzzUm7mw3b2e4F9sUQA&s"
-      );
+      if (!qrPath) return;
+  
+      const response = await fetch(`${BASE_URL}${qrPath}`);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
+  
       const link = document.createElement("a");
       link.href = url;
-      link.download = "QR-code_image.jpg";
+      link.download = "QR-code_image.png";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -25,6 +29,7 @@ function Receipt() {
       console.error("ดาวน์โหลดไม่สำเร็จ:", error);
     }
   };
+  
 
   useEffect(() => {
     if (timerActive && timeLeft > 0) {
@@ -47,7 +52,6 @@ function Receipt() {
               body: JSON.stringify({ status: "expired" }),
             }
           );
-
           if (!response.ok) throw new Error("Failed to update order status");
           console.log("✅ Order status updated");
         } catch (error) {
@@ -59,10 +63,29 @@ function Receipt() {
     }
   }, [timeLeft, orderId]);
 
+  useEffect(() => {
+    const fetchQRCode = async () => {
+      try {
+        const res = await fetch(`${BASE_URL}/api/qr?orderId=${orderId}`);
+        const data = await res.json();
+        setQrPath(data.qrCode); // ✅ backend ส่ง path มา เช่น /uploads/promptpay_abc.png
+      } catch (error) {
+        console.error("❌ Error fetching QR Code:", error);
+      }
+    };
+
+    if (orderId) {
+      fetchQRCode();
+    }
+  }, [orderId]);
+
   const formatTime = (seconds) => {
     const minutes = Math.floor(seconds / 60);
     const secondsLeft = seconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(2, "0")}`;
+    return `${String(minutes).padStart(2, "0")}:${String(secondsLeft).padStart(
+      2,
+      "0"
+    )}`;
   };
 
   return (
@@ -83,7 +106,11 @@ function Receipt() {
 
         <div className="mt-4">
           <img
-            src="https://upload.wikimedia.org/wikipedia/commons/d/d0/QR_code_for_mobile_English_Wikipedia.svg"
+            src={
+              qrPath
+                ? `${BASE_URL}${qrPath}`
+                : "https://via.placeholder.com/240"
+            }
             alt="QR Code"
             className="w-60 h-60 mx-auto"
           />

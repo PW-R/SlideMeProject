@@ -8,12 +8,15 @@ function UserLayout() {
   const hideNavBarRoutes = [
     "/StartPosition",
     "/Destination",
+    "/DriverDetail/:orderId",
     "/OrderStatusListUser",
     "/Receipt/:orderId",
     "/PaymentCompleted/:orderId",
     "/UserMassage",
   ];
-  const shouldHideNavBar = hideNavBarRoutes.includes(location.pathname);
+  const shouldHideNavBar = hideNavBarRoutes.some(route =>
+    location.pathname.startsWith(route.replace(/:orderId/, ""))
+  );
 
   return (
     <AppWrapper>

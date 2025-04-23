@@ -14,9 +14,17 @@ function OrderStatusListUser() {
   const [isLoading, setIsLoading] = useState(true);
   const [startAddress, setStartAddress] = useState("");
   const [endAddress, setEndAddress] = useState("");
-
+  
   const [origin, setOrigin] = useState({ lat: null, lng: null });
   const [destination, setDestination] = useState({ lat: null, lng: null });
+  console.log("Origin:", origin);
+  console.log("Destination:", destination);
+
+  const selectedDriverName = sessionStorage.getItem("selectedDriverName");
+  const selectedShopLat = sessionStorage.getItem("selectedShop_Lat");
+  const selectedShopLng = sessionStorage.getItem("selectedShop_Lng");
+  
+  console.log("Parsed ShopLat:", selectedShop_Lat, "ShopLng:", selectedShop_Lng);
 
   const reverseGeocode = async (lat, lng) => {
     try {
@@ -40,35 +48,46 @@ function OrderStatusListUser() {
   };
 
   useEffect(() => {
+    if (selectedShopLat && selectedShopLng) {
+      const lat = parseFloat(selectedShopLat);
+      const lng = parseFloat(selectedShopLng);
+
+      setOrigin({ lat, lng });
+      reverseGeocode(lat, lng).then(setStartAddress);
+    }
+  }, [selectedShopLat, selectedShopLng]);
+
+  useEffect(() => {
     if (orderData) {
-      console.log("ข้อมูลที่ได้จาก API:", orderData);
-      const {
-        // startLat,
-        // startLng,
-        endLat,
-        endLng,
-        shopLat,
-        shopLng,
-        serviceType,
-        driverCarType,
-        driverName,
-      } = orderData;
-      console.log("ShopLat:", shopLat, "ShopLng:", shopLng);
-      console.log("EndLat:", endLat, "EndLng:", endLng);
+      const { End_Lat, End_Lng } = orderData;
 
-      if (shopLat && shopLng) {
-        setOrigin({ lat: shopLat, lng: shopLng });
-        reverseGeocode(shopLat, shopLng).then(setStartAddress);
-      }
+      // ตรวจสอบว่า End_Lat และ End_Lng มีค่าและไม่เป็น null หรือ undefined
+      if (End_Lat && End_Lng) {
+        // แปลงจาก string เป็น number
+        const lat = parseFloat(End_Lat);
+        const lng = parseFloat(End_Lng);
 
-      if (endLat && endLng) {
-        setDestination({ lat: endLat, lng: endLng });
-        reverseGeocode(endLat, endLng).then(setEndAddress);
+        if (!isNaN(lat) && !isNaN(lng)) {
+          // ตั้งค่า destination
+          setDestination({ lat, lng });
+
+          // ทำการ reverseGeocode เพื่อหาที่อยู่
+          reverseGeocode(lat, lng).then((address) => {
+            setDestination((prev) => ({ ...prev, address }));
+          });
+        } else {
+          console.error(
+            "ค่าของ End_Lat หรือ End_Lng ไม่ถูกต้อง:",
+            End_Lat,
+            End_Lng
+          );
+        }
+      } else {
+        console.error("ข้อมูล End_Lat หรือ End_Lng ไม่สมบูรณ์");
       }
-    }  else {
-      console.log("⛔ orderData ยังไม่มีข้อมูล (null)");
     }
   }, [orderData]);
+  
   console.log("ข้อมูลที่ได้จาก API:", orderData);
 
 
@@ -77,7 +96,7 @@ function OrderStatusListUser() {
     console.log("orderId:", orderId);
     if (orderId) {
       axios
-        .get(`http://localhost:3000/api/InputOrder/order/${orderId}`)
+        .get(`http://localhost:3000/api/input-order/order/${orderId}`)
         .then((response) => {
           console.log("ข้อมูลคำสั่งซื้อ:", response.data);
           setOrderData(response.data);
@@ -117,44 +136,36 @@ function OrderStatusListUser() {
           />
         </div>
 
-        <div className="absolute bottom-0 w-full h-[320px] bg-white rounded-t-3xl z-[5000] p-4 overflow-y-auto shadow-[0_-4px_10px_rgba(0,0,0,0.2)] flex flex-col justify-between">
+        <div className="absolute bottom-0 w-full h-[270px] bg-white rounded-t-3xl z-[5000] p-6 overflow-y-auto shadow-[0_-4px_10px_rgba(0,0,0,0.2)] flex flex-col gap-3">
           {/* รายละเอียดรถ */}
           <div className="grid grid-cols-[2fr_1fr] m-0">
             {/* ฝั่งซ้าย */}
             <div className="mx-2">
-              <h3 className="font-bold">{orderData?.driverCarType}</h3>
-              {/* <p className="m-0 leading-6">
-                <i className="bi bi-car-front text-xl pr-2"></i>
-                {orderData?.driverCarType}
-              </p> */}
-              <p className="m-0 leading-6">
+              <h4 className="font-bold">
+                <i className="bi bi-car-front pr-2"></i>
+                {orderData?.DriverCar_type}
+              </h4>
+              <h4 className="m-0 leading-6">
                 <i className="bi bi-clock text-xl pr-2"></i>
-                {orderData?.serviceType}
-              </p>
+                {orderData?.ServiceType}
+              </h4>
             </div>
             {/* ฝั่งขวา */}
             <div className="mx-2 flex flex-col items-center justify-center">
               <img src="logo-black.svg" className="w-[80px]" />
-              {/* <p className="mb-0">เลขทะเบียน</p>
-              <p>No จังหวัด</p> */}
             </div>
           </div>
 
           {/* เส้นสีเทา */}
-          <hr className="border-t-2 border-gray-500 w-full m-0" />
+          <hr className="border-t-2 border-gray-500 w-full mt-0 mb-0" />
 
           {/* ข้อมูลคนขับ */}
           <div className="grid grid-cols-[2fr_5fr_1fr_1fr] items-center justify-items-center mb-2 mt-0">
             <img src="driver_logo.svg" className="w-[60px]" />
-
             <div className="text-left justify-self-start pl-2">
-              <p className="font-bold my-2 leading-none">
-                {orderData?.driverName}
-              </p>
-              <p className="font-bold my-2 leading-none">
-                <i className="bi bi-star-fill text-[#FFC30F] pr-1"></i>
-                ยังไม่ได้ทำ 4.9
-              </p>
+              <h5 className="font-bold my-2 leading-none">
+                {orderData?.driverName || "ยังไม่มีข้อมูลคนขับ"}
+              </h5>
             </div>
 
             <button

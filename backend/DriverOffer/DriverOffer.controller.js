@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const createOffer = async (req, res) => {
-  const { orderId, totalPrice, equipment, serviceType, driverId } = req.body;
+  const { orderId, totalPrice, equipment} = req.body;
 
   const connection = await pool.getConnection();
   try {
@@ -11,8 +11,8 @@ const createOffer = async (req, res) => {
 
     // 1. เพิ่มข้อมูลใน Driver_Offer
     const [offerResult] = await connection.query(
-      `INSERT INTO Driver_Offer (OrderDetail_ID, Total_Price, Driver_ID) VALUES (?, ?, ?)`,
-      [orderId, totalPrice, driverId]
+      `INSERT INTO Driver_Offer (OrderDetail_ID, Total_Price) VALUES (?, ?)`,
+      [orderId, totalPrice]
     );
 
     const offerId = offerResult.insertId;
@@ -27,8 +27,8 @@ const createOffer = async (req, res) => {
 
     // 3. เพิ่มข้อมูลใน OrderDetail โดยใช้ราคาจาก Driver_Offer ที่เพิ่งเพิ่ม
     await connection.query(
-      `UPDATE OrderDetail SET Total_Price = ? WHERE OrderDetail_ID = ?`,
-      [totalPrice, orderId]
+      `INSERT INTO OrderDetail (OrderDetail_ID, Total_Price) VALUES (?, ?)`,
+      [orderId, totalPrice]
     );
     
     

@@ -1,45 +1,38 @@
+// controllers/updateOfferStatus.controller.js
 const pool = require("../db");
 const dotenv = require("dotenv");
 dotenv.config();
 
 const updateOfferStatus = async (req, res) => {
+  const { orderDetailId, driverOfferId } = req.body;
 
-
-  const connection = await pool.getConnection();
   try {
+    const connection = await pool.getConnection();
     await connection.beginTransaction();
 
-    // อัปเดต OfferStatus ใน OrderDetail
-    const [orderResult] = await connection.query(
+    // 1. อัปเดต OrderDetail
+    await connection.query(
       `UPDATE OrderDetail
        SET OfferStatus = 'ตกลง'
        WHERE OrderDetail_ID = ? AND (OfferStatus = 'รอ' OR OfferStatus IS NULL)`,
-      [req.params.OrderDetail_ID]
+      [orderDetailId]
     );
 
-    // อัปเดต Offer_Status ใน Driver_Offer
-    const [driverOfferResult] = await connection.query(
+    // 2. อัปเดต Driver_Offer
+    await connection.query(
       `UPDATE Driver_Offer
        SET Offer_Status = 'ตกลง'
-       WHERE ID = ? AND Offer_Status = 'รอ'`,
-      [req.params.ID]
+       WHERE ID = ? AND (Offer_Status = 'รอ' OR Offer_Status IS NULL)`,
+      [driverOfferId]
     );
 
     await connection.commit();
-
-    return res.status(200).json({
-      message: "OfferStatus updated successfully",
-      rowsAffected: {
-        orderDetail: orderResult.affectedRows,
-        driverOffer: driverOfferResult.affectedRows,
-      },
-    });
-  } catch (error) {
-    await connection.rollback();
-    console.error("Error updating offer status:", error);
-    return res.status(500).json({ error: "Failed to update offer status" });
-  } finally {
     connection.release();
+
+    return res.status(200).json({ message: "อัปเดตสถานะข้อเสนอเรียบร้อยแล้ว" });
+  } catch (error) {
+    console.error("❌ Error:", error);
+    return res.status(500).json({ error: "ไม่สามารถอัปเดตสถานะข้อเสนอได้" });
   }
 };
 

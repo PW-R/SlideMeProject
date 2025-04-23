@@ -161,62 +161,51 @@ function DCSS() {
   };
 
   // ปุ่ม เลือก ( ไปหน้าถัดไป )
-  const handleSelectShops = async (store) => {
-    const driverId = Number(store.Driver_ID);
-    console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
+  // ปุ่ม เลือก ( ไปหน้าถัดไป )
+const handleSelectShops = async (store) => {
+  const driverId = Number(store.Driver_ID);
+  console.log("Driver ID ที่ส่งไป:", driverId, typeof driverId);
 
-    if (isNaN(driverId) || driverId <= 0) {
-      console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
-      alert("ไม่พบข้อมูลคนขับ");
-      return;
+  if (isNaN(driverId) || driverId <= 0) {
+    console.error("ไม่มี Driver_ID หรือ ID ไม่ถูกต้อง");
+    alert("ไม่พบข้อมูลคนขับ");
+    return;
+  }
+
+  try {
+    await axios.post(`http://localhost:3000/api/select-driver/${orderId}`, {
+      Driver_ID: driverId,
+    });
+
+    console.log("✅ บันทึกคนขับเรียบร้อย");
+
+    // ส่งข้อมูล
+    sessionStorage.setItem("selectedTotalPrice", store.total_price);
+    sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
+    sessionStorage.setItem("selectedDriverName", store.driver_name);
+    sessionStorage.setItem("selectedDriverYear", store.driver_year);
+    sessionStorage.setItem("selectedShop_Lat", store.lat);
+    sessionStorage.setItem("selectedShop_Lng", store.lng);
+    sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
+
+    console.log("📦 Store data:", store);
+
+    if (store.Shop_Lat && store.Shop_Lng) {
+      sessionStorage.setItem("selectedShop_Lat", store.Shop_Lat);
+      sessionStorage.setItem("selectedShop_Lng", store.Shop_Lng);
+      console.log("✅ เก็บค่าลง sessionStorage แล้ว:", store.Shop_Lat, store.Shop_Lng);
+    } else {
+      console.warn("❌ ไม่มีค่า Shop_Lat หรือ Shop_Lng:", store.Shop_Lat, store.Shop_Lng);
     }
 
-    try {
-      // const orderId = /* ดึงมาจาก useParams หรือ state */;
+    // ไปหน้า PaymentConfirm
+    navigate(`/PaymentConfirm/${orderId}`);
+  } catch (err) {
+    console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
+    alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
+  }
+};
 
-      await axios.post(`http://localhost:3000/api/SelectDriver/${orderId}`, {
-        Driver_ID: driverId,
-      });
-
-      console.log("✅ บันทึกคนขับเรียบร้อย");
-
-      // ส่งข้อมูล
-      sessionStorage.setItem("selectedTotalPrice", store.total_price);
-      sessionStorage.setItem("selectedEquipmentPrice", store.equipment);
-
-      sessionStorage.setItem("selectedDriverName", store.driver_name);
-      sessionStorage.setItem("selectedDriverYear", store.driver_year);
-      sessionStorage.setItem("selectedShop_Lat", store.lat);
-      sessionStorage.setItem("selectedShop_Lng", store.lng);
-      sessionStorage.setItem("selectedShop_Phone", store.shop_phone);
-      sessionStorage.setItem("selectedShop_Lat", store.lat);
-      sessionStorage.setItem("selectedShop_Lng", store.lng);
-      
-      console.log("📦 Store data:", store);
-
-      if (store.Shop_Lat && store.Shop_Lng) {
-        sessionStorage.setItem("selectedShop_Lat", store.Shop_Lat);
-        sessionStorage.setItem("selectedShop_Lng", store.Shop_Lng);
-        console.log(
-          "✅ เก็บค่าลง sessionStorage แล้ว:",
-          store.Shop_Lat,
-          store.Shop_Lng
-        );
-      } else {
-        console.warn(
-          "❌ ไม่มีค่า Shop_Lat หรือ Shop_Lng:",
-          store.Shop_Lat,
-          store.Shop_Lng
-        );
-      }
-
-      // ไปหน้า PaymentConfirm
-      navigate(`/PaymentConfirm/${orderId}`);
-    } catch (err) {
-      console.error("❌ บันทึกข้อมูลไม่สำเร็จ", err);
-      alert("เกิดข้อผิดพลาดในการเลือกร้าน / คนขับ");
-    }
-  };
 
   useEffect(() => {
     console.log("Origin:", origin); // ตรวจสอบค่าของ origin
